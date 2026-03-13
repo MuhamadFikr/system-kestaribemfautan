@@ -45,11 +45,11 @@
             box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
         }
 
-        .star-group { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+        .star-group { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 6px; }
         .star-group input { display: none; }
-        .star-group label { font-size: 1.8rem; color: #cbd5e1; cursor: pointer; transition: color 0.2s; }
+        .star-group label { font-size: 2.2rem; color: #cbd5e1; cursor: pointer; transition: transform 0.2s, color 0.2s; }
         .star-group label:hover, .star-group label:hover ~ label,
-        .star-group input:checked ~ label { color: #f59e0b; }
+        .star-group input:checked ~ label { color: #f59e0b; transform: scale(1.1); }
 
         .best-score-row {
             background-color: rgba(16, 185, 129, 0.08);
@@ -58,6 +58,11 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .success-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -71,19 +76,19 @@
                 </div>
             </div>
             <div class="text-center mb-10 relative z-20">
-                <h1 class="text-3xl font-black uppercase tracking-tight">RAPOR BEM FAHUTAN</h1>
+                <h1 class="text-3xl font-black uppercase tracking-tight leading-tight">RAPOR BEM FAHUTAN</h1>
                 <p class="text-purple-200 mt-2 font-bold tracking-widest text-sm italic">Kabinet Elaborasi Mimpi</p>
             </div>
             <div class="w-full space-y-6 relative z-30">
-                <input type="text" id="username" placeholder="Username" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium">
+                <input type="text" id="username" placeholder="Username (NIM)" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium shadow-inner">
                 <div class="relative">
-                    <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium">
+                    <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium shadow-inner">
                     <button type="button" onclick="togglePassword()" class="absolute right-5 top-4 text-white/70 hover:text-white">
                         <i data-lucide="eye" id="eye-icon" class="w-6 h-6"></i>
                     </button>
                 </div>
                 <button onclick="handleLogin()" id="login-btn" class="w-full py-4 bg-white text-purple-900 font-black rounded-2xl shadow-2xl hover:bg-purple-50 transition-all tracking-widest uppercase text-sm">MASUK</button>
-                <p id="login-error" class="text-red-300 text-xs font-bold text-center hidden animate-bounce uppercase mt-2">Kredensial Salah!</p>
+                <p id="login-error" class="text-red-300 text-xs font-bold text-center hidden animate-bounce uppercase">Username atau Password salah!</p>
             </div>
         </div>
     </div>
@@ -92,13 +97,25 @@
     <div id="main-app" class="hidden opacity-0 transition-opacity duration-1000">
         <!-- AI Motivation Popup -->
         <div id="affirmation-popup" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
-            <div class="glass bg-white p-10 rounded-[3rem] max-sm:w-full max-w-sm text-center shadow-2xl">
+            <div class="glass bg-white p-10 rounded-[3rem] max-w-sm w-full text-center shadow-2xl">
                 <div class="w-20 h-20 bg-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl rotate-6">
                     <i data-lucide="sparkles" class="text-white w-10 h-10"></i>
                 </div>
                 <h3 class="text-2xl font-black text-purple-950 mb-4 tracking-tight">Halo, Dreamakers! ✨</h3>
                 <p id="affirmation-text" class="text-slate-600 font-semibold leading-relaxed italic"></p>
                 <button onclick="document.getElementById('affirmation-popup').classList.add('hidden')" class="mt-8 px-10 py-3 bg-purple-700 text-white font-black rounded-2xl text-xs uppercase tracking-widest">Ayo Mulai</button>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 success-overlay hidden">
+            <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
+                <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="check-circle" class="text-emerald-500 w-12 h-12"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 mb-2">Terima Kasih!</h3>
+                <p class="text-slate-500 font-medium leading-relaxed">Jawaban Anda telah kami record dengan aman. Suara Anda sangat berharga bagi kemajuan kabinet.</p>
+                <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="mt-8 px-10 py-3 bg-emerald-500 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-emerald-600 transition-colors">Selesai</button>
             </div>
         </div>
 
@@ -157,7 +174,6 @@
             
             <!-- SECTION: RAPOR USER -->
             <div id="section-rapor" class="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                <!-- HERO CARD MATCHING IMAGE image_bca72e.png -->
                 <div class="bg-white rounded-[3.5rem] p-10 sm:p-14 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden">
                     <div class="absolute -right-32 -top-32 w-80 h-80 bg-purple-50 rounded-full opacity-40 blur-3xl"></div>
                     <div class="relative z-10 space-y-6 text-center md:text-left flex-grow">
@@ -219,23 +235,21 @@
             <!-- SECTION: SURVEI USER -->
             <div id="section-survei" class="hidden space-y-10 animate-in fade-in duration-700">
                 <div id="survey-list-container" class="space-y-12">
-                    <!-- Surveys will be injected here -->
+                    <!-- Intro Buttons or Active Surveys go here -->
                 </div>
             </div>
 
-            <!-- SECTION: PROFIL USER (MATCHING image_bca2b2.png) -->
+            <!-- SECTION: PROFIL USER -->
             <div id="section-profil" class="hidden space-y-10 animate-in fade-in duration-700 max-w-6xl mx-auto">
                 <div class="flex flex-col lg:flex-row gap-10">
-                    <!-- Left Card: Profile Overview -->
                     <div class="lg:w-1/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100 text-center flex flex-col items-center">
                         <div class="w-44 h-44 bg-purple-50 rounded-[3rem] flex items-center justify-center shadow-inner mb-10">
                             <i data-lucide="user" class="w-24 h-24 text-purple-400"></i>
                         </div>
-                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight">...</h2>
+                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight tracking-tighter">...</h2>
                         <p id="profile-nim-display" class="text-purple-400 font-black tracking-widest uppercase mt-3">...</p>
                     </div>
 
-                    <!-- Right Card: Detailed Organization Info -->
                     <div class="lg:w-2/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100">
                         <div class="flex items-center gap-5 mb-14 border-b border-slate-50 pb-8">
                             <div class="p-3.5 bg-purple-50 rounded-2xl">
@@ -243,10 +257,7 @@
                             </div>
                             <h3 class="text-2xl font-black text-slate-800 tracking-tight">Detail Organisasi</h3>
                         </div>
-                        
-                        <div id="profile-details" class="grid grid-cols-1 sm:grid-cols-2 gap-x-14 gap-y-12">
-                            <!-- Injected dynamically -->
-                        </div>
+                        <div id="profile-details" class="grid grid-cols-1 sm:grid-cols-2 gap-x-14 gap-y-12"></div>
                     </div>
                 </div>
             </div>
@@ -294,10 +305,8 @@
                             <button onclick="publishBPHVisitSurvey()" class="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">Publish ke Anggota</button>
                         </div>
                         <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 shadow-inner">
-                            <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Status Publikasi</p>
-                            <div id="admin-active-surveys" class="space-y-4">
-                                <!-- List here -->
-                            </div>
+                            <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Daftar Survei Berjalan</p>
+                            <div id="admin-active-surveys" class="space-y-4"></div>
                         </div>
                     </div>
                 </div>
@@ -308,7 +317,7 @@
 
     <script>
         const apiKey = ""; 
-        const scriptURL = "https://script.google.com/macros/s/AKfycbyaJdweJz9OuEq3_pFI-mY33HixPcVvCJxDvyXaTqvfJazvnqB8yjRVVgHO-KUhCiOW/exec";
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwiZvXx-FmrLmqGWHZIpOSlufhQ6OOjkE0hxFpcIxDEBSXH6WTXhhzteLvTeQ7uhPns/exec";
         const BASE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=0&single=true&output=csv";
         const TW_URLS = {
             1: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1910706860&single=true&output=csv",
@@ -319,7 +328,6 @@
         let currentUser = null, mainDB = [], twData = {1:[], 2:[], 3:[]}, myChart = null;
         let adminSortOrder = 'desc';
 
-        // --- AI ENGINE CORE (RE-ADDED) ---
         async function callGemini(prompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             try {
@@ -330,29 +338,21 @@
                 });
                 const data = await res.json();
                 return data.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (e) {
-                console.error("AI Gemini Error:", e);
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
         async function analyzeWithAI(twNum, data) {
             const resEl = document.getElementById('ai-result');
-            if (!resEl) return;
             resEl.textContent = "AI sedang melakukan analisis mendalam...";
             document.getElementById('ai-modal').classList.remove('hidden');
             document.getElementById('ai-loading').classList.remove('hidden');
-            document.getElementById('ai-result').classList.add('hidden');
-            
-            const prompt = `Berikan analisis kinerja profesional dan ramah untuk anggota BEM: Nama ${currentUser.Nama_Lengkap}, Biro ${currentUser.Biro_Departemen}, Triwulan ${twNum}. Skor Akhir: ${data.Nilai_Akhir}/4.00, Mutu: ${data.Mutu}. Jelaskan apa yang sudah baik dan apa yang bisa dikembangkan. Gunakan bahasa Indonesia.`;
-            
+            const prompt = `Berikan analisis kinerja profesional untuk: Nama ${currentUser.Nama_Lengkap}, Biro ${currentUser.Biro_Departemen}, Triwulan ${twNum}. Skor Akhir: ${data.Nilai_Akhir}/4.00. Analisis ramah dlm 3 paragraf.`;
             const result = await callGemini(prompt);
             document.getElementById('ai-loading').classList.add('hidden');
             resEl.classList.remove('hidden');
-            resEl.innerHTML = (result || "Analisis AI tidak tersedia saat ini karena masalah koneksi.").replace(/\n/g, '<br>');
+            resEl.innerHTML = (result || "Analisis tidak tersedia.").replace(/\n/g, '<br>');
         }
 
-        // Initialize Icons
         function refreshIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
 
         window.onload = async () => { refreshIcons(); await loadAllData(); };
@@ -363,17 +363,13 @@
                 twData[1] = await fetchCSV(TW_URLS[1]);
                 twData[2] = await fetchCSV(TW_URLS[2]);
                 twData[3] = await fetchCSV(TW_URLS[3]);
-                
                 const biros = [...new Set(mainDB.map(i => i.Biro_Departemen))].filter(b => b);
-                const targets = ['pub-survey-biro', 'admin-filter-biro'];
-                targets.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) biros.forEach(b => {
-                        const opt = document.createElement('option'); opt.value = b; opt.textContent = b;
-                        el.appendChild(opt);
-                    });
+                biros.forEach(b => {
+                    const opt = document.createElement('option'); opt.value = b; opt.textContent = b;
+                    document.getElementById('pub-survey-biro').appendChild(opt.cloneNode(true));
+                    document.getElementById('admin-filter-biro').appendChild(opt.cloneNode(true));
                 });
-            } catch (e) { console.error("Database error:", e); }
+            } catch (e) { console.error(e); }
         }
 
         async function fetchCSV(u) { return new Promise((res, rej) => Papa.parse(u, { download: true, header: true, skipEmptyLines: true, complete: r => res(r.data), error: e => rej(e) })); }
@@ -386,29 +382,22 @@
                 currentUser = { Nama_Lengkap: "Administrator", Role: "ADMIN", Biro_Departemen: "Admin", Jabatan: "Admin Pusat" }; showApp(); return; 
             }
             const user = mainDB.find(x => x.NIM === u && x.Password === p);
-            if (user) { currentUser = { ...user, Role: "USER" }; showApp(); } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
+            if (user) { currentUser = { ...user, Role: "USER" }; showApp(); } else document.getElementById('login-error').classList.remove('hidden');
         }
 
         async function showApp() {
             document.getElementById('login-screen').classList.add('hidden');
             const app = document.getElementById('main-app'); app.classList.remove('hidden');
             setTimeout(() => app.classList.add('opacity-100'), 10);
-
             const isAdmin = currentUser.Role === "ADMIN";
             document.querySelectorAll('.user-menu').forEach(m => m.style.display = isAdmin ? 'none' : 'flex');
             document.querySelectorAll('.admin-menu').forEach(m => m.style.display = isAdmin ? 'flex' : 'none');
-            
-            if (isAdmin) {
-                switchTab('admin-data');
-            } else {
-                switchTab('rapor');
-                populateUserData();
+            if (isAdmin) switchTab('admin-data'); else { 
+                switchTab('rapor'); 
+                populateUserData(); 
                 document.getElementById('affirmation-popup').classList.remove('hidden');
-                document.getElementById('affirmation-text').textContent = "Menghubungkan ke AI...";
-                const motivation = await callGemini(`Berikan 1 kalimat motivasi personal yang sangat pendek untuk ${currentUser.Nama_Lengkap} dari BEM FAHUTAN. Bahasa Indonesia.`);
-                document.getElementById('affirmation-text').textContent = motivation || "Semangat terus memberikan yang terbaik untuk FAHUTAN!";
+                const motivation = await callGemini(`Berikan 1 kalimat motivasi personal pendek untuk ${currentUser.Nama_Lengkap} anggota BEM FAHUTAN.`);
+                document.getElementById('affirmation-text').textContent = motivation || "Semangat memberikan yang terbaik!";
             }
             refreshIcons();
         }
@@ -416,23 +405,12 @@
         function animateNumber(id, start, end) {
             const obj = document.getElementById(id);
             if (!obj) return;
-            let current = parseFloat(start);
-            const target = parseFloat(end);
-            const duration = 2000;
-            const steps = 60;
-            const increment = (target - current) / steps;
-            
-            let count = 0;
+            let current = 0; const target = parseFloat(end);
             const timer = setInterval(() => {
-                count++;
-                current += increment;
-                if (count >= steps) {
-                    obj.textContent = target.toFixed(2);
-                    clearInterval(timer);
-                } else {
-                    obj.textContent = current.toFixed(2);
-                }
-            }, duration / steps);
+                current += target / 40;
+                if (current >= target) { obj.textContent = target.toFixed(2); clearInterval(timer); }
+                else obj.textContent = current.toFixed(2);
+            }, 30);
         }
 
         function populateUserData() {
@@ -441,51 +419,21 @@
             document.getElementById('display-nim').textContent = currentUser.NIM;
             document.getElementById('display-jabatan-hero').textContent = currentUser.Jabatan;
             document.getElementById('display-biro').textContent = currentUser.Biro_Departemen;
-            
-            const scores = [1,2,3].map(twNum => {
-                const data = twData[twNum].find(d => d.NIM === currentUser.NIM);
-                renderTW(`content-tw${twNum}`, data, twNum);
-                return data && data.Nilai_Akhir ? parseFloat(data.Nilai_Akhir) : null;
+            const scores = [1,2,3].map(tw => {
+                const d = twData[tw].find(x => x.NIM === currentUser.NIM);
+                renderTW(`content-tw${tw}`, d, tw);
+                return d && d.Nilai_Akhir ? parseFloat(d.Nilai_Akhir) : null;
             }).filter(s => s !== null);
-
-            const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : "0.00";
+            const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2) : "0.00";
             animateNumber('display-avg', 0, avg);
-            
             updateChart(scores);
-            const elTrend = document.getElementById('trend-text');
-            if (elTrend && scores.length >= 2) {
-                const diff = scores[scores.length-1] - scores[scores.length-2];
-                elTrend.textContent = diff > 0 ? "Meningkat" : diff < 0 ? "Menurun" : "Stabil";
-            }
-
-            // PROFIL MATCHING image_bca2b2.png
             const depts = { "E1": "Manajemen Hutan", "E2": "Teknologi Hasil Hutan", "E3": "Konservasi Sumberdaya Hutan dan Ekowisata", "E4": "Silvikultur" };
-            const detailsContainer = document.getElementById('profile-details');
-            if (detailsContainer) {
-                detailsContainer.innerHTML = `
-                    <div class="space-y-2">
-                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">DEPARTEMEN AKADEMIK</p>
-                        <p class="font-black text-slate-800 text-xl">${depts[currentUser.NIM?.substring(0, 2)] || "Fakultas Kehutanan"}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">BIRO / DEPARTEMEN BEM</p>
-                        <p class="font-black text-slate-800 text-xl">${currentUser.Biro_Departemen}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">JABATAN STRUKTURAL</p>
-                        <p class="font-black text-slate-800 text-xl">${currentUser.Jabatan}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">TANGGAL LAHIR</p>
-                        <p class="font-black text-slate-800 text-xl">${currentUser.Tanggal_Lahir || "-"}</p>
-                    </div>
-                    <div class="space-y-2 sm:col-span-2">
-                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">ALAMAT SUREL</p>
-                        <p class="font-black text-slate-800 text-xl break-all">${currentUser.Email || "-"}</p>
-                    </div>
-                `;
-            }
-            
+            document.getElementById('profile-details').innerHTML = `
+                <div><p class="text-[10px] text-slate-400 font-black">DEPARTEMEN AKADEMIK</p><p class="font-black text-slate-800 text-lg">${depts[currentUser.NIM?.substring(0,2)] || "Kehutanan"}</p></div>
+                <div><p class="text-[10px] text-slate-400 font-black">BIRO / DEPARTEMEN BEM</p><p class="font-black text-slate-800 text-lg">${currentUser.Biro_Departemen}</p></div>
+                <div><p class="text-[10px] text-slate-400 font-black">JABATAN STRUKTURAL</p><p class="font-black text-slate-800 text-lg">${currentUser.Jabatan}</p></div>
+                <div><p class="text-[10px] text-slate-400 font-black">TANGGAL LAHIR</p><p class="font-black text-slate-800 text-lg">${currentUser.Tanggal_Lahir || "-"}</p></div>
+                <div class="sm:col-span-2"><p class="text-[10px] text-slate-400 font-black">ALAMAT SUREL</p><p class="font-black text-slate-800 text-lg break-all">${currentUser.Email || "-"}</p></div>`;
             document.getElementById('profile-nama').textContent = currentUser.Nama_Lengkap;
             document.getElementById('profile-nim-display').textContent = currentUser.NIM;
             refreshIcons();
@@ -503,80 +451,54 @@
                         <div class="space-y-2">
                             <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest"><span>${l}</span><span>${v.toFixed(2)}/4.00</span></div>
                             <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="progress-bar-fill bg-${clr}-500 h-full" style="width: ${(v/4)*100}%"></div></div>
-                        </div>
-                    `).join('')}
+                        </div>`).join('')}
                     <div class="pt-8 border-t flex justify-between items-center">
-                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Skor Akhir</p><p class="text-4xl font-black text-slate-900 tracking-tighter">${f.toFixed(2)}</p></div>
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase">Skor Akhir</p><p class="text-4xl font-black text-slate-900 tracking-tighter">${f.toFixed(2)}</p></div>
                         <div class="flex gap-2">
-                            <button onclick='analyzeWithAI(${twNum}, ${JSON.stringify(data)})' class="p-3 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-all"><i data-lucide="sparkles" class="w-5 h-5"></i></button>
-                            <a href="${data.Link_Download}" target="_blank" class="p-4 bg-slate-50 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all"><i data-lucide="download" class="w-5 h-5"></i></a>
+                            <button onclick='analyzeWithAI(${twNum}, ${JSON.stringify(data)})' class="p-3 bg-purple-600 text-white rounded-xl ai-btn-glow"><i data-lucide="sparkles" class="w-5 h-5"></i></button>
+                            <a href="${data.Link_Download}" target="_blank" class="p-3 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100"><i data-lucide="download" class="w-5 h-5"></i></a>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
             refreshIcons();
         }
 
         function updateChart(pts) {
-            const canvas = document.getElementById('performanceChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (myChart) myChart.destroy();
+            const canvas = document.getElementById('performanceChart'); if (!canvas) return;
+            const ctx = canvas.getContext('2d'); if (myChart) myChart.destroy();
             myChart = new Chart(ctx, { type: 'line', data: { labels: ['TW1', 'TW2', 'TW3'], datasets: [{ data: pts, borderColor: '#7c3aed', borderWidth: 5, tension: 0.45, fill: true, backgroundColor: 'rgba(124, 58, 237, 0.05)', pointRadius: 6, pointBackgroundColor: '#FFF' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 4 } } } });
         }
 
         function switchTab(t) {
             document.querySelectorAll('nav button').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-slate-400'); });
             const btn = document.getElementById(`tab-${t}`); if (btn) { btn.classList.add('tab-active'); btn.classList.remove('text-slate-400'); }
-            ['rapor', 'survei', 'profil', 'admin-data', 'admin-survey'].forEach(s => {
-                const el = document.getElementById(`section-${s}`);
-                if (el) el.classList.add('hidden');
-            });
-            const target = document.getElementById(`section-${t}`);
-            if (target) target.classList.remove('hidden');
-            
+            ['rapor', 'survei', 'profil', 'admin-data', 'admin-survey'].forEach(s => { const el = document.getElementById(`section-${s}`); if (el) el.classList.add('hidden'); });
+            const target = document.getElementById(`section-${t}`); if (target) target.classList.remove('hidden');
             if (t === 'admin-data') renderAdmin();
-            if (t === 'survei') renderUserSurveys();
+            if (t === 'survei') renderUserSurveysIntro();
             if (t === 'admin-survey') renderAdminActiveSurveys();
             refreshIcons();
         }
 
+        // --- SURVEI ENGINE ---
         function publishBPHVisitSurvey() {
-            const biro = document.getElementById('pub-survey-biro').value, 
-                  start = document.getElementById('pub-survey-start').value, 
-                  end = document.getElementById('pub-survey-end').value;
-            
-            if (!start || !end) { alert("Pilih waktu mulai & berakhir!"); return; }
-            
+            const biro = document.getElementById('pub-survey-biro').value, start = document.getElementById('pub-survey-start').value, end = document.getElementById('pub-survey-end').value;
+            if (!start || !end) { alert("Pilih waktu!"); return; }
             let list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
-            const survey = {
-                id: Date.now(),
-                title: "[BPH Visit] Evaluasi BPH, Korbid, dan Pimpinan",
-                biro: biro,
-                startTime: new Date(start).getTime(),
-                endTime: new Date(end).getTime()
-            };
-            
-            list.push(survey);
+            list.push({ id: Date.now(), title: "[BPH Visit] Evaluasi BPH, Korbid, dan Pimpinan", biro, startTime: new Date(start).getTime(), endTime: new Date(end).getTime() });
             localStorage.setItem('bem_surveys', JSON.stringify(list));
-            alert("Survei berhasil dijadwalkan!");
-            renderAdminActiveSurveys();
+            alert("Survei diterbitkan!"); renderAdminActiveSurveys();
         }
 
         function renderAdminActiveSurveys() {
-            const container = document.getElementById('admin-active-surveys');
-            if (!container) return;
+            const c = document.getElementById('admin-active-surveys'); if (!c) return;
             const list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
-            if (list.length === 0) { container.innerHTML = "<p class='text-slate-400 italic text-xs'>Belum ada survei yang aktif.</p>"; return; }
-            container.innerHTML = list.map(s => `
-                <div class="p-5 bg-white rounded-2xl border flex justify-between items-center shadow-sm mb-3">
-                    <div>
-                        <p class="font-black text-slate-800 text-sm">${s.biro}</p>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-1">S/D: ${new Date(s.endTime).toLocaleString()}</p>
-                    </div>
-                    <button onclick="deleteSurvey(${s.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
-            `).join('');
+            if (list.length === 0) { c.innerHTML = "<p class='text-slate-400 italic text-xs'>Belum ada survei.</p>"; return; }
+            c.innerHTML = list.map(s => `
+                <div class="p-4 bg-white rounded-2xl border flex justify-between items-center shadow-sm mb-3">
+                    <div><p class="font-black text-slate-800 text-sm">${s.biro}</p><p class="text-[9px] text-slate-400 font-bold uppercase mt-1">Hingga: ${new Date(s.endTime).toLocaleString()}</p></div>
+                    <button onclick="deleteSurvey(${s.id})" class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>`).join('');
             refreshIcons();
         }
 
@@ -587,125 +509,163 @@
             renderAdminActiveSurveys();
         }
 
-        function renderUserSurveys() {
-            const container = document.getElementById('survey-list-container');
-            if (!container) return;
-            const now = Date.now();
-            const list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
-            
-            const mySurveys = list.filter(s => 
-                (s.biro === "Semua" || s.biro === currentUser.Biro_Departemen) && 
-                (now + 120000) >= s.startTime && 
-                now <= s.endTime
-            );
+        // User Side Intro
+        function renderUserSurveysIntro() {
+            const c = document.getElementById('survey-list-container'); if (!c) return;
+            const now = Date.now(); const list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
+            const mySurveys = list.filter(s => (s.biro === "Semua" || s.biro === currentUser.Biro_Departemen) && (now + 120000) >= s.startTime && now <= s.endTime);
             
             if (mySurveys.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto">
-                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                            <i data-lucide="clipboard-x" class="w-10 h-10 text-slate-200"></i>
-                        </div>
-                        <p class="text-slate-500 font-black text-xl leading-tight">Tidak Ada Survei Aktif</p>
-                        <p class="text-slate-400 text-sm mt-3 font-medium tracking-wide">Hubungi Admin jika Anda merasa ada jadwal pengisian.</p>
+                c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl">Tidak Ada Survei Aktif</p></div>`;
+            } else {
+                c.innerHTML = mySurveys.map(s => {
+                    const nimKey = `sub_${s.id}_${currentUser.NIM}`;
+                    const hasSubmitted = localStorage.getItem(nimKey);
+                    if (hasSubmitted) return `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="check-circle" class="w-12 h-12 mx-auto text-emerald-300 mb-6"></i><p class="text-slate-800 font-black text-xl">Survei Terkirim</p><p class="text-slate-400 mt-2">Anda sudah mengisi evaluasi ini. Terima kasih!</p></div>`;
+                    return `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto space-y-6">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto"><i data-lucide="clipboard-list" class="text-indigo-600 w-10 h-10"></i></div>
+                        <h2 class="text-3xl font-black text-slate-900">${s.title}</h2>
+                        <p class="text-slate-500 font-medium max-w-2xl mx-auto">Klik tombol di bawah untuk mulai mengisi evaluasi terhadap kinerja BPH, Koordinator Bidang, serta Pimpinan BEM Fahutan.</p>
+                        <button onclick='renderSurveyForm(${JSON.stringify(s)})' class="px-12 py-5 bg-indigo-600 text-white font-black rounded-2xl uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">BPH VISIT</button>
                     </div>`;
-                refreshIcons();
-                return;
+                }).join('');
             }
+            refreshIcons();
+        }
 
-            container.innerHTML = mySurveys.map(s => `
+        function renderSurveyForm(s) {
+            const c = document.getElementById('survey-list-container');
+            c.innerHTML = `
                 <div class="bg-white rounded-[4rem] border border-slate-100 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 max-w-5xl mx-auto">
                     <div class="bg-indigo-950 p-14 text-white">
-                        <span class="inline-block px-5 py-2 bg-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Internal Evaluasi BEM</span>
-                        <h2 class="text-4xl font-black mb-8 leading-tight tracking-tight">${s.title}</h2>
-                        <div class="text-indigo-100 text-sm leading-relaxed whitespace-pre-line opacity-80 border-t border-white/10 pt-8 italic">
-                            [𝐏𝐄𝐍𝐆𝐈𝐒𝐈𝐀𝐍 𝐄𝐕𝐀𝐋𝐔𝐀𝐒𝐈 𝐁𝐏𝐇 𝐕𝐈𝐒𝐈𝐓]
-                            Halo Dreamakers! Mohon berikan evaluasi jujur untuk perbaikan kabinet.
-                        </div>
+                        <span class="inline-block px-5 py-2 bg-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Internal Evaluasi</span>
+                        <h2 class="text-4xl font-black mb-8 leading-tight">${s.title}</h2>
+                        <p class="text-indigo-100 text-sm leading-relaxed whitespace-pre-line opacity-80 border-t border-white/10 pt-8 italic">
+                            Halo Dreamakers! Mohon berikan masukan jujur guna meningkatkan kualitas kepemimpinan, koordinasi, dan kinerja organisasi ke depan.
+                        </p>
                     </div>
                     <form id="form-survey-${s.id}" class="p-14 space-y-16">
-                        ${renderSurveySection("KOORDINATOR BIDANG", "Kepuasan Kinerja Korbid?", "Hal yang kurang baik?", "Saran koordinasi?")}
-                        ${renderSurveySection("BADAN PENGURUS HARIAN", "Kepuasan Kinerja BPH?", "Hal yang kurang baik?", "Saran sistem kerja?")}
-                        ${renderSurveySection("KETUA BIRO / DEPARTEMEN", "Kepuasan Kinerja Ketua?", "Hal yang kurang baik?", "Saran kepemimpinan?")}
-                        ${renderSurveySection("FINANCE DAN KESTARI", "Kepuasan Administrasi & Keuangan?", "Hal yang kurang baik?", "Saran sistem administrasi?")}
-                        <button type="button" onclick="submitSurveyResponse('${s.id}')" class="w-full py-6 bg-indigo-600 text-white font-black rounded-[2.5rem] uppercase tracking-widest hover:bg-indigo-700 shadow-2xl transition-all">Submit Evaluasi</button>
+                        ${renderSurveySection("KOORDINATOR BIDANG", 
+                            "Seberapa puas Anda terhadap kinerja Koordinator Bidang dalam mengoordinasikan dan memantau departemen di bawahnya selama satu bulan terakhir?", 
+                            "Menurut Anda, apa yang kurang baik dari peran Koordinator Bidang dalam membina departemen?", 
+                            "Apa saran untuk meningkatkan koordinasi Korbid dengan departemen di bawahnya?")}
+                        
+                        ${renderSurveySection("BADAN PENGURUS HARIAN", 
+                            "Seberapa puas Anda terhadap kinerja BPH dalam mengoordinasikan jalannya organisasi selama satu bulan terakhir?", 
+                            "Menurut Anda, apa hal yang kurang berjalan baik dari kinerja BPH selama satu bulan terakhir?", 
+                            "Apa saran atau evaluasi untuk meningkatkan koordinasi dan sistem kerja BPH ke depan?")}
+                        
+                        ${renderSurveySection("KETUA BADAN/BIRO/DEPARTEMEN", 
+                            "Seberapa puas Anda terhadap kinerja Ketua Badan/Biro/Departemen dalam memimpin dan mengoordinasikan timnya selama satu bulan terakhir?", 
+                            "Menurut Anda, apa yang kurang baik dari kepemimpinan Ketua Badan/Biro/Departemen selama satu bulan terakhir?", 
+                            "Apa saran atau masukan untuk meningkatkan kepemimpinan Ketua Badan/Biro/Departemen ke depan?")}
+                        
+                        ${renderSurveySection("FINANCE DAN KESTARI", 
+                            "Seberapa puas Anda terhadap kinerja Kestari dan Finance dalam mengelola administrasi serta keuangan organisasi selama satu bulan terakhir?", 
+                            "Menurut Anda, apa yang kurang berjalan baik dalam pengelolaan administrasi dan keuangan organisasi?", 
+                            "Apa saran untuk meningkatkan sistem administrasi dan pengelolaan keuangan organisasi?")}
+                        
+                        <button type="button" onclick="submitSurveyResponse('${s.id}')" id="btn-submit-${s.id}" class="w-full py-6 bg-indigo-600 text-white font-black rounded-[2.5rem] uppercase tracking-widest hover:bg-indigo-700 shadow-2xl">SUBMIT EVALUASI</button>
                     </form>
-                </div>
-            `).join('');
+                </div>`;
             refreshIcons();
         }
 
         function renderSurveySection(title, qStar, qLess, qAdvice) {
-            const sectionId = title.replace(/\s/g, '').toLowerCase();
+            const sectionId = title.replace(/[^a-z0-9]/gi, '').toLowerCase();
             return `
                 <div class="space-y-10">
                     <h3 class="text-indigo-600 font-black text-sm uppercase tracking-[0.25em] flex items-center gap-5">
                         <span class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xs font-black">#</span> ${title}
                     </h3>
                     <div class="space-y-8">
-                        <div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
-                            <p class="text-sm font-black text-slate-800 mb-8 uppercase tracking-wide leading-relaxed">${qStar}</p>
+                        <div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100">
+                            <p class="text-sm font-black text-slate-800 mb-8 leading-relaxed">${qStar}</p>
                             <div class="star-group">${[5,4,3,2,1].map(v => `<input type="radio" id="${sectionId}-${v}" name="${sectionId}_star" value="${v}"><label for="${sectionId}-${v}">★</label>`).join('')}</div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">${qLess}</p><textarea name="${sectionId}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="Tuliskan kekurangan..."></textarea></div>
-                            <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">${qAdvice}</p><textarea name="${sectionId}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="Tuliskan saran..."></textarea></div>
+                            <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">KEKURANGAN</p>
+                            <textarea name="${sectionId}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="${qLess}"></textarea></div>
+                            <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">SARAN</p>
+                            <textarea name="${sectionId}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="${qAdvice}"></textarea></div>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         async function submitSurveyResponse(surveyId) {
-            const form = document.getElementById(`form-survey-${surveyId}`), formData = new FormData(form), data = { timestamp: new Date().toLocaleString('id-ID'), nim: currentUser.NIM, nama: currentUser.Nama_Lengkap, biro: currentUser.Biro_Departemen };
-            formData.forEach((v, k) => data[k] = v);
+            const form = document.getElementById(`form-survey-${surveyId}`);
+            const btn = document.getElementById(`btn-submit-${surveyId}`);
+            const formData = new FormData(form);
+            
+            // Validate stars
+            const stars = form.querySelectorAll('input[type="radio"]:checked');
+            if (stars.length < 4) { alert("Mohon isi rating bintang untuk semua kategori!"); return; }
+
+            btn.disabled = true; btn.textContent = "MENGIRIM DATA...";
+            
+            const payload = {
+                timestamp: new Date().toLocaleString('id-ID'),
+                nim: currentUser.NIM,
+                nama: currentUser.Nama_Lengkap,
+                biro: currentUser.Biro_Departemen
+            };
+            formData.forEach((v, k) => payload[k] = v);
+
             try {
-                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-                alert("Evaluasi terkirim! Terima kasih.");
+                // Post to Google Apps Script
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                // Save submission state
+                localStorage.setItem(`sub_${surveyId}_${currentUser.NIM}`, "true");
+                
+                // Show Success Modal
+                document.getElementById('success-modal').classList.remove('hidden');
                 switchTab('rapor');
-            } catch (error) { alert("Gangguan koneksi."); }
+            } catch (error) {
+                alert("Gangguan koneksi, data tidak terdata. Pastikan URL Script benar.");
+                btn.disabled = false; btn.textContent = "SUBMIT EVALUASI";
+            }
         }
 
+        // --- ADMIN PERFORMANCE ---
         function renderAdmin() {
-            const filterTw = document.getElementById('admin-filter-tw');
-            if (!filterTw) return;
-            const twNum = filterTw.value;
-            const data = twData[twNum], container = document.getElementById('admin-performance-table');
-            if (!container) return;
-            
-            const bestPerBiro = {};
-            data.forEach(x => { const val = parseFloat(x.Nilai_Akhir || 0); if (!bestPerBiro[x.Biro_Departemen] || val > bestPerBiro[x.Biro_Departemen]) bestPerBiro[x.Biro_Departemen] = val; });
+            const tw = document.getElementById('admin-filter-tw').value;
+            const data = twData[tw], c = document.getElementById('admin-performance-table'); if (!c) return;
+            const best = {}; data.forEach(x => { const v = parseFloat(x.Nilai_Akhir||0); if(!best[x.Biro_Departemen]||v>best[x.Biro_Departemen]) best[x.Biro_Departemen]=v; });
             const rows = [...mainDB].filter(u => u.NIM);
-            rows.sort((a, b) => { const sA = parseFloat(data.find(x => x.NIM === a.NIM)?.Nilai_Akhir || 0), sB = parseFloat(data.find(x => x.NIM === b.NIM)?.Nilai_Akhir || 0); return adminSortOrder === 'desc' ? sB - sA : sA - sB; });
-            
-            container.innerHTML = `
+            rows.sort((a,b) => { const sA=parseFloat(data.find(x=>x.NIM===a.NIM)?.Nilai_Akhir||0), sB=parseFloat(data.find(x=>x.NIM===b.NIM)?.Nilai_Akhir||0); return adminSortOrder==='desc'?sB-sA:sA-sB; });
+            c.innerHTML = `
                 <div class="overflow-x-auto rounded-[3rem] border border-slate-100 shadow-sm">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b"><tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><th class="px-8 py-6">NIM</th><th class="px-8 py-6">Nama & Biro</th><th class="px-8 py-6 text-center">Nilai Akhir</th><th class="px-8 py-6 text-center">Mutu</th></tr></thead>
                         <tbody class="divide-y">${rows.map(u => {
-                            const s = data.find(x => x.NIM === u.NIM) || {}, val = parseFloat(s.Nilai_Akhir || 0), isBest = val === bestPerBiro[u.Biro_Departemen] && val > 0;
-                            return `<tr class="${isBest ? 'best-score-row' : ''} transition-colors admin-row" data-name="${(u.Nama_Lengkap||'').toLowerCase()}" data-biro="${u.Biro_Departemen}">
+                            const s = data.find(x=>x.NIM===u.NIM)||{}, v = parseFloat(s.Nilai_Akhir||0), isB = v === best[u.Biro_Departemen] && v > 0;
+                            return `<tr class="${isB?'best-score-row':''} transition-colors admin-row" data-name="${(u.Nama_Lengkap||'').toLowerCase()}" data-biro="${u.Biro_Departemen}">
                                 <td class="px-8 py-6 text-xs font-black text-slate-400">${u.NIM}</td>
-                                <td class="px-8 py-6"><p class="font-black text-slate-900">${u.Nama_Lengkap} ${isBest ? '✨' : ''}</p><p class="text-[9px] text-purple-600 font-bold uppercase">${u.Biro_Departemen}</p></td>
-                                <td class="px-8 py-6 font-black text-purple-700 text-center text-lg">${val > 0 ? val.toFixed(2) : '-'}</td>
-                                <td class="px-8 py-6 text-center"><span class="px-4 py-1 rounded-full text-[10px] font-black bg-white shadow-sm border border-slate-100">${s.Mutu || '-'}</span></td>
+                                <td class="px-8 py-6"><p class="font-black text-slate-900">${u.Nama_Lengkap} ${isB?'✨':''}</p><p class="text-[9px] text-purple-600 font-bold uppercase">${u.Biro_Departemen}</p></td>
+                                <td class="px-8 py-6 font-black text-purple-700 text-center text-lg">${v>0?v.toFixed(2):'-'}</td>
+                                <td class="px-8 py-6 text-center"><span class="px-5 py-2 rounded-full text-[10px] font-black bg-white shadow-sm border border-slate-100">${s.Mutu||'-'}</span></td>
                             </tr>`;
                         }).join('')}</tbody>
                     </table>
-                </div>
-            `;
+                </div>`;
             refreshIcons();
         }
 
         function sortAdminData() { adminSortOrder = adminSortOrder === 'desc' ? 'asc' : 'desc'; renderAdmin(); }
         function filterAdminTable() {
-            const sInput = document.getElementById('admin-search');
-            const bInput = document.getElementById('admin-filter-biro');
-            if(!sInput || !bInput) return;
-            const s = sInput.value.toLowerCase(), b = bInput.value;
+            const s = document.getElementById('admin-search').value.toLowerCase(), b = document.getElementById('admin-filter-biro').value;
             document.querySelectorAll('.admin-row').forEach(r => r.style.display = (r.getAttribute('data-name').includes(s) && (b === "" || r.getAttribute('data-biro') === b)) ? "table-row" : "none");
         }
         function handleLogout() { location.reload(); }
-        function exportData() { alert("Data sedang diekspor..."); }
+        function exportData() { alert("Data sedang disiapkan..."); }
     </script>
 </body>
 </html>
