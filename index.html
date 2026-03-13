@@ -27,9 +27,10 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .success-overlay { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); }
         
-        .password-container { position: relative; width: 100%; }
-        .eye-btn { position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%); z-index: 50; padding: 0.5rem; color: rgba(255, 255, 255, 0.8); background: none; border: none; outline: none; cursor: pointer; }
-        .eye-btn:hover { color: white; }
+        /* Ikon Mata Login */
+        .password-input-container { position: relative; width: 100%; display: flex; align-items: center; }
+        .eye-btn-login { position: absolute; right: 1rem; color: rgba(255, 255, 255, 0.7); cursor: pointer; padding: 0.5rem; z-index: 60; background: transparent; border: none; outline: none; }
+        .eye-btn-login:hover { color: white; }
         
         .ai-btn-glow { animation: pulse-ai 2.5s infinite; }
         @keyframes pulse-ai {
@@ -55,9 +56,9 @@
             </div>
             <div class="w-full space-y-6 relative z-30 text-left">
                 <input type="text" id="username" placeholder="Username (NIM)" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium shadow-inner">
-                <div class="password-container">
+                <div class="password-input-container">
                     <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 pr-14 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all font-medium shadow-inner">
-                    <button type="button" onclick="window.togglePassword()" class="eye-btn">
+                    <button type="button" onclick="window.togglePassword()" class="eye-btn-login">
                         <i id="eye-icon" data-lucide="eye" class="w-6 h-6"></i>
                     </button>
                 </div>
@@ -69,26 +70,26 @@
 
     <!-- MAIN APP SCREEN -->
     <div id="main-app" class="hidden opacity-0 transition-opacity duration-1000">
+        <!-- Success Modal -->
+        <div id="success-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 success-overlay hidden">
+            <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
+                <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="check-circle" class="text-emerald-500 w-12 h-12"></i></div>
+                <h3 class="text-2xl font-black text-slate-900 mb-2">Terima Kasih!</h3>
+                <p class="text-slate-500 font-medium leading-relaxed text-sm">Jawaban Anda telah kami record dengan aman. Suara Anda sangat berharga bagi kemajuan kabinet.</p>
+                <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="mt-8 px-10 py-3 bg-emerald-500 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-emerald-600 transition-colors">Selesai</button>
+            </div>
+        </div>
+
         <!-- AI Deep Analysis Modal -->
         <div id="ai-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl hidden">
             <div class="bg-white p-10 rounded-[3rem] max-w-2xl w-full shadow-2xl relative border border-purple-100">
                 <button onclick="document.getElementById('ai-modal').classList.add('hidden')" class="absolute top-8 right-8 text-slate-300 hover:text-red-500 transition-colors"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 <div class="flex items-center gap-5 mb-8">
                     <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="brain-circuit" class="text-white w-8 h-8"></i></div>
-                    <div><h3 class="text-2xl font-black text-slate-900 tracking-tight">Analisis Kinerja ✨</h3><p class="text-xs font-black text-purple-600 uppercase tracking-widest">Gemini AI Engine</p></div>
+                    <div><h3 class="text-2xl font-black text-slate-900 tracking-tight">Analisis Kinerja ✨</h3><p class="text-xs font-black text-purple-600 uppercase tracking-widest">Gemini AI Analysis</p></div>
                 </div>
                 <div id="ai-loading" class="py-12 space-y-4"><div class="h-4 bg-slate-100 rounded-full w-3/4 animate-pulse"></div><div class="h-4 bg-slate-100 rounded-full w-full animate-pulse"></div><p class="text-center text-xs text-slate-400 font-bold tracking-widest uppercase">Menganalisis performa triwulan Anda...</p></div>
                 <div id="ai-result" class="hidden text-slate-700 leading-relaxed max-h-[450px] overflow-y-auto pr-4 font-medium text-sm"></div>
-            </div>
-        </div>
-
-        <!-- Success Modal -->
-        <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 success-overlay hidden">
-            <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
-                <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="check-circle" class="text-emerald-500 w-12 h-12"></i></div>
-                <h3 class="text-2xl font-black text-slate-900 mb-2">Terima Kasih!</h3>
-                <p class="text-slate-500 font-medium leading-relaxed text-sm">Jawaban Anda telah kami record dengan aman. Suara Anda sangat berharga bagi kemajuan kabinet.</p>
-                <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="mt-8 px-10 py-3 bg-emerald-500 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-emerald-600 transition-colors">Selesai</button>
             </div>
         </div>
 
@@ -114,12 +115,11 @@
         <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
             <!-- SECTION: RAPOR USER -->
             <div id="section-rapor" class="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                <!-- HERO CARD -->
                 <div class="bg-white rounded-[3.5rem] p-10 sm:p-14 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden">
                     <div class="absolute -right-32 -top-32 w-80 h-80 bg-purple-50 rounded-full opacity-40 blur-3xl"></div>
                     <div class="relative z-10 space-y-6 text-center md:text-left flex-grow">
                         <span class="inline-block px-5 py-2 bg-purple-50 text-purple-600 text-[11px] font-black rounded-full uppercase tracking-[0.2em]">SISTEM PENILAIAN INTERNAL</span>
-                        <h2 id="display-nama" class="text-5xl font-black text-slate-900 leading-tight tracking-tight tracking-tighter">...</h2>
+                        <h2 id="display-nama" class="text-5xl font-black text-slate-900 leading-tight tracking-tighter">...</h2>
                         <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
                             <p class="flex items-center gap-2 text-slate-500 font-bold text-sm bg-slate-50 px-5 py-2.5 rounded-2xl shadow-sm border border-slate-100"><i data-lucide="fingerprint" class="w-4 h-4 text-purple-500"></i> <span id="display-nim">...</span></p>
                             <p class="flex items-center gap-2 text-slate-500 font-bold text-sm bg-slate-50 px-5 py-2.5 rounded-2xl shadow-sm border border-slate-100"><i data-lucide="award" class="w-4 h-4 text-purple-500"></i> <span id="display-jabatan-hero">...</span></p>
@@ -133,29 +133,9 @@
                     </div>
                 </div>
 
-                <!-- CHART SECTION (RESTORED) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <div class="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100">
-                        <h3 class="font-black text-slate-800 text-xl flex items-center gap-4 mb-10">
-                            <span class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center"><i data-lucide="trending-up" class="text-emerald-600"></i></span> Progress Kinerja Triwulan
-                        </h3>
-                        <div class="h-[350px] w-full"><canvas id="performanceChart"></canvas></div>
-                    </div>
-
-                    <div class="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl"></div>
-                        <div>
-                            <p class="text-[10px] font-black uppercase text-purple-400 tracking-widest mb-8">Status Pencapaian</p>
-                            <div class="flex items-center gap-5">
-                                <div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10"><i data-lucide="rocket" class="w-10 h-10 text-purple-400"></i></div>
-                                <div><p class="text-3xl font-black tracking-tight" id="trend-text">Stabil</p></div>
-                            </div>
-                        </div>
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm">
-                            <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-3">Insight AI ✨</p>
-                            <p class="text-xs italic leading-relaxed text-slate-200">Klik ikon bintang di kartu triwulan untuk analisis taktis.</p>
-                        </div>
-                    </div>
+                    <div class="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100"><h3 class="font-black text-slate-800 text-xl flex items-center gap-4 mb-10"><span class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center"><i data-lucide="trending-up" class="text-emerald-600"></i></span> Progress Kinerja Triwulan</h3><div class="h-[350px] w-full"><canvas id="performanceChart"></canvas></div></div>
+                    <div class="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl flex flex-col justify-between relative overflow-hidden"><div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl"></div><div><p class="text-[10px] font-black uppercase text-purple-400 tracking-widest mb-8">Status Pencapaian</p><div class="flex items-center gap-5"><div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10"><i data-lucide="rocket" class="w-10 h-10 text-purple-400"></i></div><div><p class="text-3xl font-black tracking-tight" id="trend-text">Stabil</p></div></div></div><div class="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm"><p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-3">Insight AI ✨</p><p class="text-xs italic leading-relaxed text-slate-200">Klik bintang di kartu triwulan untuk analisis taktis.</p></div></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -173,7 +153,7 @@
                 <div class="flex flex-col lg:flex-row gap-10">
                     <div class="lg:w-1/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100 text-center flex flex-col items-center">
                         <div class="w-44 h-44 bg-purple-50 rounded-[3rem] flex items-center justify-center shadow-inner mb-10"><i data-lucide="user" class="w-24 h-24 text-purple-400"></i></div>
-                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight tracking-tighter">...</h2>
+                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight">...</h2>
                         <p id="profile-nim-display" class="text-purple-400 font-black tracking-widest uppercase mt-3">...</p>
                     </div>
                     <div class="lg:w-2/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100">
@@ -217,7 +197,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection as fCollection, doc as fDoc, setDoc as fSetDoc, addDoc as fAddDoc, deleteDoc as fDeleteDoc, onSnapshot as fOnSnapshot, query as fQuery, getDocs as fGetDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
+        // Firebase Config (Updated with your provided config)
         const firebaseConfig = {
             apiKey: "AIzaSyBxsfyR3ah3E1e9-5-85Q2S2Ucoqipe9_I",
             authDomain: "rapor-bem.firebaseapp.com",
@@ -238,32 +218,7 @@
         
         window.fbState = { db: null, auth: null, user: null, submittedIds: [], appId: typeof __app_id !== 'undefined' ? __app_id : 'bem-fahutan-2025' };
 
-        // --- Functions ---
-
-        async function callGemini(prompt) {
-            const apiKeyGemini = ""; // Canvas provides key at runtime
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyGemini}`;
-            try {
-                const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                const data = await res.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (e) { return null; }
-        }
-
-        window.analyzeWithAI = async function(twNum, data) {
-            const resEl = document.getElementById('ai-result');
-            resEl.textContent = "AI sedang melakukan analisis mendalam...";
-            document.getElementById('ai-modal').classList.remove('hidden');
-            document.getElementById('ai-loading').classList.remove('hidden');
-            document.getElementById('ai-result').classList.add('hidden');
-            
-            const prompt = `Berikan analisis kinerja profesional untuk: Nama ${currentUser.Nama_Lengkap}, Biro ${currentUser.Biro_Departemen}, Triwulan ${twNum}. Skor Akhir: ${data.Nilai_Akhir}/4.00. Jelaskan kelebihan dan area pengembangan dlm 3 paragraf ramah.`;
-            const result = await callGemini(prompt);
-            
-            document.getElementById('ai-loading').classList.add('hidden');
-            resEl.classList.remove('hidden');
-            resEl.innerHTML = (result || "Analisis tidak tersedia.").replace(/\n/g, '<br>');
-        };
+        // --- Functions Exposed to Window ---
 
         window.loadAllData = async function() {
             try {
@@ -280,7 +235,7 @@
                         biros.forEach(b => { const o = document.createElement('option'); o.value = b; o.textContent = b; el.appendChild(o); });
                     }
                 });
-            } catch (e) { console.error("CSV error", e); }
+            } catch (e) { console.error("CSV loading failed", e); }
         };
 
         window.initFirebase = async function() {
@@ -289,22 +244,22 @@
                 window.fbState.auth = getAuth(app);
                 window.fbState.db = getFirestore(app);
 
-                // Auth FIRST with fallback
-                try {
+                // Auth Logic (Rule 3)
+                const loginFirebase = async () => {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(window.fbState.auth, __initial_auth_token);
+                        try { await signInWithCustomToken(window.fbState.auth, __initial_auth_token); } 
+                        catch (e) { await signInAnonymously(window.fbState.auth); }
                     } else {
                         await signInAnonymously(window.fbState.auth);
                     }
-                } catch (e) {
-                    await signInAnonymously(window.fbState.auth);
-                }
+                };
+                await loginFirebase();
 
                 onAuthStateChanged(window.fbState.auth, (user) => {
                     window.fbState.user = user;
                     if (user && currentUser) setupFirestoreListeners();
                 });
-            } catch (error) { console.error("Firebase init failed", error); }
+            } catch (error) { console.error("Cloud init failed", error); }
         };
 
         function setupFirestoreListeners() {
@@ -327,8 +282,13 @@
 
         window.togglePassword = function() {
             const p = document.getElementById('password'), i = document.getElementById('eye-icon');
-            if (p.type === 'password') { p.type = 'text'; i.setAttribute('data-lucide', 'eye-off'); } 
-            else { p.type = 'password'; i.setAttribute('data-lucide', 'eye'); }
+            if (p.type === 'password') {
+                p.type = 'text';
+                i.setAttribute('data-lucide', 'eye-off');
+            } else {
+                p.type = 'password';
+                i.setAttribute('data-lucide', 'eye');
+            }
             lucide.createIcons();
         };
 
@@ -345,8 +305,9 @@
 
         async function showApp() {
             document.getElementById('login-screen').classList.add('hidden');
-            const app = document.getElementById('main-app'); app.classList.remove('hidden');
-            setTimeout(() => app.classList.add('opacity-100'), 10);
+            const main = document.getElementById('main-app');
+            main.classList.remove('hidden');
+            setTimeout(() => main.classList.add('opacity-100'), 10);
             
             const isAdmin = currentUser.Role === "ADMIN";
             document.querySelectorAll('.user-menu').forEach(m => m.style.display = isAdmin ? 'none' : 'flex');
@@ -430,13 +391,14 @@
         window.publishBPHVisitSurvey = async function() {
             const biro = document.getElementById('pub-survey-biro').value, start = document.getElementById('pub-survey-start').value, end = document.getElementById('pub-survey-end').value;
             if (!start || !end) { alert("Pilih waktu!"); return; }
+            if (!window.fbState.db) { alert("Cloud belum siap."); return; }
             try {
                 await fAddDoc(fCollection(window.fbState.db, 'artifacts', window.fbState.appId, 'public', 'data', 'surveylist'), {
                     title: "[BPH Visit] Evaluasi BPH, Koordinator Bidang dan Pimpinan",
                     biro, startTime: new Date(start).getTime(), endTime: new Date(end).getTime(), created_at: Date.now()
                 });
-                alert("Survei berhasil dipublikasikan ke seluruh HP anggota!");
-            } catch (e) { alert("Gagal."); }
+                alert("Survei dipublikasikan ke semua HP anggota!");
+            } catch (e) { alert("Gagal mempublikasikan."); }
         };
 
         function renderAdminActiveSurveys() {
@@ -454,7 +416,7 @@
             const c = document.getElementById('survey-list-container'); if (!c) return;
             const now = Date.now();
             const mySurveys = cloudSurveys.filter(s => (s.biro === "Semua" || s.biro === currentUser.Biro_Departemen) && now >= s.startTime && now <= s.endTime);
-            if (mySurveys.length === 0) { c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl leading-tight">Tidak Ada Survei Aktif</p></div>`; } 
+            if (mySurveys.length === 0) { c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl tracking-tight">Tidak Ada Survei Aktif</p></div>`; } 
             else {
                 c.innerHTML = mySurveys.map(s => {
                     const submitted = window.fbState.submittedIds?.includes(s.id);
@@ -502,15 +464,18 @@
             const best = {}; data.forEach(x => { const v = parseFloat(x.Nilai_Akhir||0); if(!best[x.Biro_Departemen]||v>best[x.Biro_Departemen]) best[x.Biro_Departemen]=v; });
             const rows = [...mainDB].filter(u => u.NIM).sort((a,b) => { const sA=parseFloat(data.find(x=>x.NIM===a.NIM)?.Nilai_Akhir||0), sB=parseFloat(data.find(x=>x.NIM===b.NIM)?.Nilai_Akhir||0); return adminSortOrder==='desc'?sB-sA:sA-sB; });
             container.innerHTML = `<div class="overflow-x-auto rounded-[3rem] border border-slate-100 shadow-sm mt-8"><table class="w-full text-left"><thead class="bg-slate-50 border-b font-black text-[10px] uppercase text-slate-400"><tr><th class="px-8 py-6">NIM</th><th class="px-8 py-6">Identitas</th><th class="px-8 py-6 text-center">Nilai</th><th class="px-8 py-6 text-center">Mutu</th></tr></thead><tbody class="divide-y">${rows.map(u => { const s = data.find(x=>x.NIM===u.NIM)||{}, v = parseFloat(s.Nilai_Akhir||0), isB = v === best[u.Biro_Departemen] && v > 0; return `<tr class="${isB?'best-score-row':''} admin-row" data-name="${(u.Nama_Lengkap||'').toLowerCase()}" data-biro="${u.Biro_Departemen}"><td class="px-8 py-6 text-xs font-black text-slate-400">${u.NIM}</td><td class="px-8 py-6"><p class="font-black text-slate-900">${u.Nama_Lengkap} ${isB?'✨':''}</p><p class="text-[9px] text-purple-600 font-bold uppercase">${u.Biro_Departemen}</p></td><td class="px-8 py-6 font-black text-purple-700 text-center text-lg">${v>0?v.toFixed(2):'-'}</td><td class="px-8 py-6 text-center"><span class="px-4 py-1 rounded-full text-[10px] font-black bg-white shadow-sm border border-slate-100">${s.Mutu||'-'}</span></td></tr>`; }).join('')}</tbody></table></div>`;
+            lucide.createIcons();
         }
 
         window.sortAdminData = () => { adminSortOrder = adminSortOrder === 'desc' ? 'asc' : 'desc'; renderAdmin(); };
         window.filterAdminTable = () => { const s = document.getElementById('admin-search').value.toLowerCase(), b = document.getElementById('admin-filter-biro').value; document.querySelectorAll('.admin-row').forEach(r => r.style.display = (r.getAttribute('data-name').includes(s) && (b === "" || r.getAttribute('data-biro') === b)) ? "table-row" : "none"); };
         window.handleLogout = () => location.reload();
-        window.exportData = () => alert("Export CSV dimulai.");
+        window.exportData = () => alert("Export CSV sedang diproses...");
 
         // Start Application
-        window.loadAllData();
+        window.loadAllData().then(() => {
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
