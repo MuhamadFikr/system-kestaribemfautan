@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="text-center mb-10 relative z-20">
-                <h1 class="text-3xl font-black uppercase tracking-tight">RAPOR BEM FAHUTAN</h1>
+                <h1 class="text-3xl font-black uppercase tracking-tight leading-tight">RAPOR BEM FAHUTAN</h1>
                 <p class="text-purple-200 mt-2 font-bold tracking-widest text-sm italic">Kabinet Elaborasi Mimpi</p>
             </div>
             <div class="w-full space-y-6 relative z-30">
@@ -58,12 +58,24 @@
 
     <!-- MAIN APP SCREEN -->
     <div id="main-app" class="hidden opacity-0 transition-opacity duration-1000">
+        <!-- AI Motivation Popup -->
+        <div id="affirmation-popup" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+            <div class="glass bg-white p-10 rounded-[3rem] max-w-sm w-full text-center shadow-2xl">
+                <div class="w-20 h-20 bg-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl rotate-6">
+                    <i data-lucide="sparkles" class="text-white w-10 h-10"></i>
+                </div>
+                <h3 class="text-2xl font-black text-purple-950 mb-4 tracking-tight">Halo, Dreamakers! ✨</h3>
+                <p id="affirmation-text" class="text-slate-600 font-semibold leading-relaxed italic">Menghubungkan ke AI...</p>
+                <button onclick="document.getElementById('affirmation-popup').classList.add('hidden')" class="mt-8 px-10 py-3 bg-purple-700 text-white font-black rounded-2xl text-xs uppercase tracking-widest">Ayo Mulai</button>
+            </div>
+        </div>
+
         <!-- Success Modal -->
         <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 success-overlay hidden">
             <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
                 <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="check-circle" class="text-emerald-500 w-12 h-12"></i></div>
                 <h3 class="text-2xl font-black text-slate-900 mb-2">Terima Kasih!</h3>
-                <p class="text-slate-500 font-medium leading-relaxed">Jawaban Anda telah kami record dengan aman. Suara Anda sangat berharga.</p>
+                <p class="text-slate-500 font-medium leading-relaxed">Jawaban Anda telah kami record dengan aman. Suara Anda sangat berharga bagi kemajuan kabinet.</p>
                 <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="mt-8 px-10 py-3 bg-emerald-500 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-emerald-600 transition-colors">Selesai</button>
             </div>
         </div>
@@ -114,7 +126,7 @@
                         </div>
                         <p class="text-purple-700 font-black text-lg tracking-wide mt-4" id="display-biro">...</p>
                     </div>
-                    <div class="hero-gradient-card p-12 sm:p-14 rounded-[3.5rem] text-center text-white min-w-[300px] z-10 relative">
+                    <div class="hero-gradient-card p-12 sm:p-14 rounded-[3.5rem] text-center text-white min-w-[300px] z-10 relative border-4 border-white/10">
                         <p class="text-[12px] font-black uppercase tracking-[0.4em] mb-4 opacity-70">RATA-RATA KUMULATIF</p>
                         <div class="flex items-baseline justify-center"><p id="display-avg" class="text-8xl font-black tracking-tighter">0.00</p><p class="text-3xl font-black opacity-30 ml-2">/4.00</p></div>
                         <div class="mt-8 h-1.5 w-16 bg-white/20 mx-auto rounded-full"></div>
@@ -141,7 +153,7 @@
                 <div class="flex flex-col lg:flex-row gap-10">
                     <div class="lg:w-1/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100 text-center flex flex-col items-center">
                         <div class="w-44 h-44 bg-purple-50 rounded-[3rem] flex items-center justify-center shadow-inner mb-10"><i data-lucide="user" class="w-24 h-24 text-purple-400"></i></div>
-                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight tracking-tighter">...</h2>
+                        <h2 id="profile-nama" class="text-3xl font-black text-slate-900 leading-tight">...</h2>
                         <p id="profile-nim-display" class="text-purple-400 font-black tracking-widest uppercase mt-3">...</p>
                     </div>
                     <div class="lg:w-2/3 bg-white rounded-[3.5rem] shadow-sm p-14 border border-slate-100">
@@ -183,19 +195,20 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection as fCollection, doc as fDoc, setDoc as fSetDoc, addDoc as fAddDoc, deleteDoc as fDeleteDoc, onSnapshot as fOnSnapshot, query as fQuery, getDocs as fGetDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Variables
+        // Constants
         const apiKey = ""; 
         const scriptURL = "https://script.google.com/macros/s/AKfycbwiZvXx-FmrLmqGWHZIpOSlufhQ6OOjkE0hxFpcIxDEBSXH6WTXhhzteLvTeQ7uhPns/exec";
         const BASE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=0&single=true&output=csv";
         const TW_URLS = { 1: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1910706860&single=true&output=csv", 2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1724018331&single=true&output=csv", 3: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1134099960&single=true&output=csv" };
 
+        // State
         let currentUser = null, mainDB = [], twData = {1:[], 2:[], 3:[]}, myChart = null;
         let adminSortOrder = 'desc';
         let cloudSurveys = [];
         
-        // Firebase Setup
         window.fbState = { db: null, auth: null, user: null, submittedIds: [], appId: typeof __app_id !== 'undefined' ? __app_id : 'bem-fahutan-2025' };
 
+        // Firebase Initialization
         async function initFirebase() {
             try {
                 const firebaseConfig = JSON.parse(__firebase_config);
@@ -223,16 +236,16 @@
                 cloudSurveys = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderUserSurveysIntro();
                 renderAdminActiveSurveys();
-            }, (err) => console.error("Cloud survey load error", err));
+            });
 
             const submissionQuery = fCollection(window.fbState.db, 'artifacts', window.fbState.appId, 'users', window.fbState.user.uid, 'submissions');
             fOnSnapshot(submissionQuery, (snapshot) => {
                 window.fbState.submittedIds = snapshot.docs.map(doc => doc.id);
                 renderUserSurveysIntro();
-            }, (err) => console.error("Submission state error", err));
+            });
         }
 
-        // Gemini AI Integration
+        // Gemini AI Functions
         async function callGemini(prompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             try {
@@ -248,14 +261,14 @@
             document.getElementById('ai-modal').classList.remove('hidden');
             document.getElementById('ai-loading').classList.remove('hidden');
             document.getElementById('ai-result').classList.add('hidden');
-            const prompt = `Berikan analisis kinerja profesional untuk: Nama ${currentUser.Nama_Lengkap}, Biro ${currentUser.Biro_Departemen}, Triwulan ${twNum}. Skor: ${data.Nilai_Akhir}/4.00. Analisis ramah 3 paragraf.`;
+            const prompt = `Berikan analisis kinerja profesional untuk: Nama ${currentUser.Nama_Lengkap}, Biro ${currentUser.Biro_Departemen}, Triwulan ${twNum}. Skor: ${data.Nilai_Akhir}/4.00. Analisis ramah dlm 3 paragraf.`;
             const result = await callGemini(prompt);
             document.getElementById('ai-loading').classList.add('hidden');
             resEl.classList.remove('hidden');
             resEl.innerHTML = (result || "Analisis tidak tersedia.").replace(/\n/g, '<br>');
         };
 
-        // Main App Functions
+        // UI & Login Functions
         async function loadAllData() {
             try {
                 const fetchCsv = (u) => new Promise((res, rej) => Papa.parse(u, { download: true, header: true, skipEmptyLines: true, complete: r => res(r.data), error: e => rej(e) }));
@@ -264,12 +277,11 @@
                 twData[2] = await fetchCsv(TW_URLS[2]);
                 twData[3] = await fetchCsv(TW_URLS[3]);
                 const biros = [...new Set(mainDB.map(i => i.Biro_Departemen))].filter(b => b);
-                const selects = ['pub-survey-biro', 'admin-filter-biro'];
-                selects.forEach(id => {
+                ['pub-survey-biro', 'admin-filter-biro'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) biros.forEach(b => { const o = document.createElement('option'); o.value = b; o.textContent = b; el.appendChild(o); });
                 });
-            } catch (e) { console.error("CSV error", e); }
+            } catch (e) { console.error("CSV loading failed", e); }
         }
 
         window.togglePassword = function() {
@@ -281,12 +293,13 @@
 
         window.handleLogin = function() {
             const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
-            if ((u === "bemfahutan" && p === "ElaElaEse") || (u === "raporbmi" && p === "biemi123")) { 
+            if ((u === "bemfahutan" && p === "elaelaese26") || (u === "raporbmi" && p === "biemi123")) { 
                 currentUser = { Nama_Lengkap: "Administrator", Role: "ADMIN", Biro_Departemen: "Admin", Jabatan: "Pimpinan" }; 
                 showApp(); return; 
             }
             const user = mainDB.find(x => x.NIM === u && x.Password === p);
-            if (user) { currentUser = { ...user, Role: "USER" }; showApp(); } else document.getElementById('login-error').classList.remove('hidden');
+            if (user) { currentUser = { ...user, Role: "USER" }; showApp(); } 
+            else document.getElementById('login-error').classList.remove('hidden');
         };
 
         async function showApp() {
@@ -302,12 +315,14 @@
             if (isAdmin) switchTab('admin-data'); 
             else { 
                 switchTab('rapor'); populateUserData(); 
-                document.getElementById('affirmation-popup').classList.remove('hidden');
-                const motivation = await callGemini(`Tulis 1 kalimat motivasi personal pendek untuk anggota BEM bernama ${currentUser.Nama_Lengkap}.`);
-                document.getElementById('affirmation-text').textContent = motivation || "Semangat terus Dreamakers!";
+                const affirmationPopup = document.getElementById('affirmation-popup');
+                if(affirmationPopup) {
+                    affirmationPopup.classList.remove('hidden');
+                    const motivation = await callGemini(`Tulis 1 kalimat motivasi personal pendek untuk ${currentUser.Nama_Lengkap} anggota BEM FAHUTAN.`);
+                    document.getElementById('affirmation-text').textContent = motivation || "Semangat terus memberikan yang terbaik untuk FAHUTAN!";
+                }
             }
             if (!window.fbState.db) initFirebase();
-            else setupFirestoreListeners();
         }
 
         function populateUserData() {
@@ -316,14 +331,13 @@
             document.getElementById('display-jabatan-hero').textContent = currentUser.Jabatan;
             document.getElementById('display-biro').textContent = currentUser.Biro_Departemen;
             
-            const scores = [1,2,3].map(twNum => {
-                const data = twData[twNum].find(d => d.NIM === currentUser.NIM);
-                renderTW(`content-tw${twNum}`, data, twNum);
-                return data && data.Nilai_Akhir ? parseFloat(data.Nilai_Akhir) : null;
+            const scores = [1,2,3].map(tw => {
+                const d = twData[tw].find(x => x.NIM === currentUser.NIM);
+                renderTW(`content-tw${tw}`, d, tw);
+                return d && d.Nilai_Akhir ? parseFloat(d.Nilai_Akhir) : null;
             }).filter(s => s !== null);
 
-            const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : "0.00";
-            animateNumber('display-avg', 0, avg);
+            animateNumber('display-avg', 0, scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2) : "0.00");
             updateChart(scores);
             const trendEl = document.getElementById('trend-text');
             if (trendEl && scores.length >= 2) {
@@ -331,7 +345,7 @@
                 trendEl.textContent = diff > 0 ? "Meningkat" : diff < 0 ? "Menurun" : "Stabil";
             }
             
-            const depts = { "E1": "Manajemen Hutan", "E2": "Teknologi Hasil Hutan", "E3": "KSHE", "E4": "Silvikultur" };
+            const depts = { "E1": "Manajemen Hutan", "E2": "Teknologi Hasil Hutan", "E3": "Konservasi Sumberdaya Hutan dan Ekowisata", "E4": "Silvikultur" };
             document.getElementById('profile-details').innerHTML = `
                 <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">DEPARTEMEN AKADEMIK</p><p class="font-black text-slate-800 text-xl">${depts[currentUser.NIM?.substring(0,2)] || "Fakultas Kehutanan"}</p></div>
                 <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">BIRO / DEPARTEMEN BEM</p><p class="font-black text-slate-800 text-xl">${currentUser.Biro_Departemen}</p></div>
@@ -392,7 +406,6 @@
         window.publishBPHVisitSurvey = async function() {
             const biro = document.getElementById('pub-survey-biro').value, start = document.getElementById('pub-survey-start').value, end = document.getElementById('pub-survey-end').value;
             if (!start || !end) { alert("Pilih rentang waktu!"); return; }
-            if (!window.fbState.db) { alert("Menunggu koneksi cloud..."); return; }
             try {
                 await fAddDoc(fCollection(window.fbState.db, 'artifacts', window.fbState.appId, 'public', 'data', 'surveylist'), {
                     title: "[BPH Visit] Evaluasi BPH, Koordinator Bidang dan Pimpinan",
@@ -417,7 +430,7 @@
             const c = document.getElementById('survey-list-container'); if (!c) return;
             const now = Date.now();
             const mySurveys = cloudSurveys.filter(s => (s.biro === "Semua" || s.biro === currentUser.Biro_Departemen) && now >= s.startTime && now <= s.endTime);
-            if (mySurveys.length === 0) { c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl">Tidak Ada Survei Aktif</p><p class="text-slate-400 text-sm mt-2">Mohon cek kembali nanti sesuai jadwal.</p></div>`; } 
+            if (mySurveys.length === 0) { c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl leading-tight">Tidak Ada Survei Aktif</p><p class="text-slate-400 text-sm mt-2">Mohon cek kembali nanti sesuai jadwal.</p></div>`; } 
             else {
                 c.innerHTML = mySurveys.map(s => {
                     const submitted = window.fbState.submittedIds?.includes(s.id);
@@ -432,13 +445,13 @@
             const c = document.getElementById('survey-list-container');
             const renderSection = (title, q1, q2, q3) => {
                 const id = title.replace(/[^a-z0-9]/gi, '').toLowerCase();
-                return `<div class="space-y-10"><h3 class="text-indigo-600 font-black text-sm uppercase tracking-[0.25em] flex items-center gap-5"><span class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xs font-black">#</span> ${title}</h3><div class="space-y-8"><div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner"><p class="text-sm font-black text-slate-800 mb-8 leading-relaxed">${q1}</p><div class="star-group">${[5,4,3,2,1].map(v => `<input type="radio" id="${id}-${v}" name="${id}_star" value="${v}"><label for="${id}-${v}">★</label>`).join('')}</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">KEKURANGAN</p><textarea name="${id}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none shadow-inner" rows="3" placeholder="${q2}"></textarea></div><div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">SARAN</p><textarea name="${id}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none shadow-inner" rows="3" placeholder="${q3}"></textarea></div></div></div></div>`;
+                return `<div class="space-y-10"><h3 class="text-indigo-600 font-black text-sm uppercase tracking-[0.25em] flex items-center gap-5"><span class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xs font-black">#</span> ${title}</h3><div class="space-y-8"><div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner"><p class="text-sm font-black text-slate-800 mb-8 leading-relaxed">${q1}</p><div class="star-group">${[5,4,3,2,1].map(v => `<input type="radio" id="${id}-${v}" name="${id}_star" value="${v}"><label for="${id}-${v}">★</label>`).join('')}</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">KEKURANGAN</p><textarea name="${id}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none shadow-inner" rows="3" placeholder="${q2}"></textarea></div><div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">SARAN</p><textarea name="${id}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none shadow-inner" rows="3" placeholder="${q3}"></textarea></div></div></div></div>`;
             };
             c.innerHTML = `<div class="bg-white rounded-[4rem] border border-slate-100 shadow-2xl overflow-hidden max-w-5xl mx-auto"><div class="bg-indigo-950 p-14 text-white"><span class="inline-block px-5 py-2 bg-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Internal Evaluasi</span><h2 class="text-4xl font-black mb-8 leading-tight tracking-tight">${s.title}</h2><p class="text-indigo-100 text-sm leading-relaxed border-t border-white/10 pt-8 italic">Halo Dreamakers! Mohon berikan masukan jujur guna meningkatkan kualitas organisasi.</p></div><form id="form-survey-${s.id}" class="p-14 space-y-16">
-                ${renderSection("KOORDINATOR BIDANG", "Seberapa puas Anda terhadap kinerja Koordinator Bidang dalam mengoordinasikan departemen?", "Apa yang kurang baik dari peran Koordinator Bidang?", "Apa saran untuk meningkatkan koordinasi Korbid?")}
-                ${renderSection("BADAN PENGURUS HARIAN", "Seberapa puas Anda terhadap kinerja BPH dalam mengoordinasikan jalannya organisasi?", "Apa hal yang kurang berjalan baik dari kinerja BPH?", "Apa saran evaluasi meningkatkan koordinasi BPH?")}
-                ${renderSection("KETUA BADAN BIRO DEPARTEMEN", "Seberapa puas Anda terhadap kinerja Ketua Anda dalam memimpin dan mengoordinasikan timnya?", "Apa yang kurang baik dari kepemimpinan Ketua?", "Apa saran masukan meningkatkan kepemimpinan Ketua?")}
-                ${renderSection("FINANCE DAN KESTARI", "Seberapa puas Anda terhadap kinerja Kestari dan Finance dalam mengelola administrasi serta keuangan?", "Apa yang kurang berjalan baik dalam pengelolaan administrasi & keuangan?", "Apa saran meningkatkan sistem administrasi & keuangan?")}
+                ${renderSection("KOORDINATOR BIDANG", "Seberapa puas Anda terhadap kinerja Koordinator Bidang dalam mengoordinasikan departemen di bawahnya selama satu bulan terakhir?", "Menurut Anda, apa yang kurang baik dari peran Koordinator Bidang dalam membina departemen?", "Apa saran untuk meningkatkan koordinasi Korbid dengan departemen di bawahnya?")}
+                ${renderSection("BADAN PENGURUS HARIAN", "Seberapa puas Anda terhadap kinerja BPH dalam mengoordinasikan jalannya organisasi selama satu bulan terakhir?", "Menurut Anda, apa hal yang kurang berjalan baik dari kinerja BPH selama satu bulan terakhir?", "Apa saran atau evaluasi untuk meningkatkan koordinasi dan sistem kerja BPH ke depan?")}
+                ${renderSection("KETUA BADAN BIRO DEPARTEMEN", "Seberapa puas Anda terhadap kinerja Ketua Badan/Biro/Departemen dalam memimpin dan mengoordinasikan timnya selama satu bulan terakhir?", "Menurut Anda, apa yang kurang baik dari kepemimpinan Ketua Badan/Biro/Departemen selama satu bulan terakhir?", "Apa saran atau masukan untuk meningkatkan kepemimpinan Ketua Badan/Biro/Departemen ke depan?")}
+                ${renderSection("FINANCE DAN KESTARI", "Seberapa puas Anda terhadap kinerja Kestari dan Finance dalam mengelola administrasi serta keuangan organisasi selama satu bulan terakhir?", "Menurut Anda, apa yang kurang berjalan baik dalam pengelolaan administrasi dan keuangan organisasi?", "Apa saran untuk meningkatkan sistem administrasi dan pengelolaan keuangan organisasi?")}
                 <button type="button" onclick="window.submitSurveyResponse('${s.id}')" id="btn-submit-${s.id}" class="w-full py-7 bg-indigo-600 text-white font-black rounded-[2.5rem] uppercase tracking-widest hover:bg-indigo-700 shadow-2xl transition-all">SUBMIT EVALUASI</button></form></div>`;
             lucide.createIcons();
         };
