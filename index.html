@@ -273,9 +273,11 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        <input type="text" id="admin-search" onkeyup="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm" placeholder="Cari Nama/NIM...">
-                        <select id="admin-filter-biro" onchange="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm"><option value="">Semua Biro</option></select>
-                        <select id="admin-filter-tw" onchange="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm">
+                        <input type="text" id="admin-search" onkeyup="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm shadow-inner" placeholder="Cari Nama/NIM...">
+                        <select id="admin-filter-biro" onchange="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm shadow-inner text-black">
+                            <option value="">Semua Biro</option>
+                        </select>
+                        <select id="admin-filter-tw" onchange="filterAdminTable()" class="px-6 py-4 rounded-2xl bg-slate-50 border-none font-black text-sm shadow-inner text-black">
                             <option value="1">Triwulan 1</option><option value="2">Triwulan 2</option><option value="3">Triwulan 3</option>
                         </select>
                     </div>
@@ -290,17 +292,17 @@
                         <div class="space-y-6">
                             <div>
                                 <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Target Biro Staf</label>
-                                <select id="pub-survey-biro" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none focus:ring-2 focus:ring-indigo-100">
+                                <select id="pub-survey-biro" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none focus:ring-2 focus:ring-indigo-100 text-black">
                                     <option value="Semua">Seluruh Internal BEM</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Waktu Mulai Pengisian</label>
-                                <input type="datetime-local" id="pub-survey-start" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none">
+                                <input type="datetime-local" id="pub-survey-start" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none text-black">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Waktu Berakhir</label>
-                                <input type="datetime-local" id="pub-survey-end" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none">
+                                <input type="datetime-local" id="pub-survey-end" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none text-black">
                             </div>
                             <button onclick="publishBPHVisitSurvey()" class="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">Publish ke Anggota</button>
                         </div>
@@ -429,11 +431,11 @@
             updateChart(scores);
             const depts = { "E1": "Manajemen Hutan", "E2": "Teknologi Hasil Hutan", "E3": "Konservasi Sumberdaya Hutan dan Ekowisata", "E4": "Silvikultur" };
             document.getElementById('profile-details').innerHTML = `
-                <div><p class="text-[10px] text-slate-400 font-black">DEPARTEMEN AKADEMIK</p><p class="font-black text-slate-800 text-lg">${depts[currentUser.NIM?.substring(0,2)] || "Kehutanan"}</p></div>
-                <div><p class="text-[10px] text-slate-400 font-black">BIRO / DEPARTEMEN BEM</p><p class="font-black text-slate-800 text-lg">${currentUser.Biro_Departemen}</p></div>
-                <div><p class="text-[10px] text-slate-400 font-black">JABATAN STRUKTURAL</p><p class="font-black text-slate-800 text-lg">${currentUser.Jabatan}</p></div>
-                <div><p class="text-[10px] text-slate-400 font-black">TANGGAL LAHIR</p><p class="font-black text-slate-800 text-lg">${currentUser.Tanggal_Lahir || "-"}</p></div>
-                <div class="sm:col-span-2"><p class="text-[10px] text-slate-400 font-black">ALAMAT SUREL</p><p class="font-black text-slate-800 text-lg break-all">${currentUser.Email || "-"}</p></div>`;
+                <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">DEPARTEMEN AKADEMIK</p><p class="font-black text-slate-800 text-lg">${depts[currentUser.NIM?.substring(0,2)] || "Fakultas Kehutanan"}</p></div>
+                <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">BIRO / DEPARTEMEN BEM</p><p class="font-black text-slate-800 text-lg">${currentUser.Biro_Departemen}</p></div>
+                <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">JABATAN STRUKTURAL</p><p class="font-black text-slate-800 text-lg">${currentUser.Jabatan}</p></div>
+                <div class="space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">TANGGAL LAHIR</p><p class="font-black text-slate-800 text-lg">${currentUser.Tanggal_Lahir || "-"}</p></div>
+                <div class="sm:col-span-2 space-y-2"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">ALAMAT SUREL</p><p class="font-black text-slate-800 text-lg break-all">${currentUser.Email || "-"}</p></div>`;
             document.getElementById('profile-nama').textContent = currentUser.Nama_Lengkap;
             document.getElementById('profile-nim-display').textContent = currentUser.NIM;
             refreshIcons();
@@ -480,7 +482,6 @@
             refreshIcons();
         }
 
-        // --- SURVEI ENGINE ---
         function publishBPHVisitSurvey() {
             const biro = document.getElementById('pub-survey-biro').value, start = document.getElementById('pub-survey-start').value, end = document.getElementById('pub-survey-end').value;
             if (!start || !end) { alert("Pilih waktu!"); return; }
@@ -509,24 +510,41 @@
             renderAdminActiveSurveys();
         }
 
-        // User Side Intro
         function renderUserSurveysIntro() {
             const c = document.getElementById('survey-list-container'); if (!c) return;
-            const now = Date.now(); const list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
+            const now = Date.now(); 
+            const list = JSON.parse(localStorage.getItem('bem_surveys') || '[]');
             const mySurveys = list.filter(s => (s.biro === "Semua" || s.biro === currentUser.Biro_Departemen) && (now + 120000) >= s.startTime && now <= s.endTime);
             
             if (mySurveys.length === 0) {
-                c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl">Tidak Ada Survei Aktif</p></div>`;
+                c.innerHTML = `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="clipboard-x" class="w-12 h-12 mx-auto text-slate-200 mb-6"></i><p class="text-slate-500 font-black text-xl leading-tight">Tidak Ada Survei Aktif</p><p class="text-slate-400 text-sm mt-2 font-medium">Mohon cek kembali sesuai jadwal pengisian yang telah ditentukan.</p></div>`;
             } else {
                 c.innerHTML = mySurveys.map(s => {
                     const nimKey = `sub_${s.id}_${currentUser.NIM}`;
                     const hasSubmitted = localStorage.getItem(nimKey);
-                    if (hasSubmitted) return `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="check-circle" class="w-12 h-12 mx-auto text-emerald-300 mb-6"></i><p class="text-slate-800 font-black text-xl">Survei Terkirim</p><p class="text-slate-400 mt-2">Anda sudah mengisi evaluasi ini. Terima kasih!</p></div>`;
-                    return `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto space-y-6">
+                    if (hasSubmitted) return `<div class="bg-white p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto"><i data-lucide="check-circle" class="w-12 h-12 mx-auto text-emerald-400 mb-6"></i><p class="text-slate-800 font-black text-xl">Survei Terkirim</p><p class="text-slate-400 mt-2">Anda sudah mengisi evaluasi ini. Terima kasih!</p></div>`;
+                    
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    const startStr = new Date(s.startTime).toLocaleString('id-ID', options);
+                    const endStr = new Date(s.endTime).toLocaleString('id-ID', options);
+
+                    return `<div class="bg-white p-10 sm:p-14 rounded-[3.5rem] text-center border shadow-sm max-w-4xl mx-auto space-y-8 animate-in zoom-in-95 duration-500">
                         <div class="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto"><i data-lucide="clipboard-list" class="text-indigo-600 w-10 h-10"></i></div>
-                        <h2 class="text-3xl font-black text-slate-900">${s.title}</h2>
-                        <p class="text-slate-500 font-medium max-w-2xl mx-auto">Klik tombol di bawah untuk mulai mengisi evaluasi terhadap kinerja BPH, Koordinator Bidang, serta Pimpinan BEM Fahutan.</p>
-                        <button onclick='renderSurveyForm(${JSON.stringify(s)})' class="px-12 py-5 bg-indigo-600 text-white font-black rounded-2xl uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">BPH VISIT</button>
+                        <h2 class="text-3xl font-black text-slate-900 leading-tight">${s.title}</h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-xl mx-auto">
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">WAKTU MULAI</p>
+                                <p class="text-xs font-bold text-slate-600">${startStr}</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-1">WAKTU BERAKHIR</p>
+                                <p class="text-xs font-bold text-slate-600">${endStr}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">Silakan mengisi evaluasi kinerja BPH, Koordinator Bidang, serta Pimpinan BEM Fahutan Kabinet Elaborasi Mimpi melalui tombol di bawah.</p>
+                        <button onclick='renderSurveyForm(${JSON.stringify(s)})' class="px-14 py-5 bg-indigo-600 text-white font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">BPH VISIT</button>
                     </div>`;
                 }).join('');
             }
@@ -539,10 +557,11 @@
                 <div class="bg-white rounded-[4rem] border border-slate-100 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 max-w-5xl mx-auto">
                     <div class="bg-indigo-950 p-14 text-white">
                         <span class="inline-block px-5 py-2 bg-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Internal Evaluasi</span>
-                        <h2 class="text-4xl font-black mb-8 leading-tight">${s.title}</h2>
-                        <p class="text-indigo-100 text-sm leading-relaxed whitespace-pre-line opacity-80 border-t border-white/10 pt-8 italic">
+                        <h2 class="text-4xl font-black mb-8 leading-tight tracking-tight">${s.title}</h2>
+                        <div class="text-indigo-100 text-sm leading-relaxed whitespace-pre-line opacity-80 border-t border-white/10 pt-8 italic">
                             Halo Dreamakers! Mohon berikan masukan jujur guna meningkatkan kualitas kepemimpinan, koordinasi, dan kinerja organisasi ke depan.
-                        </p>
+                            Partisipasi aktif dari seluruh staf sangat kami harapkan.
+                        </div>
                     </div>
                     <form id="form-survey-${s.id}" class="p-14 space-y-16">
                         ${renderSurveySection("KOORDINATOR BIDANG", 
@@ -565,7 +584,7 @@
                             "Menurut Anda, apa yang kurang berjalan baik dalam pengelolaan administrasi dan keuangan organisasi?", 
                             "Apa saran untuk meningkatkan sistem administrasi dan pengelolaan keuangan organisasi?")}
                         
-                        <button type="button" onclick="submitSurveyResponse('${s.id}')" id="btn-submit-${s.id}" class="w-full py-6 bg-indigo-600 text-white font-black rounded-[2.5rem] uppercase tracking-widest hover:bg-indigo-700 shadow-2xl">SUBMIT EVALUASI</button>
+                        <button type="button" onclick="submitSurveyResponse('${s.id}')" id="btn-submit-${s.id}" class="w-full py-7 bg-indigo-600 text-white font-black rounded-[2.5rem] uppercase tracking-widest hover:bg-indigo-700 shadow-2xl transition-all">SUBMIT EVALUASI</button>
                     </form>
                 </div>`;
             refreshIcons();
@@ -579,15 +598,15 @@
                         <span class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xs font-black">#</span> ${title}
                     </h3>
                     <div class="space-y-8">
-                        <div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100">
+                        <div class="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
                             <p class="text-sm font-black text-slate-800 mb-8 leading-relaxed">${qStar}</p>
                             <div class="star-group">${[5,4,3,2,1].map(v => `<input type="radio" id="${sectionId}-${v}" name="${sectionId}_star" value="${v}"><label for="${sectionId}-${v}">★</label>`).join('')}</div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">KEKURANGAN</p>
-                            <textarea name="${sectionId}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="${qLess}"></textarea></div>
+                            <textarea name="${sectionId}_less" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-100 transition-all shadow-inner" rows="3" placeholder="${qLess}"></textarea></div>
                             <div class="space-y-3"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">SARAN</p>
-                            <textarea name="${sectionId}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm outline-none focus:ring-4 focus:ring-indigo-100 transition-all" rows="3" placeholder="${qAdvice}"></textarea></div>
+                            <textarea name="${sectionId}_advice" class="w-full p-8 bg-slate-50 rounded-[2rem] border-none text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-100 transition-all shadow-inner" rows="3" placeholder="${qAdvice}"></textarea></div>
                         </div>
                     </div>
                 </div>`;
@@ -602,7 +621,7 @@
             const stars = form.querySelectorAll('input[type="radio"]:checked');
             if (stars.length < 4) { alert("Mohon isi rating bintang untuk semua kategori!"); return; }
 
-            btn.disabled = true; btn.textContent = "MENGIRIM DATA...";
+            btn.disabled = true; btn.textContent = "MENGIRIM JAWABAN...";
             
             const payload = {
                 timestamp: new Date().toLocaleString('id-ID'),
@@ -622,27 +641,27 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // Save submission state
+                // Save state
                 localStorage.setItem(`sub_${surveyId}_${currentUser.NIM}`, "true");
                 
-                // Show Success Modal
+                // Success UI
                 document.getElementById('success-modal').classList.remove('hidden');
                 switchTab('rapor');
             } catch (error) {
-                alert("Gangguan koneksi, data tidak terdata. Pastikan URL Script benar.");
+                alert("Kesalahan pengiriman. Periksa URL Script Anda.");
                 btn.disabled = false; btn.textContent = "SUBMIT EVALUASI";
             }
         }
 
-        // --- ADMIN PERFORMANCE ---
         function renderAdmin() {
-            const tw = document.getElementById('admin-filter-tw').value;
-            const data = twData[tw], c = document.getElementById('admin-performance-table'); if (!c) return;
+            const twEl = document.getElementById('admin-filter-tw'); if (!twEl) return;
+            const tw = twEl.value; const data = twData[tw];
+            const c = document.getElementById('admin-performance-table'); if (!c) return;
             const best = {}; data.forEach(x => { const v = parseFloat(x.Nilai_Akhir||0); if(!best[x.Biro_Departemen]||v>best[x.Biro_Departemen]) best[x.Biro_Departemen]=v; });
             const rows = [...mainDB].filter(u => u.NIM);
             rows.sort((a,b) => { const sA=parseFloat(data.find(x=>x.NIM===a.NIM)?.Nilai_Akhir||0), sB=parseFloat(data.find(x=>x.NIM===b.NIM)?.Nilai_Akhir||0); return adminSortOrder==='desc'?sB-sA:sA-sB; });
             c.innerHTML = `
-                <div class="overflow-x-auto rounded-[3rem] border border-slate-100 shadow-sm">
+                <div class="overflow-x-auto rounded-[3rem] border border-slate-100 shadow-sm mt-8">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b"><tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><th class="px-8 py-6">NIM</th><th class="px-8 py-6">Nama & Biro</th><th class="px-8 py-6 text-center">Nilai Akhir</th><th class="px-8 py-6 text-center">Mutu</th></tr></thead>
                         <tbody class="divide-y">${rows.map(u => {
@@ -665,7 +684,7 @@
             document.querySelectorAll('.admin-row').forEach(r => r.style.display = (r.getAttribute('data-name').includes(s) && (b === "" || r.getAttribute('data-biro') === b)) ? "table-row" : "none");
         }
         function handleLogout() { location.reload(); }
-        function exportData() { alert("Data sedang disiapkan..."); }
+        function exportData() { alert("Fitur ekspor CSV sedang disiapkan."); }
     </script>
 </body>
 </html>
