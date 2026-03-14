@@ -3,595 +3,614 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Persuratan BEM Fahutan IPB</title>
-    <!-- Tailwind CSS -->
+    <title>Rapor BEM FAHUTAN 2025/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        select option { color: black; background: white; }
-        /* Animasi transisi smooth */
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px 0 rgba(148, 0, 211, 0.5);
+        }
+
+        .animated-bg {
+            background: linear-gradient(-45deg, #4b0082, #9400D3, #8a2be2, #4b0082);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .progress-bar-fill {
+            transition: width 2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .mutu-A { color: #064e3b; font-weight: 800; }
+        .mutu-B { color: #1e3a8a; font-weight: 800; }
+        .mutu-C { color: #854d0e; font-weight: 800; }
+        .mutu-D { color: #991b1b; font-weight: 800; }
+
+        .tab-active {
+            border-bottom: 4px solid #9400D3;
+            color: #9400D3;
+            font-weight: 800;
+        }
+
+        .logo-glow {
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+        }
+
+        .ai-btn-glow {
+            animation: pulse-ai 2.5s infinite;
+        }
+
+        @keyframes pulse-ai {
+            0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(147, 51, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; }
+        ::-webkit-scrollbar-thumb { background: #9400D3; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-[#0a1128] text-white overflow-x-hidden">
-    <div id="root"></div>
+<body class="bg-slate-50 min-h-screen">
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback, useMemo } = React;
-        
-        // --- KONFIGURASI ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxmMf9yjoNuzbypcGQMp2Q_XSpgzcWfuEG_hHvne_fIWg-Oy9iXEMtcsqqOSq1cmGv/exec"; 
-        const LOGO_URL = "https://i.ibb.co.com/PGDMfSbq/logo.png";
-
-        // Komponen GlassCard tetap di luar untuk stabilitas
-        const GlassCard = ({ children, className = "" }) => (
-            <div className={`glass rounded-2xl p-6 shadow-xl relative z-10 ${className}`}>
-                {children}
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center animated-bg p-4 overflow-hidden">
+        <div class="glass p-10 rounded-[3rem] w-full max-w-md flex flex-col items-center text-white relative z-10 transition-transform duration-500 hover:scale-[1.01]">
+            <div class="absolute -top-20 -left-20 w-56 h-56 bg-purple-400 rounded-full opacity-20 blur-3xl"></div>
+            <div class="absolute -bottom-20 -right-20 w-56 h-56 bg-white rounded-full opacity-10 blur-3xl"></div>
+            
+            <div class="mb-8 relative z-20">
+                <div class="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 logo-glow">
+                    <img src="https://iili.io/qaJEpMG.png" alt="Logo BEM" class="w-24 h-24 object-contain p-2" onerror="this.src='https://freeimage.host/i/qaJEpMG'">
+                </div>
             </div>
-        );
+            
+            <div class="text-center mb-10 relative z-20">
+                <h1 class="text-3xl font-black tracking-tight leading-tight uppercase">RAPOR BEM FAHUTAN</h1>
+                <p class="text-purple-200 mt-2 font-bold tracking-widest text-sm italic">Kabinet Elaborasi Mimpi</p>
+            </div>
 
-        // Komponen InputField dengan integrasi Lucide Icons
-        const InputField = ({ label, showToggle, toggleAction, isPasswordVisible, ...props }) => (
-            <div className="mb-4 relative">
-                <label className="block text-sm font-bold text-blue-100 mb-1.5">{label}</label>
-                <div className="relative">
-                    <input 
-                        {...props} 
-                        className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-white/20 transition-all ${props.disabled ? 'border-white/10 opacity-50 cursor-not-allowed' : 'border-white/20 group-hover:border-white/40'}`}
-                    />
-                    {showToggle && (
-                        <button 
-                            type="button" 
-                            onClick={toggleAction}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors p-1 mt-3"
-                        >
-                            <i data-lucide={isPasswordVisible ? "eye-off" : "eye"} style={{ width: 18, height: 18 }}></i>
+            <div class="w-full space-y-6 relative z-30">
+                <div class="space-y-2">
+                    <input type="text" id="username" placeholder="Username" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white/30 transition-all shadow-inner font-medium">
+                </div>
+                <div class="relative space-y-2">
+                    <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-white/20 border border-white/40 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white/30 transition-all shadow-inner font-medium">
+                    <button type="button" onclick="togglePassword()" class="absolute right-5 top-4 text-white/70 hover:text-white transition-colors">
+                        <i data-lucide="eye" id="eye-icon" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <button onclick="handleLogin()" id="login-btn" class="w-full py-4 bg-white text-purple-900 font-black rounded-2xl shadow-2xl hover:bg-purple-50 hover:scale-[1.03] active:scale-95 transition-all duration-300 tracking-widest uppercase text-sm mt-4">
+                    MASUK SISTEM
+                </button>
+                <p id="login-error" class="text-red-300 text-xs font-bold text-center hidden animate-bounce mt-2 uppercase">Gagal: Username atau Password salah!</p>
+            </div>
+
+            <div class="mt-14 text-center space-y-1 opacity-80 relative z-20">
+                <p class="text-[9px] font-black uppercase tracking-[0.2em]">Dikelola oleh Biro Research and Development</p>
+                <p class="text-[9px] font-medium tracking-wider">© 2026 BEM Fakultas Kehutanan dan Lingkungan</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="main-app" class="hidden opacity-0 transition-opacity duration-1000">
+        <!-- AI Motivation Popup -->
+        <div id="affirmation-popup" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+            <div class="glass bg-white p-10 rounded-[3rem] max-w-sm w-full text-center border-none shadow-2xl">
+                <div class="w-20 h-20 bg-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl rotate-6">
+                    <i data-lucide="sparkles" class="text-white w-10 h-10"></i>
+                </div>
+                <h3 class="text-2xl font-black text-purple-950 mb-4 tracking-tight">Semangat Anggota! ✨</h3>
+                <div id="affirmation-loading" class="flex flex-col items-center gap-2 mb-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                    <p class="text-[10px] text-purple-600 font-bold uppercase tracking-widest">Merangkai Motivasi AI...</p>
+                </div>
+                <p id="affirmation-text" class="text-slate-600 font-semibold leading-relaxed italic hidden"></p>
+                <button onclick="document.getElementById('affirmation-popup').classList.add('hidden')" class="mt-8 px-10 py-3 bg-purple-700 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-purple-800 transition-colors">Ayo Mulai</button>
+            </div>
+        </div>
+
+        <!-- AI Deep Analysis Modal -->
+        <div id="ai-modal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl hidden">
+            <div class="bg-white p-10 rounded-[3rem] max-w-2xl w-full shadow-2xl relative border border-purple-100">
+                <button onclick="document.getElementById('ai-modal').classList.add('hidden')" class="absolute top-8 right-8 text-slate-300 hover:text-red-500 transition-colors">
+                    <i data-lucide="x-circle" class="w-8 h-8"></i>
+                </button>
+                <div class="flex items-center gap-5 mb-8">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="brain-circuit" class="text-white w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">Analisis Kinerja ✨</h3>
+                        <p class="text-xs font-black text-purple-600 uppercase tracking-widest">Gemini Intelligent Engine</p>
+                    </div>
+                </div>
+                <div id="ai-loading" class="py-12 space-y-6">
+                    <div class="h-4 bg-slate-100 rounded-full w-3/4 animate-pulse"></div>
+                    <div class="h-4 bg-slate-100 rounded-full w-full animate-pulse"></div>
+                    <div class="h-4 bg-slate-100 rounded-full w-5/6 animate-pulse"></div>
+                    <p class="text-center text-xs text-slate-400 font-bold tracking-widest uppercase">Mengkalkulasi variabel kinerja...</p>
+                </div>
+                <div id="ai-result" class="hidden text-slate-700 leading-relaxed max-h-[450px] overflow-y-auto pr-4 font-medium text-sm">
+                    <!-- AI response injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-xl shadow-sm sticky top-0 z-40 border-b border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-24">
+                    <div class="flex items-center space-x-5">
+                        <img src="https://iili.io/qaJEpMG.png" class="w-12 h-12 object-contain" onerror="this.src='https://i.ibb.co/LST6m8F/logo-bem.png'">
+                        <div>
+                            <span class="font-black text-purple-800 text-xl block leading-none tracking-tight">BEM FAHUTAN</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 block">Kabinet Elaborasi Mimpi</span>
+                        </div>
+                    </div>
+                    
+                    <nav class="hidden md:flex space-x-10 h-full">
+                        <button onclick="switchTab('rapor')" id="tab-rapor" class="px-2 h-full flex items-center text-xs font-black uppercase tracking-widest tab-active">Rapor & Analisis</button>
+                        <button onclick="switchTab('profil')" id="tab-profil" class="px-2 h-full flex items-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-purple-600 transition-colors">Profil Saya</button>
+                        <button id="admin-nav-btn" onclick="switchTab('admin')" class="px-2 h-full items-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-purple-600 hidden">Admin BMI</button>
+                    </nav>
+
+                    <div class="flex items-center space-x-5">
+                        <div class="text-right hidden sm:block">
+                            <span id="nav-user-name" class="text-sm font-black text-slate-900 block leading-none">Anggota</span>
+                            <span class="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Akun Terverifikasi</span>
+                        </div>
+                        <button onclick="handleLogout()" class="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                            <i data-lucide="power" class="w-6 h-6"></i>
                         </button>
-                    )}
-                </div>
-            </div>
-        );
-
-        const SelectField = ({ label, options, ...props }) => (
-            <div className="mb-4">
-                <label className="block text-sm font-bold text-blue-100 mb-1.5">{label}</label>
-                <div className="relative">
-                    <select 
-                        {...props} 
-                        className={`w-full bg-white/10 border rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none ${props.disabled ? 'border-white/10 opacity-50 cursor-not-allowed' : 'border-white/20'}`}
-                    >
-                        <option value="">Pilih Opsi</option>
-                        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                        <i data-lucide="chevron-down" style={{width: 14}}></i>
                     </div>
                 </div>
             </div>
-        );
+        </header>
 
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [view, setView] = useState('dashboard');
-            const [loading, setLoading] = useState(false);
-            const [dataArsip, setDataArsip] = useState([]);
-            const [dataCOPM, setDataCOPM] = useState([]);
-            const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-            const [showPassword, setShowPassword] = useState(false);
-            const [error, setError] = useState('');
-            const [submitting, setSubmitting] = useState(false);
-            const [searchQuery, setSearchQuery] = useState('');
-            const [showDeleteModal, setShowDeleteModal] = useState(null);
+        <main class="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+            
+            <!-- SECTION: RAPOR -->
+            <div id="section-rapor" class="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-1000">
+                
+                <!-- Hero Card -->
+                <div class="bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-10 relative overflow-hidden">
+                    <div class="absolute -right-32 -top-32 w-80 h-80 bg-purple-50 rounded-full opacity-40 blur-3xl"></div>
+                    <div class="relative z-10 space-y-4">
+                        <span class="inline-block px-4 py-1.5 bg-purple-100 text-purple-700 text-[10px] font-black rounded-full uppercase tracking-[0.2em]">Sistem Penilaian Internal</span>
+                        <h2 id="display-nama" class="text-4xl font-black text-slate-900 leading-tight">Memuat Data...</h2>
+                        <div class="flex flex-wrap gap-6 pt-2">
+                            <p class="flex items-center gap-2 text-slate-500 font-bold text-sm bg-slate-50 px-4 py-2 rounded-xl">
+                                <i data-lucide="fingerprint" class="w-4 h-4 text-purple-500"></i> <span id="display-nim">...</span>
+                            </p>
+                            <p class="flex items-center gap-2 text-slate-500 font-bold text-sm bg-slate-50 px-4 py-2 rounded-xl">
+                                <i data-lucide="crown" class="w-4 h-4 text-purple-500"></i> <span id="display-jabatan">...</span>
+                            </p>
+                        </div>
+                        <p class="text-purple-800 font-black text-sm flex items-center gap-3 mt-4" id="display-biro">
+                            <i data-lucide="boxes" class="w-5 h-5"></i> Biro/Departemen BEM
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-700 to-indigo-900 p-10 rounded-[3rem] text-center text-white shadow-2xl shadow-purple-200 min-w-[240px] relative z-10 border-4 border-white/10">
+                        <p class="text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-70">Rata-rata Kumulatif</p>
+                        <p class="text-6xl font-black tracking-tighter">
+                            <span id="display-avg">0.00</span><span class="text-xl opacity-50 ml-1">/ 4.00</span>
+                        </p>
+                        <div class="mt-4 h-1.5 w-16 bg-white/20 mx-auto rounded-full"></div>
+                    </div>
+                </div>
 
-            const [formArsip, setFormArsip] = useState({
-                tglTerima: '', noSurat: '', tglSurat: '', asal: '', perihal: '', diteruskan: '', kode: '', file: null
-            });
+                <!-- Trending Chart -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div class="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100">
+                        <h3 class="font-black text-slate-800 text-xl flex items-center gap-4 mb-10">
+                            <span class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-7 h-7 text-emerald-600"></i>
+                            </span>
+                            Progress Kinerja Triwulan
+                        </h3>
+                        <div class="h-[350px] w-full">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
 
-            const [formCOPM, setFormCOPM] = useState({
-                noSurat: '', judul: '', linkDocs: '', owner: '', tglIsi: '', deadline: '', status: 'Draft', notes: '', linkPdf: ''
-            });
+                    <div class="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl"></div>
+                        <div>
+                            <h3 class="font-black text-purple-400 uppercase tracking-widest text-[10px] mb-8">Status Pencapaian</h3>
+                            <div class="flex items-center gap-5 mb-10">
+                                <div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10">
+                                    <i data-lucide="rocket" class="w-10 h-10 text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-3xl font-black tracking-tight" id="trend-text">Stabil</p>
+                                    <p class="text-xs text-slate-400 font-bold mt-1">Dihitung dari tren TW</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm">
+                            <p class="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] mb-3">Saran AI ✨</p>
+                            <p class="text-xs italic leading-relaxed text-slate-200 font-medium">Klik tombol <span class="text-purple-400">bintang</span> di kartu triwulan untuk mendapatkan analisis taktis dari AI.</p>
+                        </div>
+                    </div>
+                </div>
 
-            const DEPARTEMEN_LIST = ["BEM Fahutan", "Ketua BEM", "Sekretaris", "Bendahara", "Koordinator Bidang", "Badan Manajemen Internal", "Biro Research and Development", "Biro Media and Digital Information", "Departemen Advokasi dan Kesejahteraan Mahasiswa", "Departemen Konektivitas Eksternal", "Departemen Ekonomi Kreatif", "Departemen Human Resource and Development", "Departemen Akademik dan Prestasi", "Departemen Seni dan Budaya", "Departemen Olahraga", "Departemen Sosial Lingkungan dan Kehutanan", "Departemen Kajian dan Aksi Strategis"];
-            const KODE_ARSIP = ["INT", "ORM", "UKM", "BEM", "DTM", "FAK", "IPB", "EKS", "MIT", "MED"];
-            const OWNER_LIST = ["BPH", "MI", "RND", "MENDIGI", "KESTARI", "FINANCE", "KORBID", "KONEK", "ADKESMAH", "EKRAF", "AKPRES", "SENBUD", "HRD", "DEPOR", "SLH", "KASTRAT", "[MP] FORCUP", "[MP] BCR", "[MP] SEMARAK", "[MP] FACT", "[MP] RIMBADES", "Faculty Day"];
-            const STATUS_LIST = ["Draft", "Final", "Revisi"];
+                <!-- Quarters Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div id="tw-card-1" class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full hover:shadow-xl hover:shadow-purple-50 transition-all">
+                        <div class="bg-slate-50/50 px-10 py-6 border-b flex justify-between items-center">
+                            <h3 class="font-black text-slate-700 text-xs uppercase tracking-widest">Triwulan 1</h3>
+                            <span id="mutu-tw1" class="px-5 py-2 rounded-full text-xs font-black bg-white shadow-sm tracking-tighter">-</span>
+                        </div>
+                        <div id="content-tw1" class="p-10 flex-grow">
+                            <p class="text-slate-300 text-center py-20 italic font-bold text-sm">Data Tidak Tersedia</p>
+                        </div>
+                    </div>
 
-            useEffect(() => { 
-                lucide.createIcons(); 
-            });
+                    <div id="tw-card-2" class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full hover:shadow-xl hover:shadow-purple-50 transition-all">
+                        <div class="bg-slate-50/50 px-10 py-6 border-b flex justify-between items-center">
+                            <h3 class="font-black text-slate-700 text-xs uppercase tracking-widest">Triwulan 2</h3>
+                            <span id="mutu-tw2" class="px-5 py-2 rounded-full text-xs font-black bg-white shadow-sm tracking-tighter">-</span>
+                        </div>
+                        <div id="content-tw2" class="p-10 flex-grow">
+                            <p class="text-slate-300 text-center py-20 italic font-bold text-sm">Data Tidak Tersedia</p>
+                        </div>
+                    </div>
 
-            const handleLogin = async (e) => {
-                e.preventDefault();
-                setLoading(true);
-                setError('');
+                    <div id="tw-card-3" class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full hover:shadow-xl hover:shadow-purple-50 transition-all">
+                        <div class="bg-slate-50/50 px-10 py-6 border-b flex justify-between items-center">
+                            <h3 class="font-black text-slate-700 text-xs uppercase tracking-widest">Triwulan 3</h3>
+                            <span id="mutu-tw3" class="px-5 py-2 rounded-full text-xs font-black bg-white shadow-sm tracking-tighter">-</span>
+                        </div>
+                        <div id="content-tw3" class="p-10 flex-grow">
+                            <p class="text-slate-300 text-center py-20 italic font-bold text-sm">Data Tidak Tersedia</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECTION: PROFIL -->
+            <div id="section-profil" class="hidden max-w-5xl mx-auto space-y-10 animate-in fade-in duration-700">
+                <button onclick="switchTab('rapor')" class="flex items-center text-purple-600 font-black hover:gap-4 transition-all gap-2 uppercase text-xs tracking-widest">
+                    <i data-lucide="arrow-left-circle" class="w-6 h-6"></i> Kembali ke Rapor
+                </button>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="bg-white rounded-[3rem] shadow-sm p-12 text-center border border-slate-100 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-purple-50/30 to-transparent"></div>
+                        <div class="w-36 h-36 bg-purple-100 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 relative z-10 shadow-inner">
+                            <i data-lucide="user-round" class="w-16 h-16 text-purple-600"></i>
+                        </div>
+                        <h2 id="profile-nama" class="text-2xl font-black text-slate-900 leading-tight relative z-10">Nama Anggota</h2>
+                        <p id="profile-nim" class="text-purple-500 font-black mt-2 uppercase tracking-widest text-sm relative z-10">NIM</p>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-10">
+                        <div class="bg-white rounded-[3rem] shadow-sm p-12 border border-slate-100">
+                            <h3 class="font-black text-slate-800 text-lg mb-10 flex items-center gap-3">
+                                <i data-lucide="id-card" class="text-purple-600 w-6 h-6"></i> Detail Organisasi
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                                <div class="space-y-1"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Departemen Akademik</p><p id="profile-dept-akademik" class="font-black text-slate-700">...</p></div>
+                                <div class="space-y-1"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Biro / Departemen BEM</p><p id="profile-biro" class="font-black text-slate-700">...</p></div>
+                                <div class="space-y-1"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Tanggal Lahir</p><p id="profile-tgl-lahir" class="font-black text-slate-700">...</p></div>
+                                <div class="space-y-1"><p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Alamat Surel</p><p id="profile-email" class="font-black text-slate-700 text-sm">...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ADMIN -->
+            <div id="section-admin" class="hidden space-y-10 animate-in fade-in duration-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Pusat Data BMI</h2>
+                        <p class="text-slate-500 font-bold mt-2">Monitoring kinerja kolektif Kabinet Elaborasi Mimpi.</p>
+                    </div>
+                    <button onclick="exportData('csv')" class="px-10 py-5 bg-emerald-600 text-white text-xs font-black rounded-3xl flex items-center gap-3 shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-colors uppercase tracking-widest">
+                        <i data-lucide="sheet" class="w-5 h-5"></i> Ekspor CSV
+                    </button>
+                </div>
+
+                <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pencarian</label>
+                            <input type="text" id="admin-search" onkeyup="filterAdminTable()" class="w-full px-8 py-5 rounded-3xl bg-slate-50 border-none font-black outline-none focus:ring-4 focus:ring-purple-100 transition-all text-slate-900" placeholder="Ketik Nama/NIM...">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Biro / Departemen</label>
+                            <select id="admin-filter-biro" onchange="filterAdminTable()" class="w-full px-8 py-5 rounded-3xl bg-slate-50 border-none font-black outline-none focus:ring-4 focus:ring-purple-100 transition-all text-slate-900">
+                                <option value="">Semua Biro</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Periode Triwulan</label>
+                            <select id="admin-filter-tw" onchange="filterAdminTable()" class="w-full px-8 py-5 rounded-3xl bg-slate-50 border-none font-black outline-none focus:ring-4 focus:ring-purple-100 transition-all text-slate-900">
+                                <option value="1">Triwulan 1</option>
+                                <option value="2">Triwulan 2</option>
+                                <option value="3">Triwulan 3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-[2rem] border border-slate-50">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50">
+                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    <th class="px-8 py-5">NIM</th>
+                                    <th class="px-8 py-5">Identitas Anggota</th>
+                                    <th class="px-8 py-5 text-center">Skor Akhir (4.00)</th>
+                                    <th class="px-8 py-5 text-center">Mutu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-slate-50">
+                                <!-- Data rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // API KEY & DATABASE ENDPOINTS
+        const apiKey = ""; 
+        const BASE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=0&single=true&output=csv";
+        const TW1_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1910706860&single=true&output=csv";
+        const TW2_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1724018331&single=true&output=csv";
+        const TW3_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9VR79GJ9IPYlgaAYuHtEXcSBxA-Zb_kBohzwiwtrJu9HVX5S3GVlvhwE0Xbwy_dyX0Y5PYQuLBgcv/pub?gid=1134099960&single=true&output=csv";
+
+        // APP STATE
+        let currentUser = null, mainDB = [], tw1Data = [], tw2Data = [], tw3Data = [], myChart = null;
+
+        // GEMINI AI INTEGRATION
+        async function callGemini(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
                 try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ 
-                            action: 'login', 
-                            payload: loginForm
-                        })
+                    const res = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                     });
-                    const result = await response.json();
-                    if (result.status === 'success') {
-                        setUser(result.user);
-                    } else {
-                        setError(result.message || 'Username atau Password salah!');
-                    }
-                } catch (err) { 
-                    setError('Koneksi database gagal. Periksa Script URL.'); 
+                    if (!res.ok) throw new Error("API Busy");
+                    const data = await res.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (e) {
+                    if (i === 4) return "AI sedang sibuk. Silakan coba beberapa saat lagi.";
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
                 }
-                setLoading(false);
-            };
-
-            const fetchData = useCallback(async () => {
-                if (!user) return;
-                setLoading(true);
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=readAll`);
-                    const result = await response.json();
-                    setDataArsip(result.arsip || []);
-                    setDataCOPM(result.copm || []);
-                } catch (err) { console.error(err); }
-                setLoading(false);
-            }, [user]);
-
-            useEffect(() => { if (user) fetchData(); }, [user, fetchData]);
-
-            const handleSubmitArsip = async (e) => {
-                e.preventDefault();
-                setSubmitting(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'submitArsip', payload: formArsip })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') {
-                        alert("Surat berhasil diarsipkan!");
-                        setFormArsip({ tglTerima: '', noSurat: '', tglSurat: '', asal: '', perihal: '', diteruskan: '', kode: '', file: null });
-                        fetchData();
-                        setView('data-arsip');
-                    }
-                } catch (err) { alert("Terjadi kesalahan pengiriman."); }
-                setSubmitting(false);
-            };
-
-            const handleSubmitCOPM = async (e) => {
-                e.preventDefault();
-                setSubmitting(true);
-                try {
-                    const payload = { ...formCOPM, notes: formCOPM.notes || "" };
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'submitCOPM', payload })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') {
-                        alert("Data COPM Berhasil Diperbarui!");
-                        setFormCOPM({ noSurat: '', judul: '', linkDocs: '', owner: '', tglIsi: '', deadline: '', status: 'Draft', notes: '', linkPdf: '' });
-                        fetchData();
-                        setView('cek-status');
-                    }
-                } catch (err) { alert("Gagal memperbarui data."); }
-                setSubmitting(false);
-            };
-
-            const handleDeleteArsip = async (noSurat) => {
-                setLoading(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'deleteArsip', payload: { noSurat } })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') fetchData();
-                } catch (err) { console.error(err); }
-                setShowDeleteModal(null);
-                setLoading(false);
-            };
-
-            // FUNGSI EDIT YANG SEBELUMNYA HILANG
-            const handleEditCOPM = (item) => {
-                setFormCOPM(item);
-                setView('ajukan');
-            };
-
-            const filteredArsip = dataArsip.filter(item => 
-                Object.values(item).some(val => String(val).toLowerCase().includes(searchQuery.toLowerCase()))
-            );
-
-            if (!user) {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative bg-[#0a0e27]">
-                        <div className="absolute w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-                        <GlassCard className="w-full max-w-md border-t-4 border-t-[#193DEB] fade-in">
-                            <div className="text-center mb-8">
-                                <img src={LOGO_URL} alt="Logo" className="h-24 mx-auto mb-4 drop-shadow-lg" />
-                                <h1 className="text-xl font-extrabold uppercase tracking-widest text-white">Sistem Persuratan</h1>
-                                <p className="text-blue-300 text-[10px] mt-1 font-bold uppercase tracking-wider">BEM Fahutan Elaborasi Mimpi</p>
-                            </div>
-                            <form onSubmit={handleLogin}>
-                                <InputField 
-                                    label="Username" 
-                                    type="text" 
-                                    value={loginForm.username} 
-                                    onChange={e => setLoginForm(p => ({...p, username: e.target.value}))} 
-                                    required 
-                                    placeholder="Username"
-                                />
-                                <InputField 
-                                    label="Password" 
-                                    type={showPassword ? "text" : "password"} 
-                                    value={loginForm.password} 
-                                    onChange={e => setLoginForm(p => ({...p, password: e.target.value}))} 
-                                    required 
-                                    placeholder="Password"
-                                    showToggle={true}
-                                    isPasswordVisible={showPassword}
-                                    toggleAction={() => setShowPassword(!showPassword)}
-                                />
-                                {error && (
-                                    <div className="text-red-400 text-[10px] mb-4 flex items-center gap-2 bg-red-400/10 p-2 rounded-lg border border-red-400/20">
-                                        <i data-lucide="alert-circle" style={{width: 14}}></i> {error}
-                                    </div>
-                                )}
-                                <button disabled={loading} className="w-full py-4 bg-[#193DEB] hover:bg-blue-600 text-white font-black rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
-                                    {loading ? <i data-lucide="loader" className="animate-spin"></i> : <i data-lucide="log-in"></i>}
-                                    {loading ? "MEMUAT..." : "MASUK KE SISTEM"}
-                                </button>
-                            </form>
-                        </GlassCard>
-                        <div className="mt-8 text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">&copy; Sekretaris Eksekutif</div>
-                    </div>
-                );
             }
+        }
 
-            return (
-                <div className="min-h-screen flex flex-col md:flex-row bg-[#0a1128]">
-                    {/* Sidebar */}
-                    <div className="w-full md:w-64 bg-black/40 backdrop-blur-xl border-r border-white/10 p-6 flex flex-col shrink-0">
-                        <div className="mb-10 flex items-center gap-3">
-                            <img src={LOGO_URL} className="h-10" alt="Logo" />
-                            <div className="text-xs font-black leading-tight uppercase tracking-tighter">ELABORASI<br/><span className="text-blue-500">MIMPI</span></div>
-                        </div>
-                        <nav className="flex-1 space-y-2 font-bold text-sm">
-                            <button onClick={() => setView('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'dashboard' ? 'bg-[#193DEB] shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="layout-dashboard"></i> Dashboard
-                            </button>
-                            {user.role === 'admin' && (
-                                <>
-                                    <div className="pt-6 pb-2 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Pengarsipan</div>
-                                    <button onClick={() => setView('arsipkan')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'arsipkan' ? 'bg-[#193DEB] shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}>
-                                        <i data-lucide="archive"></i> Arsipkan Surat
-                                    </button>
-                                    <button onClick={() => setView('data-arsip')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'data-arsip' ? 'bg-[#193DEB] shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}>
-                                        <i data-lucide="list"></i> Data Surat
-                                    </button>
-                                </>
-                            )}
-                            <div className="pt-6 pb-2 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">COPM Surat</div>
-                            <button onClick={() => setView('ajukan')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'ajukan' ? 'bg-[#193DEB] shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="plus-circle"></i> Ajukan Surat
-                            </button>
-                            <button onClick={() => setView('cek-status')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'cek-status' ? 'bg-[#193DEB] shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="shield-check"></i> Cek Status
-                            </button>
-                        </nav>
-                        <div className="mt-auto pt-6 border-t border-white/10 flex items-center gap-3 text-[10px]">
-                            <div className="bg-[#193DEB] w-8 h-8 rounded-lg font-black flex items-center justify-center text-white">U</div>
-                            <div className="truncate flex-1">
-                                <b className="text-white uppercase tracking-wider">{user.nama_lengkap}</b><br/>
-                                <span className="opacity-50 font-bold uppercase">{user.biro_departemen}</span>
-                            </div>
-                            <button onClick={() => setUser(null)} className="text-red-400 hover:bg-red-400/10 p-2 rounded-lg transition-all" title="Logout">
-                                <i data-lucide="log-out" style={{width: 16}}></i>
-                            </button>
+        async function analyzeWithAI(twNum, data) {
+            const modal = document.getElementById('ai-modal');
+            modal.classList.remove('hidden');
+            document.getElementById('ai-loading').classList.remove('hidden');
+            document.getElementById('ai-result').classList.add('hidden');
+
+            const prompt = `Analisis performa anggota BEM: Nama ${currentUser.Nama_Lengkap}, Jabatan ${currentUser.Jabatan}, Triwulan ${twNum}. Statistik skala 4.0: Kehadiran ${data["Kehadiran_40%"]}, TJ ${data["TanggungJawab_35%"]}, Keaktifan ${data["Keaktifan_25%"]}, Nilai Akhir ${data.Nilai_Akhir}, Mutu ${data.Mutu}. Tuliskan dalam 3 poin: Keunggulan, Area Pengembangan, dan Pesan Semangat. Bahasa Indonesia ramah. Format Markdown.`;
+            
+            const result = await callGemini(prompt);
+            document.getElementById('ai-loading').classList.add('hidden');
+            const resEl = document.getElementById('ai-result');
+            resEl.innerHTML = result.replace(/\n/g, '<br>');
+            resEl.classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function refreshIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+
+        window.onload = async () => { refreshIcons(); await loadAllData(); };
+
+        async function loadAllData() {
+            try {
+                mainDB = await fetchCSV(BASE_CSV);
+                tw1Data = await fetchCSV(TW1_URL);
+                tw2Data = await fetchCSV(TW2_URL);
+                tw3Data = await fetchCSV(TW3_URL);
+                
+                const biros = [...new Set(mainDB.map(i => i.Biro_Departemen))].filter(b => b);
+                biros.forEach(b => {
+                    const opt = document.createElement('option'); opt.value = b; opt.textContent = b;
+                    document.getElementById('admin-filter-biro').appendChild(opt);
+                });
+            } catch (e) { console.error("Critical Load Failure", e); }
+        }
+
+        async function fetchCSV(url) {
+            return new Promise((res, rej) => Papa.parse(url, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: r => res(r.data), error: e => rej(e)
+            }));
+        }
+
+        function togglePassword() {
+            const p = document.getElementById('password'), icon = document.getElementById('eye-icon');
+            p.type = p.type === "password" ? "text" : "password";
+            icon.setAttribute('data-lucide', p.type === "password" ? "eye" : "eye-off");
+            refreshIcons();
+        }
+
+        async function handleLogin() {
+            const uInput = document.getElementById('username').value.trim(), pInput = document.getElementById('password').value.trim();
+            if (!uInput || !pInput) return;
+            if (uInput === "raporbmi" && pInput === "biemi123") { currentUser = { Nama_Lengkap: "Admin BMI", NIM: "ADMIN", Role: "ADMIN" }; showApp(); return; }
+            const user = mainDB.find(x => x.NIM === uInput && x.Password === pInput);
+            if (user) { currentUser = user; showApp(); }
+            else document.getElementById('login-error').classList.remove('hidden');
+        }
+
+        async function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            const app = document.getElementById('main-app'); app.classList.remove('hidden');
+            setTimeout(() => app.classList.add('opacity-100'), 10);
+            document.getElementById('nav-user-name').textContent = currentUser.Nama_Lengkap;
+            if (currentUser.Role === "ADMIN") document.getElementById('admin-nav-btn').classList.remove('hidden');
+            document.getElementById('affirmation-popup').classList.remove('hidden');
+            const aff = await callGemini(`Tuliskan satu kalimat motivasi pendek untuk ${currentUser.Nama_Lengkap} (${currentUser.Jabatan}). Bahasa Indonesia.`);
+            document.getElementById('affirmation-loading').classList.add('hidden');
+            const affT = document.getElementById('affirmation-text'); affT.textContent = aff || "Terus berkarya!"; affT.classList.remove('hidden');
+            populateUserData();
+            refreshIcons();
+        }
+
+        function populateUserData() {
+            if (currentUser.Role === "ADMIN") { switchTab('admin'); return; }
+            document.getElementById('display-nama').textContent = currentUser.Nama_Lengkap;
+            document.getElementById('display-nim').textContent = currentUser.NIM;
+            document.getElementById('display-jabatan').textContent = currentUser.Jabatan;
+            document.getElementById('display-biro').textContent = currentUser.Biro_Departemen;
+            const my1 = tw1Data.find(d => d.NIM === currentUser.NIM), my2 = tw2Data.find(d => d.NIM === currentUser.NIM), my3 = tw3Data.find(d => d.NIM === currentUser.NIM);
+            renderTW('tw1', my1, 1); renderTW('tw2', my2, 2); renderTW('tw3', my3, 3);
+            const scores = [my1, my2, my3].map(x => x && x.Nilai_Akhir ? parseFloat(x.Nilai_Akhir) : null).filter(x => x !== null);
+            const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : "0.00";
+            animateNumber('display-avg', 0, avg);
+            updateChart(scores);
+            const trendText = document.getElementById('trend-text');
+            if (scores.length >= 2) {
+                const diff = scores[scores.length - 1] - scores[scores.length - 2];
+                trendText.textContent = diff > 0 ? "Meningkat" : diff < 0 ? "Menurun" : "Stabil";
+            }
+            document.getElementById('profile-nama').textContent = currentUser.Nama_Lengkap;
+            document.getElementById('profile-nim').textContent = currentUser.NIM;
+            document.getElementById('profile-biro').textContent = currentUser.Biro_Departemen;
+            document.getElementById('profile-email').textContent = currentUser.Email || "-";
+            document.getElementById('profile-tgl-lahir').textContent = currentUser.Tanggal_Lahir || "-";
+            const nimPrefix = currentUser.NIM.substring(0, 2);
+            const deptMapping = { "E1": "Manajemen Hutan", "E2": "Teknologi Hasil Hutan", "E3": "KSHE", "E4": "Silvikultur" };
+            document.getElementById('profile-dept-akademik').textContent = deptMapping[nimPrefix] || "Fakultas Kehutanan & Lingkungan";
+        }
+
+        function renderTW(id, data, twNum) {
+            const cardContent = document.getElementById(`content-${id}`), badge = document.getElementById(`mutu-${id}`);
+            if (!data || !data.Nilai_Akhir) { cardContent.innerHTML = `<p class="text-slate-300 text-center py-20 italic font-bold text-sm">Data Tidak Tersedia</p>`; badge.textContent = "-"; return; }
+            badge.textContent = data.Mutu || "-"; 
+            badge.className = `px-5 py-2 rounded-full text-xs font-black bg-white shadow-sm tracking-tighter mutu-${data.Mutu}`;
+            
+            // Raw numbers from CSV (ensure exact 2 decimal points)
+            const pres = parseFloat(data["Kehadiran_40%"]);
+            const res = parseFloat(data["TanggungJawab_35%"]);
+            const act = parseFloat(data["Keaktifan_25%"]);
+            const finalScore = parseFloat(data.Nilai_Akhir);
+            
+            // Percentage width calculation (Value / 4.0 * 100)
+            const wP = (pres / 4) * 100;
+            const wR = (res / 4) * 100;
+            const wA = (act / 4) * 100;
+
+            cardContent.innerHTML = `
+                <div class="space-y-8">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest"><span>Kehadiran (40%)</span><span>${pres.toFixed(2)} / 4.00</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="progress-bar-fill bg-indigo-500 h-full" style="width: 0%" data-width="${wP}"></div></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest"><span>Tanggung Jawab (35%)</span><span>${res.toFixed(2)} / 4.00</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="progress-bar-fill bg-purple-500 h-full" style="width: 0%" data-width="${wR}"></div></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest"><span>Keaktifan (25%)</span><span>${act.toFixed(2)} / 4.00</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="progress-bar-fill bg-amber-500 h-full" style="width: 0%" data-width="${wA}"></div></div>
+                    </div>
+                    <div class="pt-8 border-t border-slate-50 flex items-center justify-between">
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Skor Akhir</p><p class="text-4xl font-black text-slate-900 tracking-tighter">${finalScore.toFixed(2)}</p></div>
+                        <div class="flex gap-3">
+                            <button onclick='analyzeWithAI(${twNum}, ${JSON.stringify(data)})' class="p-4 bg-purple-700 text-white rounded-2xl ai-btn-glow hover:bg-purple-800 transition-all"><i data-lucide="sparkles" class="w-6 h-6"></i></button>
+                            <a href="${data.Link_Download}" target="_blank" class="p-4 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition-colors"><i data-lucide="external-link" class="w-6 h-6"></i></a>
                         </div>
                     </div>
-
-                    {/* Content */}
-                    <div className="flex-1 p-6 md:p-10 overflow-y-auto">
-                        
-                        {view === 'dashboard' && (
-                            <div className="fade-in">
-                                <h2 className="text-3xl font-black mb-8 italic uppercase tracking-tighter">Dashboard Utama</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <GlassCard className="border-l-4 border-l-blue-500 py-10 flex justify-between items-center group hover:bg-white/5 transition-all">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-300">Total Arsip Surat</p>
-                                            <h3 className="text-6xl font-black">{dataArsip.length}</h3>
-                                        </div>
-                                        <i data-lucide="archive" className="opacity-10 group-hover:opacity-30 transition-all" style={{width: 80, height: 80}}></i>
-                                    </GlassCard>
-                                    <GlassCard className="border-l-4 border-l-indigo-500 py-10 flex justify-between items-center group hover:bg-white/5 transition-all">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300">Total COPM Surat</p>
-                                            <h3 className="text-6xl font-black">{dataCOPM.length}</h3>
-                                        </div>
-                                        <i data-lucide="file-text" className="opacity-10 group-hover:opacity-30 transition-all" style={{width: 80, height: 80}}></i>
-                                    </GlassCard>
-                                </div>
-                            </div>
-                        )}
-
-                        {view === 'arsipkan' && (
-                            <div className="max-w-4xl mx-auto fade-in">
-                                <h2 className="text-2xl font-black mb-6 uppercase italic flex items-center gap-3">
-                                    <i data-lucide="archive" className="text-blue-500"></i> Arsipkan Surat Baru
-                                </h2>
-                                <GlassCard>
-                                    <form onSubmit={handleSubmitArsip} className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                                        <InputField label="Tanggal Terima" type="date" value={formArsip.tglTerima} onChange={e => setFormArsip(p => ({...p, tglTerima: e.target.value}))} required />
-                                        <InputField label="Nomor Surat" type="text" value={formArsip.noSurat} onChange={e => setFormArsip(p => ({...p, noSurat: e.target.value}))} required />
-                                        <InputField label="Tanggal Surat" type="date" value={formArsip.tglSurat} onChange={e => setFormArsip(p => ({...p, tglSurat: e.target.value}))} required />
-                                        <InputField label="Terima Dari" type="text" value={formArsip.asal} onChange={e => setFormArsip(p => ({...p, asal: e.target.value}))} required />
-                                        <div className="md:col-span-2"><InputField label="Perihal" type="text" value={formArsip.perihal} onChange={e => setFormArsip(p => ({...p, perihal: e.target.value}))} required /></div>
-                                        <SelectField label="Diteruskan Kepada" options={DEPARTEMEN_LIST} value={formArsip.diteruskan} onChange={e => setFormArsip(p => ({...p, diteruskan: e.target.value}))} required />
-                                        <SelectField label="Kode Arsip" options={KODE_ARSIP} value={formArsip.kode} onChange={e => setFormArsip(p => ({...p, kode: e.target.value}))} required />
-                                        <div className="md:col-span-2 mb-6">
-                                            <div className="border-2 border-dashed border-white/20 p-10 rounded-2xl text-center relative group hover:border-blue-500 transition-all bg-white/5">
-                                                <input type="file" accept=".pdf" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={e => {
-                                                    const f = e.target.files[0];
-                                                    if (!f) return;
-                                                    const r = new FileReader();
-                                                    r.onload = () => setFormArsip(p => ({...p, file: { base64: r.result.split(',')[1], name: f.name, type: f.type }}));
-                                                    r.readAsDataURL(f);
-                                                }} />
-                                                {formArsip.file ? (
-                                                    <div className="flex flex-col items-center gap-2">
-                                                        <i data-lucide="file-check" className="text-green-400" style={{width: 32, height: 32}}></i>
-                                                        <span className="text-green-400 font-bold uppercase text-[10px]">{formArsip.file.name}</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="opacity-50 font-black flex flex-col items-center gap-2 text-[10px]">
-                                                        <i data-lucide="upload-cloud" style={{width: 32, height: 32}}></i>
-                                                        <span>KLIK UNTUK UNGGAH BERKAS PDF SURAT</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <button disabled={submitting} className="bg-[#193DEB] hover:bg-blue-600 px-8 py-4 rounded-xl font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
-                                            {submitting ? <i data-lucide="loader" className="animate-spin"></i> : <i data-lucide="save"></i>}
-                                            {submitting ? "PROSES..." : "SIMPAN ARSIP"}
-                                        </button>
-                                    </form>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'data-arsip' && (
-                            <div className="fade-in">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                                    <h2 className="text-2xl font-black uppercase italic">Database Surat Masuk</h2>
-                                    <div className="relative w-full md:w-80">
-                                        <i data-lucide="search" className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30"></i>
-                                        <input className="bg-white/5 border border-white/10 rounded-full pl-12 pr-6 py-3 text-sm w-full outline-none focus:ring-1 focus:ring-blue-500 transition-all" placeholder="Cari berdasarkan No/Perihal/Asal..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                                    </div>
-                                </div>
-                                <GlassCard className="p-0 overflow-hidden">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-[11px] whitespace-nowrap">
-                                            <thead className="bg-white/5 font-black uppercase tracking-widest text-blue-200">
-                                                <tr>
-                                                    <th className="px-6 py-5 border-r border-white/5">No. Surat</th>
-                                                    <th className="px-6 py-4 border-r border-white/5">Asal Pengirim</th>
-                                                    <th className="px-6 py-4 border-r border-white/5">Perihal</th>
-                                                    <th className="px-6 py-4 text-center">Tindakan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {filteredArsip.length === 0 ? (
-                                                    <tr><td colSpan="4" className="text-center py-20 opacity-30 italic font-bold">Data tidak ditemukan atau masih kosong.</td></tr>
-                                                ) : (
-                                                    filteredArsip.map((it, i) => (
-                                                        <tr key={i} className="hover:bg-white/[0.03] transition-colors">
-                                                            <td className="px-6 py-5 font-mono font-black text-blue-400 tracking-tighter">{it.noSurat}</td>
-                                                            <td className="px-6 py-4 font-bold">{it.asal}</td>
-                                                            <td className="px-6 py-4 truncate max-w-xs">{it.perihal}</td>
-                                                            <td className="px-6 py-4 flex justify-center gap-4">
-                                                                {it.fileUrl && (
-                                                                    <a href={it.fileUrl} target="_blank" className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg font-black hover:bg-blue-500/20 transition-all flex items-center gap-1 uppercase text-[10px]">
-                                                                        <i data-lucide="file-text" style={{width: 12}}></i> LIHAT
-                                                                    </a>
-                                                                )}
-                                                                <button onClick={() => setShowDeleteModal(it.noSurat)} className="bg-red-500/10 text-red-400 px-3 py-1 rounded-lg font-black hover:bg-red-500/20 transition-all flex items-center gap-1 uppercase text-[10px]">
-                                                                    <i data-lucide="trash-2" style={{width: 12}}></i> HAPUS
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'ajukan' && (
-                            <div className="max-w-4xl mx-auto fade-in">
-                                <h2 className="text-2xl font-black mb-6 uppercase italic flex items-center gap-3">
-                                    <i data-lucide="file-plus" className="text-indigo-400"></i> {formCOPM.judul ? "Edit / Revisi Pengajuan" : "Ajukan Pembuatan Surat"}
-                                </h2>
-                                <GlassCard>
-                                    <form onSubmit={handleSubmitCOPM} className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                                        <InputField 
-                                            label="Nomor Surat" 
-                                            type="text" 
-                                            value={formCOPM.noSurat} 
-                                            onChange={e => setFormCOPM(p => ({...p, noSurat: e.target.value}))} 
-                                            disabled={user.role !== 'admin'} 
-                                            placeholder={user.role === 'admin' ? "Input Nomor Surat" : "Hanya Admin"}
-                                        />
-                                        <InputField 
-                                            label="Judul Surat" 
-                                            type="text" 
-                                            value={formCOPM.judul} 
-                                            onChange={e => setFormCOPM(p => ({...p, judul: e.target.value}))} 
-                                            required 
-                                            disabled={user.role === 'admin'} 
-                                            placeholder="Nama Kegiatan/Proposal"
-                                        />
-                                        <InputField 
-                                            label="Link Google Docs" 
-                                            type="url" 
-                                            value={formCOPM.linkDocs} 
-                                            onChange={e => setFormCOPM(p => ({...p, linkDocs: e.target.value}))} 
-                                            required 
-                                            disabled={user.role === 'admin'} 
-                                            placeholder="https://docs.google.com/..."
-                                        />
-                                        <SelectField 
-                                            label="Owner Unit" 
-                                            options={OWNER_LIST} 
-                                            value={formCOPM.owner} 
-                                            onChange={e => setFormCOPM(p => ({...p, owner: e.target.value}))} 
-                                            required 
-                                            disabled={user.role === 'admin'} 
-                                        />
-                                        <InputField 
-                                            label="Tgl Pengisian" 
-                                            type="date" 
-                                            value={formCOPM.tglIsi} 
-                                            onChange={e => setFormCOPM(p => ({...p, tglIsi: e.target.value}))} 
-                                            required 
-                                            disabled={user.role === 'admin'} 
-                                        />
-                                        <InputField 
-                                            label="Deadline" 
-                                            type="date" 
-                                            value={formCOPM.deadline} 
-                                            onChange={e => setFormCOPM(p => ({...p, deadline: e.target.value}))} 
-                                            required 
-                                            disabled={user.role === 'admin'} 
-                                        />
-                                        
-                                        {user.role === 'admin' ? (
-                                            <>
-                                                <SelectField label="Status (Wewenang Admin)" options={STATUS_LIST} value={formCOPM.status} onChange={e => setFormCOPM(p => ({...p, status: e.target.value}))} />
-                                                <InputField label="Link PDF Final" type="url" value={formCOPM.linkPdf} onChange={e => setFormCOPM(p => ({...p, linkPdf: e.target.value}))} placeholder="Link Berkas PDF yang sudah ditanda tangan" />
-                                            </>
-                                        ) : (
-                                            <div className="mb-4 bg-blue-500/10 p-4 rounded-xl border border-blue-500/20 text-[11px]">
-                                                <p className="font-bold uppercase text-blue-300 mb-1">Status Pengajuan</p>
-                                                <div className="flex items-center gap-2">
-                                                    <i data-lucide="shield-alert" style={{width: 14}}></i>
-                                                    <span className="font-black uppercase tracking-widest">{formCOPM.status}</span>
-                                                </div>
-                                                <p className="opacity-50 mt-1 italic">Hanya Admin yang dapat merubah Status & mengunggah PDF Final.</p>
-                                            </div>
-                                        )}
-                                        
-                                        <div className="md:col-span-2">
-                                            <InputField 
-                                                label="Catatan / Notes (Opsional)" 
-                                                type="text" 
-                                                value={formCOPM.notes} 
-                                                onChange={e => setFormCOPM(p => ({...p, notes: e.target.value}))} 
-                                                disabled={user.role === 'admin'} 
-                                                placeholder="Berikan info tambahan jika diperlukan..."
-                                            />
-                                        </div>
-                                        
-                                        <button disabled={submitting} className="bg-[#193DEB] hover:bg-blue-600 px-12 py-4 rounded-2xl font-black uppercase shadow-lg shadow-blue-900/20 flex items-center justify-center gap-3 transition-all active:scale-95 w-full md:w-auto">
-                                            {submitting ? <i data-lucide="loader" className="animate-spin"></i> : <i data-lucide="check-circle-2"></i>}
-                                            {submitting ? "MENGIRIM..." : "SIMPAN PERUBAHAN DATA"}
-                                        </button>
-                                    </form>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'cek-status' && (
-                            <div className="fade-in">
-                                <h2 className="text-2xl font-black mb-8 uppercase italic flex items-center gap-3">
-                                    <i data-lucide="shield-check" className="text-blue-500"></i> Monitoring Status COPM
-                                </h2>
-                                <GlassCard className="p-0 overflow-hidden">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-[11px] whitespace-nowrap">
-                                            <thead className="bg-white/5 font-black uppercase tracking-widest text-indigo-200">
-                                                <tr>
-                                                    <th className="px-8 py-5 border-r border-white/5">Judul Surat</th>
-                                                    <th className="px-8 py-5 border-r border-white/5">Owner</th>
-                                                    <th className="px-8 py-5 border-r border-white/5">Status</th>
-                                                    <th className="px-8 py-5 text-center">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {dataCOPM.length === 0 ? (
-                                                    <tr><td colSpan="4" className="text-center py-20 opacity-30 italic font-bold">Belum ada pengajuan surat saat ini.</td></tr>
-                                                ) : (
-                                                    dataCOPM.map((it, i) => (
-                                                        <tr key={i} className="hover:bg-white/[0.03] transition-colors">
-                                                            <td className="px-8 py-5">
-                                                                <div className="font-black text-white uppercase">{it.judul}</div>
-                                                                <div className="text-[9px] opacity-40 font-mono mt-0.5">{it.noSurat || 'Nomor Belum Terbit'}</div>
-                                                            </td>
-                                                            <td className="px-8 py-5 font-bold text-gray-400">{it.owner}</td>
-                                                            <td className="px-8 py-5">
-                                                                <span className={`px-3 py-1 rounded-md font-black tracking-tighter uppercase border ${
-                                                                    it.status === 'Final' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
-                                                                    it.status === 'Revisi' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 
-                                                                    'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                                                }`}>
-                                                                    {it.status || 'Draft'}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-8 py-5 flex justify-center gap-4">
-                                                                <a href={it.linkDocs} target="_blank" className="flex items-center gap-1 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg font-black transition-all text-blue-400 border border-white/5">
-                                                                    <i data-lucide="file-text" style={{width: 14}}></i> DOCS
-                                                                </a>
-                                                                <button onClick={() => handleEditCOPM(it)} className="flex items-center gap-1 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg font-black transition-all text-indigo-400 border border-white/5">
-                                                                    <i data-lucide="edit-3" style={{width: 14}}></i> EDIT
-                                                                </button>
-                                                                {it.linkPdf && (
-                                                                    <a href={it.linkPdf} target="_blank" className="flex items-center gap-1 bg-green-500/10 hover:bg-green-500/20 px-3 py-1.5 rounded-lg font-black transition-all text-green-400 border border-green-500/20">
-                                                                        <i data-lucide="file-check" style={{width: 14}}></i> PDF
-                                                                    </a>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </GlassCard>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Modal Hapus */}
-                    {showDeleteModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 fade-in">
-                            <GlassCard className="max-w-sm w-full text-center border-t-4 border-t-red-600 shadow-red-900/20 shadow-2xl">
-                                <i data-lucide="alert-triangle" className="mx-auto text-red-600 mb-4" style={{width: 60, height: 60}}></i>
-                                <h3 className="text-lg font-black mb-2 uppercase tracking-tight text-white">KONFIRMASI HAPUS</h3>
-                                <p className="text-[10px] text-gray-400 mb-6 font-bold">Apakah Anda yakin ingin menghapus data arsip surat nomor:<br/><span className="text-red-400 font-black">{showDeleteModal}</span>?</p>
-                                <div className="flex gap-4 px-2">
-                                    <button onClick={() => setShowDeleteModal(null)} className="flex-1 py-3 rounded-xl bg-white/5 font-black uppercase text-[10px] border border-white/10 hover:bg-white/10 transition-all">BATAL</button>
-                                    <button onClick={() => handleDeleteArsip(showDeleteModal)} className="flex-1 py-3 rounded-xl bg-red-600 font-black uppercase text-[10px] shadow-lg shadow-red-900/40 hover:bg-red-700 transition-all active:scale-95 text-white">HAPUS DATA</button>
-                                </div>
-                            </GlassCard>
-                        </div>
-                    )}
                 </div>
-            );
-        };
+            `;
+            refreshIcons();
+            setTimeout(() => cardContent.querySelectorAll('.progress-bar-fill').forEach(x => x.style.width = x.getAttribute('data-width') + '%'), 100);
+        }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function updateChart(pts) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, { 
+                type: 'line', 
+                data: { labels: ['TW1', 'TW2', 'TW3'], datasets: [{ data: pts, borderColor: '#7c3aed', borderWidth: 5, tension: 0.45, fill: true, backgroundColor: 'rgba(124, 58, 237, 0.05)', pointBackgroundColor: '#FFF', pointBorderColor: '#7c3aed', pointBorderWidth: 4, pointRadius: 6 }] }, 
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 4.0, ticks: { stepSize: 1.0, font: { weight: 'bold' }, color: '#94a3b8' }, grid: { color: '#f8fafc' } }, x: { ticks: { font: { weight: 'bold' }, color: '#94a3b8' }, grid: { display: false } } } } 
+            });
+        }
+
+        function animateNumber(id, s, e) {
+            const o = document.getElementById(id); if (!o) return;
+            let c = s; const r = e - s, inc = r / 60;
+            const step = () => { c += inc; if ((r > 0 && c >= e) || (r < 0 && c <= e)) o.textContent = parseFloat(e).toFixed(2); else { o.textContent = c.toFixed(2); requestAnimationFrame(step); } };
+            requestAnimationFrame(step);
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active', 'text-slate-900'));
+            document.getElementById(`tab-${t}`).classList.add('tab-active');
+            ['rapor', 'profil', 'admin'].forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
+            document.getElementById(`section-${t}`).classList.remove('hidden');
+            if (t === 'admin') renderAdmin();
+            refreshIcons();
+        }
+
+        function renderAdmin() {
+            const tbody = document.getElementById('admin-table-body'), tw = document.getElementById('admin-filter-tw').value, data = tw === "1" ? tw1Data : tw === "2" ? tw2Data : tw3Data;
+            tbody.innerHTML = "";
+            mainDB.forEach(u => {
+                if (!u.NIM) return; const s = data.find(x => x.NIM === u.NIM) || {};
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50/50 admin-row transition-colors";
+                tr.setAttribute('data-name', u.Nama_Lengkap.toLowerCase()); tr.setAttribute('data-biro', u.Biro_Departemen);
+                const scoreDisplay = s.Nilai_Akhir ? parseFloat(s.Nilai_Akhir).toFixed(2) : '-';
+                tr.innerHTML = `<td class="px-8 py-6 text-xs font-black text-slate-400 tracking-widest">${u.NIM}</td><td class="px-8 py-6"><p class="font-black text-slate-900">${u.Nama_Lengkap}</p><p class="text-[10px] text-purple-600 font-black uppercase tracking-widest mt-1">${u.Biro_Departemen}</p></td><td class="px-8 py-6 font-black text-purple-700 text-center text-lg">${scoreDisplay}</td><td class="px-8 py-6 text-center"><span class="mutu-${s.Mutu} text-sm">${s.Mutu || '-'}</span></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAdminTable() {
+            const s = document.getElementById('admin-search').value.toLowerCase(), b = document.getElementById('admin-filter-biro').value;
+            document.querySelectorAll('.admin-row').forEach(r => {
+                const n = r.getAttribute('data-name'), br = r.getAttribute('data-biro');
+                r.style.display = (n.includes(s) && (b === "" || br === b)) ? "table-row" : "none";
+            });
+        }
+
+        function exportData() {
+            const tw = document.getElementById('admin-filter-tw').value, data = tw === "1" ? tw1Data : tw === "2" ? tw2Data : tw3Data;
+            const csv = Papa.unparse(data);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", `REKAP_RAPOR_TW${tw}.csv`);
+            link.click();
+        }
+
+        function handleLogout() { location.reload(); }
     </script>
 </body>
 </html>
