@@ -1,667 +1,661 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Package, 
-  LogOut, 
-  Plus, 
-  Trash2, 
-  Edit3,
-  CheckCircle2, 
-  Smartphone, 
-  Banknote,
-  Moon,
-  Sun,
-  FileSpreadsheet,
-  AlertCircle,
-  Search,
-  ArrowUpRight,
-  X,
-  ChevronRight,
-  Filter,
-  Calendar,
-  Wallet,
-  ReceiptText,
-  History,
-  Store
-} from 'lucide-react';
-
-// --- CONFIGURATION ---
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1_0ARWmgYs_lyrFMNyPlvosoSPiX9I06WXLGEMiTm_U0nvVlNWSuuaElE7S_O9Y9Orw/exec"; 
-
-const INITIAL_PRODUCTS = [
-  { 
-    id: 1, 
-    name: 'SOSTANG (Sosis Kentang)', 
-    category: 'SOSTANG', 
-    image: 'https://i.ibb.co.com/fV0mxHRx/sostang.jpg', 
-    hasVariants: true,
-    variants: [
-      { name: 'Medium', price: 10000 },
-      { name: 'Large', price: 15000 }
-    ],
-    stock: 50
-  },
-  { 
-    id: 2, 
-    name: 'Mozarella Corndog', 
-    category: 'MOZARELLA', 
-    image: 'https://i.ibb.co.com/pr0JWb5F/mozarella.jpg', 
-    hasVariants: true,
-    variants: [
-      { name: 'Original', price: 13000 },
-      { name: 'Choco', price: 15000 },
-      { name: 'Strawberry', price: 15000 },
-      { name: 'Tiramisu', price: 15000 },
-      { name: 'Kentang', price: 15000 }
-    ],
-    stock: 40
-  },
-  { 
-    id: 3, 
-    name: 'Mozarella Sosis Kentang', 
-    category: 'MOZARELLA', 
-    image: 'https://i.ibb.co.com/pr0JWb5F/mozarella.jpg', 
-    hasVariants: true,
-    variants: [
-      { name: 'Kentang Medium', price: 17000 },
-      { name: 'Kentang Large', price: 22000 }
-    ],
-    stock: 30
-  },
-  { 
-    id: 4, 
-    name: 'French Fries', 
-    category: 'French Fries', 
-    image: 'https://i.ibb.co.com/z39t9H4/fries.jpg', 
-    hasVariants: true,
-    variants: [
-      { name: 'Medium', price: 10000 },
-      { name: 'Large', price: 15000 }
-    ],
-    stock: 60
-  }
-];
-
-const App = () => {
-  const [user, setUser] = useState(null);
-  const [view, setView] = useState('login');
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
-  const [cart, setCart] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [notification, setNotification] = useState(null);
-  
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
-  const [paymentModal, setPaymentModal] = useState(null); 
-  const [cashReceived, setCashReceived] = useState('');
-  const [isSuccessModal, setIsSuccessModal] = useState(false);
-
-  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [variantModal, setVariantModal] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
-
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-
-  const showNotify = (msg) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3000);
-  };
-
-  const sendToSpreadsheet = async (data) => {
-    if (!APPS_SCRIPT_URL) return;
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    } catch (error) {
-      console.error("Gagal sinkronisasi", error);
-    }
-  };
-
-  const handleStartCheckout = (type) => {
-    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    setPaymentModal({ type, total });
-    setCashReceived('');
-  };
-
-  const finalizeTransaction = () => {
-    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const today = new Date().toISOString().split('T')[0];
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jajanan-Z POS | Premium Cloud System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel untuk JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    const newTrx = {
-      id: `TRX-${Date.now()}`,
-      date: today,
-      time: new Date().toLocaleTimeString('id-ID'),
-      items: cart.map(i => `${i.name} ${i.variant} (x${i.qty})`).join(', '),
-      total: total,
-      paymentMethod: paymentModal.type,
-      cashier: user.name,
-      paid: paymentModal.type === 'CASH' ? parseInt(cashReceived) : total,
-      change: paymentModal.type === 'CASH' ? (parseInt(cashReceived) - total) : 0
-    };
-
-    setProducts(prev => prev.map(p => {
-      const itemsInCart = cart.filter(c => c.id === p.id);
-      const soldCount = itemsInCart.reduce((s, i) => s + i.qty, 0);
-      return { ...p, stock: p.stock - soldCount };
-    }));
-
-    setTransactions([newTrx, ...transactions]);
-    sendToSpreadsheet(newTrx); 
-
-    setCart([]);
-    setPaymentModal(null);
-    setIsSuccessModal(true);
-  };
-
-  const addToCart = (product, variantName, price) => {
-    const cartId = `${product.id}-${variantName}`;
-    const existing = cart.find(item => item.cartId === cartId);
-    if (existing) {
-      setCart(cart.map(item => item.cartId === cartId ? { ...item, qty: item.qty + 1 } : item));
-    } else {
-      setCart([...cart, { 
-        cartId, id: product.id, name: product.name, variant: variantName, 
-        price, image: product.image, qty: 1 
-      }]);
-    }
-    setVariantModal(null);
-  };
-
-  const handleSaveMenu = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const name = formData.get('name');
-    const price = parseInt(formData.get('price'));
-    const stock = parseInt(formData.get('stock'));
-    const image = formData.get('image');
-    const category = formData.get('category');
-
-    if (editingProduct) {
-      setProducts(products.map(p => p.id === editingProduct.id ? {
-        ...p, name, stock, image, category,
-        variants: p.hasVariants ? p.variants : [{name: 'Original', price}]
-      } : p));
-      showNotify("Menu diperbarui!");
-    } else {
-      setProducts([...products, {
-        id: Date.now(),
-        name, category, image, stock,
-        hasVariants: false,
-        variants: [{name: 'Original', price}]
-      }]);
-      showNotify("Menu ditambahkan!");
-    }
-    setIsMenuModalOpen(false);
-    setEditingProduct(null);
-  };
-
-  const filteredTransactions = useMemo(() => transactions.filter(t => t.date === filterDate), [transactions, filterDate]);
-  const dailyTotal = useMemo(() => filteredTransactions.reduce((sum, t) => sum + t.total, 0), [filteredTransactions]);
-
-  if (view === 'login') {
-    return (
-      <div className={`min-h-screen w-full flex items-center justify-center p-4 ${isDarkMode ? 'bg-slate-950' : 'bg-orange-50'}`}>
-        <div className={`w-full max-w-md p-8 md:p-10 rounded-[40px] shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5 shadow-black/40' : 'bg-white border-white'}`}>
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[30px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white">
-              <Store size={40} />
-            </div>
-            <h1 className="text-3xl font-black text-orange-500 uppercase tracking-tighter italic">Jajanan-Z</h1>
-            <p className="opacity-40 mt-1 font-bold uppercase text-[10px] tracking-[0.3em]">Smart Cloud POS</p>
-          </div>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if(loginForm.username === 'admin' && loginForm.password === 'admin123') {
-               setUser({name: 'Owner', role: 'admin'}); setView('pos');
-            } else if(loginForm.username === 'kasir') {
-               setUser({name: 'Staff Kasir', role: 'staff'}); setView('pos');
-            } else { showNotify("Gunakan admin/admin123"); }
-          }} className="space-y-4">
-            <input type="text" placeholder="User ID" className="w-full px-6 py-4 rounded-2xl bg-slate-800/30 border-2 border-transparent focus:border-orange-500 outline-none font-bold" value={loginForm.username} onChange={e=>setLoginForm({...loginForm, username: e.target.value})} />
-            <input type="password" placeholder="Password" className="w-full px-6 py-4 rounded-2xl bg-slate-800/30 border-2 border-transparent focus:border-orange-500 outline-none font-bold" value={loginForm.password} onChange={e=>setLoginForm({...loginForm, password: e.target.value})} />
-            <button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all mt-4 uppercase tracking-widest">Mulai Shift</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`min-h-screen w-full flex flex-col md:flex-row font-sans ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
-      
-      {/* SIDEBAR */}
-      <aside className={`w-full md:w-72 lg:w-80 p-6 md:p-8 border-r-2 flex flex-col ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-        <div className="flex items-center space-x-4 mb-10">
-          <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg">
-            <Wallet size={20} />
-          </div>
-          <span className="font-black text-xl text-orange-500 tracking-tighter italic">JAJAN-Z</span>
-        </div>
-
-        <nav className="flex-1 space-y-2">
-          <button onClick={()=>setView('pos')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'pos' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-            <ShoppingCart size={20}/> <span className="text-sm">TRANSAKSI</span>
-          </button>
-          {user?.role === 'admin' && (
-            <button onClick={()=>setView('inventory')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'inventory' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-              <Package size={20}/> <span className="text-sm">STOK & MENU</span>
-            </button>
-          )}
-          <button onClick={()=>setView('reports')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'reports' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-            <History size={20}/> <span className="text-sm">LAPORAN</span>
-          </button>
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
-          <button onClick={()=>setIsDarkMode(!isDarkMode)} className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/30">
-             <span className="text-[10px] font-black uppercase opacity-40">Tampilan</span>
-             {isDarkMode ? <Moon size={16} className="text-yellow-400"/> : <Sun size={16} className="text-orange-500"/>}
-          </button>
-          <button onClick={()=>setView('login')} className="w-full flex items-center space-x-4 p-4 text-red-500 font-black hover:bg-red-500/10 rounded-2xl transition-all">
-            <LogOut size={20}/> <span className="text-sm">KELUAR</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto w-full">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
-        {view === 'pos' && (
-          <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 h-full">
-            <div className="flex-1 space-y-6 lg:space-y-8">
-              <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
-                <div>
-                  <h2 className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter uppercase italic leading-tight">Menu Jajan</h2>
-                  <p className="opacity-40 text-[10px] font-bold uppercase tracking-widest mt-1">Sapa pelanggan dengan senyum :)</p>
-                </div>
-                <div className="px-4 py-2 bg-orange-500/10 rounded-full text-orange-500 font-black text-[10px] border border-orange-500/20 self-start sm:self-auto">
-                  {new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}
-                </div>
-              </header>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background-color: #fffaf0;
+        }
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 pb-20">
-                {products.map(p => (
-                  <div key={p.id} onClick={()=>p.stock > 0 ? (p.hasVariants ? setVariantModal(p) : addToCart(p, 'Original', p.variants[0].price)) : showNotify("Stok habis!")} 
-                    className={`group cursor-pointer rounded-[40px] border-4 transition-all active:scale-95 overflow-hidden relative shadow-xl ${isDarkMode ? 'bg-slate-900 border-white/5 hover:border-orange-500' : 'bg-white border-transparent hover:border-orange-200'} ${p.stock <= 0 ? 'grayscale opacity-60' : ''}`}>
-                    <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden">
-                      <img 
-                        src={p.image} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                        alt={p.name} 
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400'; }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                      <div className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8">
-                        <span className="text-white text-[8px] lg:text-[10px] font-black bg-orange-500 px-2 py-1 rounded-full uppercase tracking-tighter mb-2 inline-block">{p.category}</span>
-                        <h4 className="text-lg lg:text-3xl font-black text-white uppercase tracking-tighter italic leading-none">{p.name}</h4>
-                      </div>
-                      <div className="absolute top-4 right-4 lg:top-8 lg:right-8 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl text-white font-black text-[10px]">
-                        {p.stock} STOK
-                      </div>
-                    </div>
-                    <div className="p-4 lg:p-8 flex justify-between items-center">
-                       <p className="text-orange-500 font-black text-lg lg:text-2xl italic tracking-tighter">Rp {p.hasVariants ? `${Math.min(...p.variants.map(v=>v.price)).toLocaleString()}` : p.variants[0].price.toLocaleString()}</p>
-                       <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg">
-                          <Plus size={18} strokeWidth={3} className="lg:w-6 lg:h-6" />
-                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* KERANJANG */}
-            <div className={`w-full xl:w-[400px] 2xl:w-[450px] rounded-[45px] lg:rounded-[55px] p-6 lg:p-10 flex flex-col h-auto xl:h-[calc(100vh-120px)] xl:sticky xl:top-6 shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'} mb-10 xl:mb-0`}>
-              <div className="flex justify-between items-center mb-6 lg:mb-10">
-                <h3 className="text-xl lg:text-3xl font-black tracking-tighter uppercase italic">Pesanan <span className="text-orange-500 bg-orange-500/10 px-2 lg:px-3 py-1 rounded-xl ml-2">{cart.reduce((s,i)=>s+i.qty,0)}</span></h3>
-                <button onClick={()=>setCart([])} className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><Trash2 size={20}/></button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto space-y-4 lg:space-y-5 pr-2 custom-scrollbar min-h-[200px] max-h-[400px] xl:max-h-none">
-                {cart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center opacity-10 text-center font-black py-10">
-                    <ReceiptText size={64} className="mb-4" />
-                    <p className="uppercase text-sm lg:text-xl tracking-widest">Keranjang Kosong</p>
-                  </div>
-                ) : (
-                  cart.map(i => (
-                    <div key={i.cartId} className={`flex items-center p-4 lg:p-5 rounded-[25px] lg:rounded-[30px] border-2 ${isDarkMode ? 'bg-white/5 border-transparent' : 'bg-orange-50 border-orange-100'}`}>
-                      <div className="flex-1">
-                        <p className="font-black text-[10px] lg:text-sm uppercase leading-none mb-1">{i.name}</p>
-                        <p className="text-[8px] lg:text-[10px] font-bold text-orange-500 mb-2 lg:mb-3 tracking-widest">{i.variant}</p>
-                        <div className="flex items-center space-x-3 lg:space-x-4">
-                          <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:Math.max(0,c.qty-1)}:c).filter(c=>c.qty>0))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl bg-orange-500/20 text-orange-500 flex items-center justify-center font-black text-xs">-</button>
-                          <span className="font-black text-xs lg:text-lg">{i.qty}</span>
-                          <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:c.qty+1}:c))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl bg-orange-500 text-white flex items-center justify-center font-black text-xs">+</button>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-black text-orange-500 text-sm lg:text-lg">{(i.price * i.qty).toLocaleString()}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              <div className="mt-6 lg:mt-8 pt-6 lg:pt-8 border-t-4 border-orange-500/10 space-y-6 lg:space-y-8">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Tagihan</span>
-                  <span className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter">Rp {cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString()}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={()=>handleStartCheckout('CASH')} className="p-4 lg:p-6 rounded-[25px] bg-slate-800 text-white font-black flex flex-col items-center shadow-lg active:scale-95 transition-all">
-                    <Banknote size={24} className="mb-1 text-orange-500 lg:w-7 lg:h-7"/> <span className="text-[8px] lg:text-[10px] uppercase tracking-widest">Tunai</span>
-                  </button>
-                  <button onClick={()=>handleStartCheckout('QRIS')} className="p-4 lg:p-6 rounded-[25px] bg-orange-500 text-white font-black flex flex-col items-center shadow-xl active:scale-95 transition-all">
-                    <Smartphone size={24} className="mb-1 lg:w-7 lg:h-7"/> <span className="text-[8px] lg:text-[10px] uppercase tracking-widest">QRIS / E-Wallet</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* INVENTORY & REPORTS VIEW (Sama dengan sebelumnya namun dengan penyesuaian padding mobile) */}
-        {view === 'inventory' && (
-          <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20">
-            <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
-              <div>
-                <h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Gudang Menu</h2>
-                <p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Update stok dan jajanan baru</p>
-              </div>
-              <button onClick={()=>{setEditingProduct(null); setIsMenuModalOpen(true)}} className="bg-orange-500 text-white px-6 lg:px-10 py-4 lg:py-5 rounded-2xl lg:rounded-[30px] font-black shadow-xl active:scale-95 transition-all flex items-center uppercase tracking-widest text-[10px] lg:text-sm">
-                <Plus size={20} className="mr-3"/> Tambah Menu
-              </button>
-            </header>
-
-            <div className={`rounded-[30px] lg:rounded-[50px] border-4 overflow-x-auto shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-              <table className="w-full text-left min-w-[600px]">
-                <thead className="bg-orange-500 text-white font-black text-[10px] lg:text-[11px] uppercase tracking-[0.2em]">
-                  <tr>
-                    <th className="px-6 lg:px-10 py-5 lg:py-7">Item Menu</th>
-                    <th className="px-6 lg:px-10 py-5 lg:py-7 text-center">Stok</th>
-                    <th className="px-6 lg:px-10 py-5 lg:py-7">Harga</th>
-                    <th className="px-6 lg:px-10 py-5 lg:py-7 text-center">Tindakan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y-4 divide-white/5 font-bold">
-                  {products.map(p => (
-                    <tr key={p.id} className="hover:bg-white/5 transition-colors group">
-                      <td className="px-6 lg:px-10 py-4 lg:py-8 flex items-center space-x-4 lg:space-x-6">
-                        <img src={p.image} className="w-12 h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-[20px] object-cover shadow-xl" alt={p.name} />
-                        <div>
-                           <p className="text-sm lg:text-xl font-black uppercase tracking-tight">{p.name}</p>
-                           <p className="text-[8px] lg:text-[10px] opacity-40 uppercase">{p.category}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 lg:px-10 py-4 lg:py-8 text-center">
-                        <div className={`inline-block px-3 py-1 lg:px-5 lg:py-2 rounded-xl lg:rounded-2xl text-lg lg:text-2xl ${p.stock < 10 ? 'bg-red-500/10 text-red-500 font-black' : 'bg-orange-500/10 text-orange-500'}`}>
-                           {p.stock}
-                        </div>
-                      </td>
-                      <td className="px-6 lg:px-10 py-4 lg:py-8 text-sm lg:text-xl text-orange-500 font-black tracking-tighter italic">Rp {p.variants[0].price.toLocaleString()}</td>
-                      <td className="px-6 lg:px-10 py-4 lg:py-8">
-                        <div className="flex justify-center space-x-2">
-                          <button onClick={()=>{setEditingProduct(p); setIsMenuModalOpen(true)}} className="p-2 lg:p-4 bg-slate-800 rounded-xl lg:rounded-3xl text-yellow-400 hover:scale-110 transition-all shadow-lg"><Edit3 size={16} className="lg:w-5 lg:h-5"/></button>
-                          <button onClick={()=>setDeleteConfirm(p)} className="p-2 lg:p-4 bg-red-500/10 rounded-xl lg:rounded-3xl text-red-500 hover:scale-110 transition-all shadow-lg"><Trash2 size={16} className="lg:w-5 lg:h-5"/></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {view === 'reports' && (
-          <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12">
-            <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
-              <div>
-                <h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Laporan</h2>
-                <p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Cek hasil cuan jualanmu</p>
-              </div>
-              <div className="flex gap-4">
-                <div className={`flex items-center px-4 lg:px-8 py-3 lg:py-4 rounded-xl lg:rounded-[30px] border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-                  <Calendar size={18} className="text-orange-500 mr-2 lg:mr-4" />
-                  <input type="date" className="bg-transparent outline-none font-black text-[10px] lg:text-sm" value={filterDate} onChange={e=>setFilterDate(e.target.value)} />
-                </div>
-                <button className="bg-green-600 text-white px-4 lg:px-8 py-3 lg:py-4 rounded-xl lg:rounded-[30px] font-black shadow-xl hover:bg-green-700 active:scale-95 transition-all text-[10px] lg:text-sm uppercase tracking-widest">Download</button>
-              </div>
-            </header>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-10">
-               <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl relative overflow-hidden ${isDarkMode ? 'bg-orange-500/10 border-orange-500/20' : 'bg-orange-500 border-orange-500 text-white'}`}>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-2 lg:mb-3">Total Omzet Harian</p>
-                  <h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic">Rp {dailyTotal.toLocaleString()}</h3>
-                  <ArrowUpRight className="absolute top-6 right-6 lg:top-10 lg:right-10 opacity-20 w-8 h-8 lg:w-16 lg:h-16" />
-               </div>
-               <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mb-2 lg:mb-3">Pesanan Sukses</p>
-                  <h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic">{filteredTransactions.length} <span className="text-lg lg:text-2xl opacity-30 font-normal">Selesai</span></h3>
-               </div>
-            </div>
-
-            <div className={`rounded-[30px] lg:rounded-[50px] border-4 overflow-hidden shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-               <div className="overflow-x-auto min-h-[300px] max-h-[600px] custom-scrollbar">
-                  {filteredTransactions.length === 0 ? (
-                    <div className="py-20 lg:py-40 text-center opacity-10 font-black italic text-2xl lg:text-4xl uppercase tracking-tighter">Belum Ada Transaksi</div>
-                  ) : (
-                    <table className="w-full text-left min-w-[600px]">
-                      <thead className={`sticky top-0 font-black text-[9px] lg:text-[11px] uppercase tracking-widest ${isDarkMode ? 'bg-slate-800' : 'bg-orange-50 text-orange-500'}`}>
-                        <tr>
-                          <th className="px-6 lg:px-10 py-4 lg:py-6 border-b-2 border-white/5">Waktu</th>
-                          <th className="px-6 lg:px-10 py-4 lg:py-6 border-b-2 border-white/5">Item Pesanan</th>
-                          <th className="px-6 lg:px-10 py-4 lg:py-6 border-b-2 border-white/5">Metode</th>
-                          <th className="px-6 lg:px-10 py-4 lg:py-6 text-right border-b-2 border-white/5">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y-2 divide-white/5 font-bold text-xs lg:text-sm">
-                        {filteredTransactions.map(t => (
-                          <tr key={t.id} className="hover:bg-white/5 transition-colors">
-                            <td className="px-6 lg:px-10 py-4 lg:py-8 opacity-40 font-mono">{t.time}</td>
-                            <td className="px-6 lg:px-10 py-4 lg:py-8 leading-relaxed">{t.items}</td>
-                            <td className="px-6 lg:px-10 py-4 lg:py-8"><span className="px-3 py-1 lg:px-4 lg:py-2 bg-slate-800 text-orange-400 rounded-xl text-[8px] lg:text-[10px] font-black uppercase tracking-widest">{t.paymentMethod}</span></td>
-                            <td className="px-6 lg:px-10 py-4 lg:py-8 text-right text-orange-500 font-black text-sm lg:text-lg italic">Rp {t.total.toLocaleString()}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-               </div>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* --- MODALS (Tetap menggunakan struktur yang aman untuk responsivitas) --- */}
-
-      {/* PAYMENT MODAL */}
-      {paymentModal && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4">
-          <div className={`w-full max-w-3xl rounded-[40px] lg:rounded-[60px] border-4 p-6 lg:p-12 overflow-hidden relative animate-in zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'}`}>
-            <div className="flex justify-between items-start mb-6 lg:mb-10">
-              <div>
-                <h3 className="text-2xl lg:text-4xl font-black text-orange-500 uppercase tracking-tighter italic">Pembayaran</h3>
-                <p className="text-[8px] lg:text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Selesaikan pesanan pelanggan</p>
-              </div>
-              <button onClick={()=>setPaymentModal(null)} className="p-2 lg:p-4 bg-red-500/10 text-red-500 rounded-xl lg:rounded-3xl"><X size={24}/></button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
-              <div className="space-y-4 lg:space-y-6">
-                 <div className="p-6 lg:p-8 rounded-[30px] lg:rounded-[40px] bg-slate-800/40 border-2 border-white/5">
-                    <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mb-2 lg:mb-3">Cara Bayar</p>
-                    <div className="flex items-center text-lg lg:text-2xl font-black text-orange-500 uppercase italic tracking-tighter">
-                       {paymentModal.type === 'CASH' ? <Banknote className="mr-3 lg:mr-4" size={24}/> : <Smartphone className="mr-3 lg:mr-4" size={24}/>}
-                       {paymentModal.type === 'CASH' ? 'Tunai / Cash' : 'QRIS / E-Wallet'}
-                    </div>
-                 </div>
-                 <div className="p-6 lg:p-8 rounded-[30px] lg:rounded-[40px] bg-orange-500/10 border-2 border-orange-500/30">
-                    <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mb-2 lg:mb-3">Total Tagihan</p>
-                    <div className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter italic">Rp {paymentModal.total.toLocaleString()}</div>
-                 </div>
-                 
-                 {paymentModal.type === 'CASH' && (
-                   <div className="space-y-4 lg:space-y-6">
-                      <div>
-                        <label className="text-[9px] lg:text-[11px] font-black uppercase opacity-40 ml-2 mb-2 lg:mb-3 block tracking-widest">Uang Diterima (Rp)</label>
-                        <input type="number" autoFocus className="w-full px-6 py-4 lg:px-8 lg:py-5 rounded-2xl lg:rounded-[30px] bg-slate-800 border-4 border-orange-500 outline-none text-2xl lg:text-4xl font-black tracking-tighter" placeholder="0" value={cashReceived} onChange={e=>setCashReceived(e.target.value)} />
-                      </div>
-                      {parseInt(cashReceived) >= paymentModal.total && (
-                        <div className="p-5 lg:p-7 rounded-[25px] lg:rounded-[35px] bg-green-500/10 border-2 border-green-500/30 animate-in slide-in-from-bottom-10">
-                           <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-40 mb-1 tracking-widest">Kembalian</p>
-                           <p className="text-xl lg:text-3xl font-black text-green-500 italic tracking-tighter">Rp {(parseInt(cashReceived) - paymentModal.total).toLocaleString()}</p>
-                        </div>
-                      )}
-                   </div>
-                 )}
-              </div>
-
-              <div className="flex flex-col items-center justify-center p-6 lg:p-8 bg-white rounded-[35px] lg:rounded-[50px] shadow-2xl relative min-h-[250px]">
-                 {paymentModal.type === 'QRIS' ? (
-                   <div className="text-center">
-                    <img src="https://i.ibb.co.com/rfH4wLBj/qris.jpg" className="w-full max-w-[200px] lg:max-w-[280px] object-contain rounded-xl shadow-lg mb-4 lg:mb-6" alt="QRIS" />
-                    <p className="text-slate-900 font-black text-[10px] lg:text-sm uppercase tracking-widest">Scan QR Untuk Bayar</p>
-                   </div>
-                 ) : (
-                   <div className="text-center p-6 opacity-20">
-                      <Banknote size={80} className="text-slate-900 mb-4 mx-auto lg:w-[100px] lg:h-[100px]" />
-                      <p className="text-slate-900 font-black text-sm lg:text-lg uppercase italic leading-tight">Terima Tunai Dari<br/>Pelanggan</p>
-                   </div>
-                 )}
-              </div>
-            </div>
-
-            <button 
-              disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)}
-              onClick={finalizeTransaction}
-              className={`w-full py-4 lg:py-6 rounded-2xl lg:rounded-[35px] font-black text-lg lg:text-2xl mt-8 lg:mt-12 transition-all uppercase tracking-tighter shadow-2xl italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed' : 'bg-orange-500 text-white shadow-orange-500/40 hover:scale-[1.02] active:scale-95'}`}
-            >
-              SIMPAN & SELESAIKAN
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Sisa modal lainnya (Success, Menu, Variant, Delete) mengikuti pola layout yang sama untuk keamanan responsivitas */}
-      {/* ... (SuccessModal, MenuModal, VariantModal, DeleteConfirm) ... */}
-
-      {/* SUCCESS MODAL */}
-      {isSuccessModal && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[300] flex items-center justify-center p-4">
-           <div className="w-full max-w-sm p-10 lg:p-14 bg-slate-900 rounded-[40px] lg:rounded-[60px] border-4 border-green-500/30 text-center animate-in zoom-in shadow-2xl">
-              <div className="w-20 h-20 lg:w-28 lg:h-28 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/30"><CheckCircle2 size={40} className="lg:w-[56px] lg:h-[56px]" strokeWidth={3}/></div>
-              <h3 className="text-2xl lg:text-4xl font-black mb-2 uppercase italic tracking-tighter text-white">Sukses!</h3>
-              <p className="opacity-40 text-[10px] font-bold mb-8 uppercase tracking-[0.2em]">Data Sinkron ke Cloud</p>
-              <button onClick={()=>setIsSuccessModal(false)} className="w-full bg-green-500 text-white font-black py-4 lg:py-6 rounded-2xl lg:rounded-[35px] shadow-2xl shadow-green-500/30 uppercase tracking-widest active:scale-95">Lanjut Jualan</button>
-           </div>
-        </div>
-      )}
-
-      {isMenuModalOpen && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4">
-          <div className={`w-full max-w-2xl p-8 lg:p-12 rounded-[40px] lg:rounded-[60px] border-4 shadow-2xl animate-in zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-200'}`}>
-            <div className="flex justify-between items-center mb-8 lg:mb-12">
-              <h3 className="text-2xl lg:text-4xl font-black text-orange-500 tracking-tighter uppercase italic leading-none">{editingProduct ? 'Edit Menu' : 'Tambah Menu'}</h3>
-              <button onClick={()=>setIsMenuModalOpen(false)} className="p-3 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-lg"><X size={28}/></button>
-            </div>
-            <form onSubmit={handleSaveMenu} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-              <div className="sm:col-span-2">
-                <label className="text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1">Nama Jajanan</label>
-                <input name="name" defaultValue={editingProduct?.name} required className="w-full px-6 py-4 rounded-2xl bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1">Kategori Menu</label>
-                <select name="category" defaultValue={editingProduct?.category} className="w-full px-6 py-4 rounded-2xl bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold appearance-none text-md">
-                   <option value="SOSTANG">SOSTANG</option>
-                   <option value="MOZARELLA">MOZARELLA</option>
-                   <option value="French Fries">French Fries</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1">Harga Dasar (Rp)</label>
-                <input name="price" type="number" defaultValue={editingProduct?.variants[0].price} required className="w-full px-6 py-4 rounded-2xl bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
-              </div>
-              <div>
-                <label className="text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1">Stok Awal</label>
-                <input name="stock" type="number" defaultValue={editingProduct?.stock} required className="w-full px-6 py-4 rounded-2xl bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
-              </div>
-              <div className="sm:col-span-2">
-                 <label className="text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1">Link URL Foto</label>
-                 <input name="image" defaultValue={editingProduct?.image} placeholder="https://..." className="w-full px-6 py-4 rounded-2xl bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-[10px]" />
-              </div>
-              <button className="sm:col-span-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 lg:py-6 rounded-[25px] lg:rounded-[35px] shadow-2xl active:scale-95 transition-all mt-4 text-xl lg:text-2xl uppercase tracking-tighter italic">Simpan Perubahan</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {variantModal && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
-          <div className={`w-full max-w-xl p-8 lg:p-14 rounded-[40px] lg:rounded-[65px] border-4 animate-in zoom-in max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20 shadow-orange-500/10' : 'bg-white border-orange-200'}`}>
-             <header className="flex justify-between items-center mb-10">
-               <div>
-                <h3 className="text-3xl lg:text-5xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{variantModal.name}</h3>
-                <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mt-2 tracking-widest ml-1">Tentukan Porsi Pelanggan</p>
-               </div>
-               <button onClick={()=>setVariantModal(null)} className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all"><X size={24}/></button>
-             </header>
-             <div className="space-y-4 lg:space-y-5">
-               {variantModal.variants.map((v, i) => (
-                 <button key={i} onClick={()=>addToCart(variantModal, v.name, v.price)} className={`w-full flex justify-between items-center p-6 lg:p-10 rounded-[30px] lg:rounded-[40px] border-4 transition-all active:scale-[0.97] font-black text-xl lg:text-3xl italic tracking-tighter ${isDarkMode ? 'bg-white/5 border-transparent hover:border-orange-500 shadow-xl shadow-black/20' : 'bg-orange-50 border-transparent hover:border-orange-500'}`}>
-                   <span>{v.name}</span>
-                   <span className="text-orange-500">Rp {v.price.toLocaleString()}</span>
-                 </button>
-               ))}
-             </div>
-          </div>
-        </div>
-      )}
-
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center p-4">
-           <div className="w-full max-w-md p-8 lg:p-12 bg-slate-900 rounded-[40px] lg:rounded-[55px] border-4 border-red-500/30 text-center animate-in zoom-in shadow-2xl">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 bg-red-500/20 text-red-500 rounded-2xl lg:rounded-[30px] flex items-center justify-center mx-auto mb-8 lg:mb-10"><AlertCircle size={40} /></div>
-              <h3 className="text-2xl lg:text-3xl font-black mb-2 uppercase tracking-tighter italic text-white">Hapus Menu?</h3>
-              <p className="opacity-40 text-[10px] font-bold mb-10 uppercase leading-relaxed">Menu <span className="text-red-500 font-black">{deleteConfirm.name}</span> akan hilang dari sistem selamanya.</p>
-              <div className="grid grid-cols-2 gap-4">
-                 <button onClick={()=>setDeleteConfirm(null)} className="py-4 rounded-2xl bg-slate-800 font-black text-[10px] uppercase opacity-40">Batal</button>
-                 <button onClick={()=>{setProducts(products.filter(p=>p.id!==deleteConfirm.id)); setDeleteConfirm(null); showNotify("Dihapus!");}} className="py-4 rounded-2xl bg-red-500 text-white font-black text-[10px] uppercase shadow-xl shadow-red-500/20">Hapus Menu</button>
-              </div>
-           </div>
-        </div>
-      )}
-
-      {/* NOTIFIKASI TOAST */}
-      {notification && (
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 px-8 lg:px-12 py-4 lg:py-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full shadow-[0_20px_50px_rgba(249,115,22,0.4)] z-[500] flex items-center space-x-4 animate-in slide-in-from-bottom-10 uppercase text-[10px] tracking-widest border-2 border-white/20">
-           <CheckCircle2 size={24}/> <span>{notification}</span>
-        </div>
-      )}
-
-      <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.2); border-radius: 20px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.5); }
-        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes zoom-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes slide-in-from-bottom { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-in { animation-duration: 0.4s; animation-fill-mode: both; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-        .fade-in { animation-name: fade-in; }
-        .zoom-in { animation-name: zoom-in; }
-        .slide-in-from-bottom-10 { animation-name: slide-in-from-bottom; }
-      `}</style>
-    </div>
-  );
-};
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.4); }
 
-export default App;
+        @keyframes zoom-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-zoom-in { animation: zoom-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        
+        .product-card:hover .product-img { transform: scale(1.1); }
+        .product-img { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- INTERNAL ICON COMPONENTS (Anti-Error & Stabil) ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const icons = {
+                dashboard: <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+                cart: <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>,
+                package: <><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+                logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
+                plus: <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+                trash: <><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></>,
+                edit: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
+                check: <polyline points="20 6 9 17 4 12"/>,
+                smartphone: <><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>,
+                banknote: <><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></>,
+                moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,
+                sun: <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
+                spreadsheet: <><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></>,
+                alert: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>,
+                search: <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+                x: <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+                chevron: <polyline points="9 18 15 12 9 6"/>,
+                calendar: <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
+                history: <><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></>,
+                store: <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            };
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    {icons[name] || null}
+                </svg>
+            );
+        };
+
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1_0ARWmgYs_lyrFMNyPlvosoSPiX9I06WXLGEMiTm_U0nvVlNWSuuaElE7S_O9Y9Orw/exec"; 
+
+        const INITIAL_PRODUCTS = [
+            { 
+                id: 1, 
+                name: 'SOSTANG (Sosis Kentang)', 
+                category: 'SOSTANG', 
+                image: 'https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=600&q=80', 
+                hasVariants: true,
+                variants: [
+                    { name: 'Medium', price: 10000 },
+                    { name: 'Large', price: 15000 }
+                ],
+                stock: 50
+            },
+            { 
+                id: 2, 
+                name: 'Mozarella Corndog', 
+                category: 'MOZARELLA', 
+                image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c175f0?w=600&q=80', 
+                hasVariants: true,
+                variants: [
+                    { name: 'Original', price: 13000 },
+                    { name: 'Choco', price: 15000 },
+                    { name: 'Strawberry', price: 15000 },
+                    { name: 'Tiramisu', price: 15000 },
+                    { name: 'Kentang', price: 15000 }
+                ],
+                stock: 40
+            },
+            { 
+                id: 3, 
+                name: 'Mozarella Sosis Kentang', 
+                category: 'MOZARELLA', 
+                image: 'https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=600&q=80', 
+                hasVariants: true,
+                variants: [
+                    { name: 'Kentang Medium', price: 17000 },
+                    { name: 'Kentang Large', price: 22000 }
+                ],
+                stock: 30
+            },
+            { 
+                id: 4, 
+                name: 'French Fries', 
+                category: 'French Fries', 
+                image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80', 
+                hasVariants: true,
+                variants: [
+                    { name: 'Medium', price: 10000 },
+                    { name: 'Large', price: 15000 }
+                ],
+                stock: 60
+            }
+        ];
+
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [view, setView] = useState('login');
+            const [isDarkMode, setIsDarkMode] = useState(true);
+            const [products, setProducts] = useState(INITIAL_PRODUCTS);
+            const [cart, setCart] = useState([]);
+            const [transactions, setTransactions] = useState([]);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [notification, setNotification] = useState(null);
+            
+            const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+            const [paymentModal, setPaymentModal] = useState(null); 
+            const [cashReceived, setCashReceived] = useState('');
+            const [isSuccessModal, setIsSuccessModal] = useState(false);
+
+            const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+            const [editingProduct, setEditingProduct] = useState(null);
+            const [variantModal, setVariantModal] = useState(null);
+            const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+            const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+
+            const showNotify = (msg) => {
+                setNotification(msg);
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            const sendToSpreadsheet = async (data) => {
+                if (!APPS_SCRIPT_URL) return;
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } catch (error) {
+                    console.error("Sync Error:", error);
+                }
+            };
+
+            const handleStartCheckout = (type) => {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                setPaymentModal({ type, total });
+                setCashReceived('');
+            };
+
+            const finalizeTransaction = () => {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const today = new Date().toISOString().split('T')[0];
+                
+                const newTrx = {
+                    id: `TRX-${Date.now()}`,
+                    date: today,
+                    time: new Date().toLocaleTimeString('id-ID'),
+                    items: cart.map(i => `${i.name} ${i.variant} (x${i.qty})`).join(', '),
+                    total: total,
+                    paymentMethod: paymentModal.type,
+                    cashier: user.name,
+                    paid: paymentModal.type === 'CASH' ? parseInt(cashReceived) : total,
+                    change: paymentModal.type === 'CASH' ? (parseInt(cashReceived) - total) : 0
+                };
+
+                setProducts(prev => prev.map(p => {
+                    const itemsInCart = cart.filter(c => c.id === p.id);
+                    const soldCount = itemsInCart.reduce((s, i) => s + i.qty, 0);
+                    return { ...p, stock: p.stock - soldCount };
+                }));
+
+                setTransactions([newTrx, ...transactions]);
+                sendToSpreadsheet(newTrx); 
+
+                setCart([]);
+                setPaymentModal(null);
+                setIsSuccessModal(true);
+            };
+
+            const addToCart = (product, variantName, price) => {
+                const cartId = `${product.id}-${variantName}`;
+                const existing = cart.find(item => item.cartId === cartId);
+                if (existing) {
+                    setCart(cart.map(item => item.cartId === cartId ? { ...item, qty: item.qty + 1 } : item));
+                } else {
+                    setCart([...cart, { 
+                        cartId, id: product.id, name: product.name, variant: variantName, 
+                        price, image: product.image, qty: 1 
+                    }]);
+                }
+                setVariantModal(null);
+            };
+
+            const handleSaveMenu = (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const name = formData.get('name');
+                const price = parseInt(formData.get('price'));
+                const stock = parseInt(formData.get('stock'));
+                const image = formData.get('image');
+                const category = formData.get('category');
+
+                if (editingProduct) {
+                    setProducts(products.map(p => p.id === editingProduct.id ? {
+                        ...p, name, stock, image, category,
+                        variants: p.hasVariants ? p.variants : [{name: 'Original', price}]
+                    } : p));
+                    showNotify("Menu diperbarui!");
+                } else {
+                    setProducts([...products, {
+                        id: Date.now(),
+                        name, category, image, stock,
+                        hasVariants: false,
+                        variants: [{name: 'Original', price}]
+                    }]);
+                    showNotify("Menu ditambahkan!");
+                }
+                setIsMenuModalOpen(false);
+                setEditingProduct(null);
+            };
+
+            const filteredTransactions = useMemo(() => transactions.filter(t => t.date === filterDate), [transactions, filterDate]);
+            const dailyTotal = useMemo(() => filteredTransactions.reduce((sum, t) => sum + t.total, 0), [filteredTransactions]);
+
+            if (view === 'login') {
+                return (
+                    <div className={`min-h-screen w-full flex items-center justify-center p-4 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
+                        <div className={`w-full max-w-md p-8 md:p-10 rounded-[40px] shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5 shadow-black/40' : 'bg-white border-white'} animate-zoom-in`}>
+                            <div className="text-center mb-10">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-[30px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white">
+                                    <Icon name="store" size={40} />
+                                </div>
+                                <h1 className="text-3xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">Jajanan-Z</h1>
+                                <p className="opacity-40 mt-1 font-bold uppercase text-[10px] tracking-[0.3em]">Smart Cloud POS</p>
+                            </div>
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                if(loginForm.username === 'admin' && loginForm.password === 'admin123') {
+                                    setUser({name: 'Owner', role: 'admin'}); setView('pos');
+                                } else if(loginForm.username === 'kasir') {
+                                    setUser({name: 'Staff Kasir', role: 'staff'}); setView('pos');
+                                } else { showNotify("Gunakan admin/admin123 atau kasir (tanpa pw)"); }
+                            }} className="space-y-4">
+                                <input type="text" placeholder="User ID" className={`w-full px-6 py-4 rounded-2xl border-2 border-transparent focus:border-orange-500 outline-none font-bold ${isDarkMode ? 'bg-slate-800/50 text-white' : 'bg-gray-100 text-slate-900'}`} value={loginForm.username} onChange={e=>setLoginForm({...loginForm, username: e.target.value})} />
+                                <input type="password" placeholder="Password" className={`w-full px-6 py-4 rounded-2xl border-2 border-transparent focus:border-orange-500 outline-none font-bold ${isDarkMode ? 'bg-slate-800/50 text-white' : 'bg-gray-100 text-slate-900'}`} value={loginForm.password} onChange={e=>setLoginForm({...loginForm, password: e.target.value})} />
+                                <button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all mt-4 uppercase tracking-widest">Mulai Shift</button>
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className={`min-h-screen w-full flex flex-col md:flex-row ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
+                    {/* SIDEBAR */}
+                    <aside className={`w-full md:w-72 lg:w-80 p-6 md:p-8 border-r-2 flex flex-col ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                        <div className="flex items-center space-x-4 mb-10">
+                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg">
+                                <Icon name="dashboard" size={20} />
+                            </div>
+                            <span className="font-black text-xl text-orange-500 tracking-tighter italic">JAJAN-Z</span>
+                        </div>
+
+                        <nav className="flex-1 space-y-2">
+                            <button onClick={()=>setView('pos')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'pos' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+                                <Icon name="cart" size={20}/> <span className="text-sm">TRANSAKSI</span>
+                            </button>
+                            {user?.role === 'admin' && (
+                                <button onClick={()=>setView('inventory')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'inventory' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+                                    <Icon name="package" size={20}/> <span className="text-sm">STOK & MENU</span>
+                                </button>
+                            )}
+                            <button onClick={()=>setView('reports')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'reports' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+                                <Icon name="spreadsheet" size={20}/> <span className="text-sm">LAPORAN</span>
+                            </button>
+                        </nav>
+
+                        <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
+                            <button onClick={()=>setIsDarkMode(!isDarkMode)} className={`w-full flex items-center justify-between p-3 rounded-xl ${isDarkMode ? 'bg-slate-800/30' : 'bg-gray-100'}`}>
+                                <span className="text-[10px] font-black uppercase opacity-40">Tampilan</span>
+                                {isDarkMode ? <Icon name="moon" size={16} className="text-yellow-400"/> : <Icon name="sun" size={16} className="text-orange-500"/>}
+                            </button>
+                            <button onClick={()=>setView('login')} className="w-full flex items-center space-x-4 p-4 text-red-500 font-black hover:bg-red-500/10 rounded-2xl transition-all">
+                                <Icon name="logout" size={20}/> <span className="text-sm">KELUAR</span>
+                            </button>
+                        </div>
+                    </aside>
+
+                    {/* MAIN CONTENT */}
+                    <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto w-full">
+                        {view === 'pos' && (
+                            <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 h-full">
+                                <div className="flex-1 space-y-6 lg:space-y-8">
+                                    <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+                                        <div>
+                                            <h2 className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter uppercase italic leading-tight">Menu Jajan</h2>
+                                            <p className="opacity-40 text-[10px] font-bold uppercase tracking-widest mt-1">Sapa pelanggan dengan senyum :)</p>
+                                        </div>
+                                        <div className="px-4 py-2 bg-orange-500/10 rounded-full text-orange-500 font-black text-[10px] border border-orange-500/20 self-start sm:self-auto">
+                                            {new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}
+                                        </div>
+                                    </header>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 pb-20">
+                                        {products.map(p => (
+                                            <div key={p.id} onClick={()=>p.stock > 0 ? (p.hasVariants ? setVariantModal(p) : addToCart(p, 'Original', p.variants[0].price)) : showNotify("Stok habis!")} 
+                                                className={`group product-card cursor-pointer rounded-[40px] border-4 transition-all active:scale-95 overflow-hidden relative shadow-xl ${isDarkMode ? 'bg-slate-900 border-white/5 hover:border-orange-500' : 'bg-white border-transparent hover:border-orange-200'} ${p.stock <= 0 ? 'grayscale opacity-60' : ''}`}>
+                                                <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden">
+                                                    <img src={p.image} className="w-full h-full object-cover product-img" alt={p.name} onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400'; }} />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                                    <div className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8">
+                                                        <span className="text-white text-[8px] lg:text-[10px] font-black bg-orange-500 px-2 py-1 rounded-full uppercase tracking-tighter mb-2 inline-block">{p.category}</span>
+                                                        <h4 className="text-lg lg:text-3xl font-black text-white uppercase tracking-tighter italic leading-none">{p.name}</h4>
+                                                    </div>
+                                                    <div className="absolute top-4 right-4 lg:top-8 lg:right-8 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl text-white font-black text-[10px]">
+                                                        {p.stock} STOK
+                                                    </div>
+                                                </div>
+                                                <div className="p-4 lg:p-8 flex justify-between items-center">
+                                                    <p className="text-orange-500 font-black text-lg lg:text-2xl italic tracking-tighter">Rp {p.hasVariants ? `${Math.min(...p.variants.map(v=>v.price)).toLocaleString()}` : p.variants[0].price.toLocaleString()}</p>
+                                                    <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg">
+                                                        <Icon name="plus" size={18} strokeWidth={3} className="lg:w-6 lg:h-6" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* KERANJANG */}
+                                <div className={`w-full xl:w-[400px] 2xl:w-[450px] rounded-[45px] lg:rounded-[55px] p-6 lg:p-10 flex flex-col h-auto xl:h-[calc(100vh-120px)] xl:sticky xl:top-6 shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'} mb-10 xl:mb-0 animate-zoom-in`}>
+                                    <div className="flex justify-between items-center mb-6 lg:mb-10">
+                                        <h3 className="text-xl lg:text-3xl font-black tracking-tighter uppercase italic">Pesanan <span className="text-orange-500 bg-orange-500/10 px-2 lg:px-3 py-1 rounded-xl ml-2">{cart.reduce((s,i)=>s+i.qty,0)}</span></h3>
+                                        <button onClick={()=>setCart([])} className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><Icon name="trash" size={20}/></button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto space-y-4 lg:space-y-5 pr-2 custom-scrollbar min-h-[200px] max-h-[400px] xl:max-h-none">
+                                        {cart.length === 0 ? (
+                                            <div className="h-full flex flex-col items-center justify-center opacity-10 text-center font-black py-10">
+                                                <Icon name="history" size={64} className="mb-4" />
+                                                <p className="uppercase text-sm lg:text-xl tracking-widest">Keranjang Kosong</p>
+                                            </div>
+                                        ) : (
+                                            cart.map(i => (
+                                                <div key={i.cartId} className={`flex items-center p-4 lg:p-5 rounded-[25px] lg:rounded-[30px] border-2 ${isDarkMode ? 'bg-white/5 border-transparent' : 'bg-orange-50 border-orange-100'}`}>
+                                                    <div className="flex-1">
+                                                        <p className="font-black text-[10px] lg:text-sm uppercase leading-none mb-1">{i.name}</p>
+                                                        <p className="text-[8px] lg:text-[10px] font-bold text-orange-500 mb-2 lg:mb-3 tracking-widest">{i.variant}</p>
+                                                        <div className="flex items-center space-x-3 lg:space-x-4">
+                                                            <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:Math.max(0,c.qty-1)}:c).filter(c=>c.qty>0))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl bg-orange-500/20 text-orange-500 flex items-center justify-center font-black text-xs">-</button>
+                                                            <span className="font-black text-xs lg:text-lg">{i.qty}</span>
+                                                            <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:c.qty+1}:c))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg lg:rounded-xl bg-orange-500 text-white flex items-center justify-center font-black text-xs">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-black text-orange-500 text-sm lg:text-lg">{(i.price * i.qty).toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    <div className="mt-6 lg:mt-8 pt-6 lg:pt-8 border-t-4 border-orange-500/10 space-y-6 lg:space-y-8">
+                                        <div className="flex justify-between items-end">
+                                            <span className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Tagihan</span>
+                                            <span className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter">Rp {cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button onClick={()=>handleStartCheckout('CASH')} className="p-4 lg:p-6 rounded-[25px] bg-slate-800 text-white font-black flex flex-col items-center shadow-lg active:scale-95 transition-all">
+                                                <Icon name="banknote" size={24} className="mb-1 text-orange-500 lg:w-7 lg:h-7"/> <span className="text-[8px] lg:text-[10px] uppercase tracking-widest">Tunai</span>
+                                            </button>
+                                            <button onClick={()=>handleStartCheckout('QRIS')} className="p-4 lg:p-6 rounded-[25px] bg-orange-500 text-white font-black flex flex-col items-center shadow-xl active:scale-95 transition-all">
+                                                <Icon name="smartphone" size={24} className="mb-1 lg:w-7 lg:h-7"/> <span className="text-[8px] lg:text-[10px] uppercase tracking-widest">QRIS / Dana</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'inventory' && (
+                            <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-zoom-in">
+                                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
+                                    <div>
+                                        <h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Gudang Menu</h2>
+                                        <p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Update stok dan jajanan baru</p>
+                                    </div>
+                                    <button onClick={()=>{setEditingProduct(null); setIsMenuModalOpen(true)}} className="bg-orange-500 text-white px-6 lg:px-10 py-4 lg:py-5 rounded-2xl lg:rounded-[30px] font-black shadow-xl active:scale-95 transition-all flex items-center uppercase tracking-widest text-[10px] lg:text-sm">
+                                        <Icon name="plus" size={20} className="mr-3"/> Tambah Menu
+                                    </button>
+                                </header>
+
+                                <div className={`rounded-[30px] lg:rounded-[50px] border-4 overflow-x-auto shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                                    <table className="w-full text-left min-w-[600px]">
+                                        <thead className="bg-orange-500 text-white font-black text-[10px] lg:text-[11px] uppercase tracking-[0.2em]">
+                                            <tr>
+                                                <th className="px-6 lg:px-10 py-5 lg:py-7">Item Menu</th>
+                                                <th className="px-6 lg:px-10 py-5 lg:py-7 text-center">Stok</th>
+                                                <th className="px-6 lg:px-10 py-5 lg:py-7">Harga</th>
+                                                <th className="px-6 lg:px-10 py-5 lg:py-7 text-center">Tindakan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y-4 divide-white/5 font-bold">
+                                            {products.map(p => (
+                                                <tr key={p.id} className="hover:bg-white/5 transition-colors group text-sm lg:text-base">
+                                                    <td className="px-6 lg:px-10 py-4 lg:py-8 flex items-center space-x-4 lg:space-x-6">
+                                                        <img src={p.image} className="w-12 h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-[20px] object-cover shadow-xl" alt={p.name} />
+                                                        <div>
+                                                            <p className="font-black uppercase tracking-tight">{p.name}</p>
+                                                            <p className="text-[8px] lg:text-[10px] opacity-40 uppercase">{p.category}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 lg:px-10 py-4 lg:py-8 text-center font-mono">
+                                                        <span className={`inline-block px-3 py-1 lg:px-5 lg:py-2 rounded-xl lg:rounded-2xl text-lg lg:text-2xl ${p.stock < 10 ? 'bg-red-500/10 text-red-500 font-black' : 'bg-orange-500/10 text-orange-500'}`}>
+                                                            {p.stock}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 lg:px-10 py-4 lg:py-8 text-orange-500 font-black tracking-tighter italic">Rp {p.variants[0].price.toLocaleString()}</td>
+                                                    <td className="px-6 lg:px-10 py-4 lg:py-8">
+                                                        <div className="flex justify-center space-x-2">
+                                                            <button onClick={()=>{setEditingProduct(p); setIsMenuModalOpen(true)}} className="p-2 lg:p-4 bg-slate-800 rounded-xl lg:rounded-3xl text-yellow-400 hover:scale-110 transition-all shadow-lg"><Icon name="edit" size={16}/></button>
+                                                            <button onClick={()=>setDeleteConfirm(p)} className="p-2 lg:p-4 bg-red-500/10 rounded-xl lg:rounded-3xl text-red-500 hover:scale-110 transition-all shadow-lg"><Icon name="trash" size={16}/></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'reports' && (
+                            <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 animate-zoom-in">
+                                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
+                                    <div>
+                                        <h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Laporan</h2>
+                                        <p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Pantau Omzet Jualan</p>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className={`flex items-center px-4 lg:px-8 py-3 lg:py-4 rounded-xl lg:rounded-[30px] border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                                            <Icon name="calendar" size={18} className="text-orange-500 mr-2 lg:mr-4" />
+                                            <input type="date" className="bg-transparent border-none outline-none font-black text-[10px] lg:text-sm" value={filterDate} onChange={e=>setFilterDate(e.target.value)} />
+                                        </div>
+                                    </div>
+                                </header>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-10">
+                                    <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl relative overflow-hidden ${isDarkMode ? 'bg-orange-500/10 border-orange-500/20' : 'bg-orange-500 border-orange-500 text-white'}`}>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-2 lg:mb-3">Total Omzet Harian</p>
+                                        <h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic">Rp {dailyTotal.toLocaleString()}</h3>
+                                    </div>
+                                    <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mb-2 lg:mb-3">Transaksi Sukses</p>
+                                        <h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic">{filteredTransactions.length} <span className="text-lg lg:text-2xl opacity-30 font-normal">Order</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* MODALS SECTION */}
+                    
+                    {/* PAYMENT MODAL */}
+                    {paymentModal && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-3xl rounded-[40px] lg:rounded-[60px] border-4 p-6 lg:p-12 overflow-hidden relative animate-zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'}`}>
+                                <div className="flex justify-between items-start mb-6 lg:mb-10">
+                                    <div>
+                                        <h3 className="text-2xl lg:text-4xl font-black text-orange-500 uppercase tracking-tighter italic">Pembayaran</h3>
+                                        <p className="text-[8px] lg:text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Selesaikan pesanan pelanggan</p>
+                                    </div>
+                                    <button onClick={()=>setPaymentModal(null)} className="p-2 lg:p-4 bg-red-500/10 text-red-500 rounded-xl lg:rounded-3xl"><Icon name="x" size={24}/></button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+                                    <div className="space-y-4 lg:space-y-6">
+                                        <div className="p-6 lg:p-8 rounded-[30px] lg:rounded-[40px] bg-slate-800/40 border-2 border-white/5">
+                                            <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mb-2 lg:mb-3">Cara Bayar</p>
+                                            <div className="flex items-center text-lg lg:text-2xl font-black text-orange-500 uppercase italic tracking-tighter">
+                                                <Icon name={paymentModal.type === 'CASH' ? 'banknote' : 'smartphone'} className="mr-3 lg:mr-4" size={24}/>
+                                                {paymentModal.type === 'CASH' ? 'Tunai / Cash' : 'QRIS / E-Wallet'}
+                                            </div>
+                                        </div>
+                                        <div className="p-6 lg:p-8 rounded-[30px] lg:rounded-[40px] bg-orange-500/10 border-2 border-orange-500/30 text-center">
+                                            <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mb-2 lg:mb-3">Total Tagihan</p>
+                                            <div className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter italic">Rp {paymentModal.total.toLocaleString()}</div>
+                                        </div>
+                                        
+                                        {paymentModal.type === 'CASH' && (
+                                            <div className="space-y-4 lg:space-y-6 text-slate-800">
+                                                <div>
+                                                    <label className={`text-[9px] lg:text-[11px] font-black uppercase opacity-40 ml-2 mb-2 lg:mb-3 block tracking-widest ${isDarkMode ? 'text-white' : ''}`}>Uang Diterima (Rp)</label>
+                                                    <input type="number" autoFocus className="w-full px-6 py-4 lg:px-8 lg:py-5 rounded-2xl lg:rounded-[30px] bg-slate-100 border-4 border-orange-500 outline-none text-2xl lg:text-4xl font-black tracking-tighter" placeholder="0" value={cashReceived} onChange={e=>setCashReceived(e.target.value)} />
+                                                </div>
+                                                {parseInt(cashReceived) >= paymentModal.total && (
+                                                    <div className="p-5 lg:p-7 rounded-[25px] lg:rounded-[35px] bg-green-500/10 border-2 border-green-500/30">
+                                                        <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-40 mb-1 tracking-widest">Kembalian</p>
+                                                        <p className="text-xl lg:text-3xl font-black text-green-500 italic tracking-tighter">Rp {(parseInt(cashReceived) - paymentModal.total).toLocaleString()}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col items-center justify-center p-6 lg:p-8 bg-white rounded-[35px] lg:rounded-[50px] shadow-2xl relative min-h-[250px]">
+                                        {paymentModal.type === 'QRIS' ? (
+                                            <div className="text-center">
+                                                <img src="https://i.ibb.co.com/rfH4wLBj/qris.jpg" className="w-full max-w-[200px] lg:max-w-[280px] object-contain rounded-xl shadow-lg mb-4 lg:mb-6" alt="QRIS" />
+                                                <p className="text-slate-900 font-black text-[10px] lg:text-sm uppercase tracking-widest">Scan QR Untuk Bayar</p>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center p-6 opacity-20">
+                                                <Icon name="banknote" size={80} className="text-slate-900 mb-4 mx-auto" />
+                                                <p className="text-slate-900 font-black text-sm lg:text-lg uppercase italic leading-tight">Terima Tunai Dari Pelanggan</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <button 
+                                    disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)}
+                                    onClick={finalizeTransaction}
+                                    className={`w-full py-4 lg:py-6 rounded-2xl lg:rounded-[35px] font-black text-lg lg:text-2xl mt-8 lg:mt-12 transition-all uppercase tracking-tighter shadow-2xl italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed' : 'bg-orange-500 text-white shadow-orange-500/40 hover:scale-[1.02] active:scale-95'}`}
+                                >
+                                    SIMPAN & SELESAIKAN
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* SUCCESS MODAL */}
+                    {isSuccessModal && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[300] flex items-center justify-center p-4">
+                            <div className="w-full max-w-sm p-10 lg:p-14 bg-slate-900 rounded-[40px] lg:rounded-[60px] border-4 border-green-500/30 text-center animate-zoom-in">
+                                <div className="w-20 h-20 lg:w-28 lg:h-28 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/30"><Icon name="check" size={40} strokeWidth={3}/></div>
+                                <h3 className="text-2xl lg:text-4xl font-black mb-2 uppercase italic tracking-tighter text-white">Sukses!</h3>
+                                <p className="opacity-40 text-[10px] font-bold mb-8 uppercase tracking-[0.2em] text-white">Transaksi Berhasil</p>
+                                <button onClick={()=>setIsSuccessModal(false)} className="w-full bg-green-500 text-white font-black py-4 lg:py-6 rounded-2xl lg:rounded-[35px] shadow-2xl shadow-green-500/30 uppercase tracking-widest active:scale-95">Lanjut Jualan</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Notification Toast */}
+                    {notification && (
+                        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 px-8 lg:px-12 py-4 lg:py-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full shadow-[0_20px_50px_rgba(249,115,22,0.4)] z-[500] flex items-center space-x-4 animate-zoom-in uppercase text-[10px] tracking-widest border-2 border-white/20">
+                            <Icon name="check" size={24}/> <span>{notification}</span>
+                        </div>
+                    )}
+
+                    {/* Variant Modal */}
+                    {variantModal && (
+                        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-xl p-8 lg:p-14 rounded-[40px] lg:rounded-[65px] border-4 animate-zoom-in max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20 shadow-orange-500/10' : 'bg-white border-orange-200'}`}>
+                                <header className="flex justify-between items-center mb-10">
+                                    <div>
+                                        <h3 className="text-3xl lg:text-5xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{variantModal.name}</h3>
+                                        <p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mt-2 tracking-widest ml-1">Tentukan Porsi Pelanggan</p>
+                                    </div>
+                                    <button onClick={()=>setVariantModal(null)} className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all"><Icon name="x" size={24}/></button>
+                                </header>
+                                <div className="space-y-4 lg:space-y-5">
+                                    {variantModal.variants.map((v, i) => (
+                                        <button key={i} onClick={()=>addToCart(variantModal, v.name, v.price)} className={`w-full flex justify-between items-center p-6 lg:p-10 rounded-[30px] lg:rounded-[40px] border-4 transition-all active:scale-[0.97] font-black text-xl lg:text-3xl italic tracking-tighter ${isDarkMode ? 'bg-white/5 border-transparent hover:border-orange-500 shadow-xl shadow-black/20' : 'bg-orange-50 border-transparent hover:border-orange-500'}`}>
+                                            <span>{v.name}</span>
+                                            <span className="text-orange-500">Rp {v.price.toLocaleString()}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Menu Modal (Add/Edit) */}
+                    {isMenuModalOpen && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-2xl p-8 lg:p-12 rounded-[40px] lg:rounded-[60px] border-4 shadow-2xl animate-zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-200'}`}>
+                                <div className="flex justify-between items-center mb-8 lg:mb-12">
+                                    <h3 className="text-2xl lg:text-4xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{editingProduct ? 'Edit Menu' : 'Tambah Menu'}</h3>
+                                    <button onClick={()=>setIsMenuModalOpen(false)} className="p-3 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-lg"><Icon name="x" size={28}/></button>
+                                </div>
+                                <form onSubmit={handleSaveMenu} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 text-slate-800">
+                                    <div className="sm:col-span-2">
+                                        <label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : ''}`}>Nama Jajanan</label>
+                                        <input name="name" defaultValue={editingProduct?.name} required className="w-full px-6 py-4 rounded-2xl bg-slate-100 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : ''}`}>Kategori Menu</label>
+                                        <select name="category" defaultValue={editingProduct?.category} className="w-full px-6 py-4 rounded-2xl bg-slate-100 border-2 border-transparent focus:border-orange-500 outline-none font-bold appearance-none text-md">
+                                            <option value="SOSTANG">SOSTANG</option>
+                                            <option value="MOZARELLA">MOZARELLA</option>
+                                            <option value="French Fries">French Fries</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : ''}`}>Harga Dasar (Rp)</label>
+                                        <input name="price" type="number" defaultValue={editingProduct?.variants[0].price} required className="w-full px-6 py-4 rounded-2xl bg-slate-100 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
+                                    </div>
+                                    <div>
+                                        <label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : ''}`}>Stok Awal</label>
+                                        <input name="stock" type="number" defaultValue={editingProduct?.stock} required className="w-full px-6 py-4 rounded-2xl bg-slate-100 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-lg" />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : ''}`}>Link URL Foto</label>
+                                        <input name="image" defaultValue={editingProduct?.image} placeholder="https://..." className="w-full px-6 py-4 rounded-2xl bg-slate-100 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-[10px]" />
+                                    </div>
+                                    <button className="sm:col-span-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 lg:py-6 rounded-[25px] lg:rounded-[35px] shadow-2xl active:scale-95 transition-all mt-4 text-xl lg:text-2xl uppercase tracking-tighter italic">Simpan Perubahan</button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Delete Confirm Modal */}
+                    {deleteConfirm && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-md p-8 lg:p-12 bg-slate-900 rounded-[40px] lg:rounded-[55px] border-4 border-red-500/30 text-center animate-zoom-in shadow-2xl`}>
+                                <div className="w-16 h-16 lg:w-24 lg:h-24 bg-red-500/20 text-red-500 rounded-2xl lg:rounded-[30px] flex items-center justify-center mx-auto mb-8 lg:mb-10"><Icon name="alert" size={40} /></div>
+                                <h3 className="text-2xl lg:text-3xl font-black mb-2 uppercase tracking-tighter italic text-white">Hapus Menu?</h3>
+                                <p className="opacity-40 text-[10px] font-bold mb-10 uppercase leading-relaxed text-white">Menu <span className="text-red-500 font-black">{deleteConfirm.name}</span> akan hilang dari sistem selamanya.</p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button onClick={()=>setDeleteConfirm(null)} className="py-4 rounded-2xl bg-slate-800 font-black text-[10px] uppercase opacity-40 text-white">Batal</button>
+                                    <button onClick={()=>{setProducts(products.filter(p=>p.id!==deleteConfirm.id)); setDeleteConfirm(null); showNotify("Dihapus!");}} className="py-4 rounded-2xl bg-red-500 text-white font-black text-[10px] uppercase shadow-xl shadow-red-500/20">Hapus Menu</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
