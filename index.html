@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jajanan-Z POS | Premium Cloud System</title>
+    <title>Jajanan-Z POS | Premium Integrated System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -23,7 +23,8 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
-            background-color: #fffaf0;
+            background-color: #0f172a; 
+            transition: all 0.3s ease;
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
@@ -38,21 +39,20 @@
             cursor: pointer;
             transition: all 0.2s ease; 
             position: relative;
-            z-index: 10;
         }
-        .product-card:active { transform: scale(0.92); }
+        .product-card:active { transform: scale(0.95); }
         .product-img { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
         .product-card:hover .product-img { transform: scale(1.05); }
 
-        /* Input Cash dengan Kontras Tinggi */
         .cash-input-field {
             background-color: #ffffff !important;
             color: #000000 !important;
-            border-color: #f97316 !important;
+            border: 3px solid #f97316 !important;
+            font-weight: 900;
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden text-slate-800">
+<body class="antialiased overflow-x-hidden text-slate-200">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -72,11 +72,16 @@
                 eye: <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
                 eyeOff: <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>,
                 x: <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
-                alert: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>,
                 banknote: <><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></>,
-                smartphone: <><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>,
                 store: <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>,
-                calendar: <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>
+                calendar: <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
+                sun: <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
+                moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,
+                maximize: <><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></>,
+                layers: <><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>,
+                save: <><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></>,
+                alert: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>,
+                smartphone: <><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>
             };
             return (
                 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -86,7 +91,7 @@
         };
 
         // --- CONFIGURATION ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1_0ARWmgYs_lyrFMNyPlvosoSPiX9I06WXLGEMiTm_U0nvVlNWSuuaElE7S_O9Y9Orw/exec"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTrpT2x2Unr2UHRPI6YPIDlq04GoPI8hwxUzLrNnQPAL7XKBkoCx_wGr1c_Y5B2-Y18g/exec"; 
         const firebaseConfig = {
             apiKey: "AIzaSyB_U-e8oHiHn8PdC77OWIe0WH46KL7chRA",
             authDomain: "jajanan-genz.firebaseapp.com",
@@ -97,67 +102,64 @@
             measurementId: "G-2V19QJ20DF"
         };
 
-        // Initialize Firebase
-        let db = null;
-        let auth = null;
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            auth = firebase.auth();
-        } catch (e) { console.error("Firebase error", e); }
-        
-        const appId = "jajanan-pos-final-v4"; 
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const appId = "jajanan-pos-final-v25-pro"; 
 
         const App = () => {
             const [fbUser, setFbUser] = useState(null);
+            const [currentUser, setCurrentUser] = useState(null);
             const [view, setView] = useState('login');
             const [isDarkMode, setIsDarkMode] = useState(true);
             const [products, setProducts] = useState([]);
             const [cart, setCart] = useState([]);
             const [transactions, setTransactions] = useState([]);
-            const [searchTerm, setSearchTerm] = useState('');
+            const [rawMaterials, setRawMaterials] = useState({ sosis_besar: 0, sosis_kecil: 0, mika: 0, keju: 0 });
             const [notification, setNotification] = useState(null);
             const [showPassword, setShowPassword] = useState(false);
-            const [authError, setAuthError] = useState(false);
-            
+            const [isLoggingIn, setIsLoggingIn] = useState(false);
             const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+            
             const [paymentModal, setPaymentModal] = useState(null); 
             const [cashReceived, setCashReceived] = useState('');
             const [isSuccessModal, setIsSuccessModal] = useState(false);
-
+            const [qtyModal, setQtyModal] = useState(null); 
+            const [variantModal, setVariantModal] = useState(null);
+            const [orderQty, setOrderQty] = useState(1);
             const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
             const [editingProduct, setEditingProduct] = useState(null);
-            const [variantModal, setVariantModal] = useState(null);
-            const [qtyModal, setQtyModal] = useState(null); 
-            const [orderQty, setOrderQty] = useState(1);
             const [deleteConfirm, setDeleteConfirm] = useState(null);
-
             const [loginForm, setLoginForm] = useState({ username: '', password: '' });
 
             const showNotify = (msg) => {
                 setNotification(msg);
-                setTimeout(() => setNotification(null), 7000);
+                setTimeout(() => setNotification(null), 4000);
             };
 
-            const logToSpreadsheet = async (data) => {
-                if (!APPS_SCRIPT_URL) return;
+            const toggleFullscreen = () => {
                 try {
-                    await fetch(APPS_SCRIPT_URL, {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(() => showNotify("Fullscreen diblokir"));
+                    } else { document.exitFullscreen(); }
+                } catch (e) { showNotify("Fitur tidak didukung"); }
+            };
+
+            const callGAS = async (data) => {
+                if (!APPS_SCRIPT_URL) return { error: "URL belum diset" };
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     });
-                } catch (error) { console.error("Log error", error); }
+                    const resText = await response.text();
+                    try { return JSON.parse(resText); } catch(e) { return { success: true }; }
+                } catch (error) { return { error: "Koneksi Database Gagal" }; }
             };
 
             useEffect(() => {
                 if (!auth) return;
-                auth.signInAnonymously().catch(err => {
-                    if (err.code === 'auth/configuration-not-found') setAuthError(true);
-                });
+                auth.signInAnonymously().catch(() => {});
                 const unsubscribeAuth = auth.onAuthStateChanged((user) => setFbUser(user));
                 return () => unsubscribeAuth();
             }, []);
@@ -165,90 +167,109 @@
             useEffect(() => {
                 if (!db) return;
                 const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products');
-                
                 const unsubscribeProducts = colRef.onSnapshot((snapshot) => {
-                    if (snapshot.empty) {
+                    if (!snapshot.empty) {
+                        setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                    } else {
                         const INITIAL = [
-                            { name: 'SOSTANG (Sosis Kentang)', category: 'SOSTANG', image: 'https://ibb.co.com/9k46yNJ2/Sostang.jpg', hasVariants: true, variants: [{ name: 'Medium', price: 10000 }, { name: 'Large', price: 15000 }], stock: 50 },
+                            { name: 'SOSTANG (Sosis Kentang)', category: 'SOSTANG', image: 'https://i.ibb.co.com/9k46yNJ2/sostang.jpg', hasVariants: true, variants: [{ name: 'Medium', price: 10000 }, { name: 'Large', price: 15000 }], stock: 50 },
                             { name: 'Mozarella Corndog', category: 'MOZARELLA', image: 'https://i.ibb.co.com/pr0JWb5F/mozarella.jpg', hasVariants: true, variants: [{ name: 'Original', price: 13000 }, { name: 'Choco', price: 15000 }, { name: 'Strawberry', price: 15000 }, { name: 'Tiramisu', price: 15000 }, { name: 'Kentang', price: 15000 }], stock: 40 },
                             { name: 'Mozarella Sosis Kentang', category: 'MOZARELLA', image: 'https://i.ibb.co.com/pr0JWb5F/mozarella.jpg', hasVariants: true, variants: [{ name: 'Kentang Medium', price: 17000 }, { name: 'Kentang Large', price: 22000 }], stock: 30 },
                             { name: 'French Fries', category: 'French Fries', image: 'https://i.ibb.co.com/z39t9H4/fries.jpg', hasVariants: true, variants: [{ name: 'Medium', price: 10000 }, { name: 'Large', price: 15000 }], stock: 60 }
                         ];
                         INITIAL.forEach(p => colRef.add(p));
-                    } else {
-                        setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                     }
                 });
 
-                const unsubscribeTransactions = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions')
-                    .onSnapshot((snapshot) => setTransactions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+                const matRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('materials').doc('daily_stock');
+                const unsubscribeMaterials = matRef.onSnapshot((doc) => { if (doc.exists) setRawMaterials(doc.data()); });
 
-                return () => { unsubscribeProducts(); unsubscribeTransactions(); };
+                const unsubscribeTransactions = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions')
+                    .onSnapshot((snapshot) => {
+                        const trxData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setTransactions(trxData);
+                    });
+
+                return () => { unsubscribeProducts(); unsubscribeTransactions(); unsubscribeMaterials(); };
             }, [fbUser]);
 
+            const filteredTransactions = useMemo(() => transactions.filter(t => t.date === filterDate), [transactions, filterDate]);
+            const dailyTotal = useMemo(() => filteredTransactions.reduce((sum, t) => sum + (Number(t.total) || 0), 0), [filteredTransactions]);
+
+            const handleLogin = async (e) => {
+                e.preventDefault();
+                setIsLoggingIn(true);
+                const res = await callGAS({ action: "validateLogin", username: loginForm.username, password: loginForm.password });
+                if (res && res.success) {
+                    setCurrentUser({ name: res.name, role: res.role });
+                    setView('pos');
+                    showNotify(`Halo ${res.name}!`);
+                } else { showNotify(res?.error || "Gagal Login!"); }
+                setIsLoggingIn(false);
+            };
+
             const handleProductClick = (product) => {
-                if (product.stock <= 0) return showNotify("Stok sudah habis!");
-                if (product.hasVariants) {
-                    setVariantModal(product);
-                } else {
-                    setQtyModal({ product, variantName: 'Original', price: product.variants[0].price });
-                    setOrderQty(1);
-                }
+                if (product.stock <= 0) return showNotify("Stok habis!");
+                setVariantModal(product);
             };
 
             const confirmAddToCart = () => {
+                if (!qtyModal) return;
                 const { product, variantName, price } = qtyModal;
-                if (orderQty > product.stock) return showNotify("Stok tidak mencukupi!");
                 const cartId = `${product.id}-${variantName}`;
-                
-                setCart(prevCart => {
-                    const existing = prevCart.find(item => item.cartId === cartId);
-                    if (existing) {
-                        return prevCart.map(item => item.cartId === cartId ? { ...item, qty: item.qty + orderQty } : item);
-                    } else {
-                        return [...prevCart, { 
-                            cartId, id: product.id, name: product.name, variant: variantName, 
-                            price, image: product.image, qty: orderQty 
-                        }];
-                    }
+                setCart(prev => {
+                    const exist = prev.find(x => x.cartId === cartId);
+                    if (exist) return prev.map(x => x.cartId === cartId ? {...x, qty: x.qty + orderQty} : x);
+                    return [...prev, { cartId, id: product.id, name: product.name, variant: variantName, price, image: product.image, qty: orderQty, category: product.category }];
                 });
-                
                 setQtyModal(null);
-                setOrderQty(1);
-                showNotify("Masuk keranjang!");
+                showNotify("Item masuk keranjang!");
+            };
+
+            const handleStartCheckout = (type) => {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                if (total === 0) return showNotify("Pilih menu dahulu!");
+                setPaymentModal({ type, total });
+                setCashReceived('');
             };
 
             const finalizeTransaction = async () => {
                 const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
                 const today = new Date().toISOString().split('T')[0];
                 const time = new Date().toLocaleTimeString('id-ID');
-                const itemsStr = cart.map(i => `${i.name} ${i.variant} (x${i.qty})`).join(', ');
+                const cashierName = currentUser?.name || "Kasir";
                 
                 const trxData = {
                     id: `TRX-${Date.now()}`,
                     date: today,
                     time: time,
-                    items: itemsStr,
+                    items: cart.map(i => `${i.name} ${i.variant} (x${i.qty})`).join(', '),
                     total: total,
                     paymentMethod: paymentModal.type,
-                    cashier: loginForm.username || "Kasir"
+                    cashier: cashierName
                 };
 
-                // Kirim ke Spreadsheet
-                await logToSpreadsheet(trxData);
+                let newMats = { ...rawMaterials };
+                cart.forEach(item => {
+                    if (item.variant.toLowerCase().includes("large")) newMats.sosis_besar -= item.qty;
+                    if (item.variant.toLowerCase().includes("medium")) newMats.sosis_kecil -= item.qty;
+                    newMats.mika -= item.qty;
+                    if (item.category === "MOZARELLA") newMats.keju -= item.qty;
+                });
 
-                // Sinkron ke Firebase
+                await callGAS({ ...trxData, action: "logTransaction" });
+                await callGAS({ ...newMats, cashier: cashierName, action: "updateMaterials" });
+
                 if (fbUser && db) {
                     try {
                         await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions').add(trxData);
+                        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('materials').doc('daily_stock').set(newMats);
                         for (const item of cart) {
-                            const productRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').doc(item.id);
-                            const snap = await productRef.get();
-                            if (snap.exists) {
-                                await productRef.update({ stock: Math.max(0, snap.data().stock - item.qty) });
-                            }
+                            const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').doc(item.id);
+                            const snap = await ref.get();
+                            if (snap.exists) await ref.update({ stock: Math.max(0, snap.data().stock - item.qty) });
                         }
-                    } catch (e) { console.error(e); }
+                    } catch (e) {}
                 }
 
                 setCart([]);
@@ -256,68 +277,32 @@
                 setIsSuccessModal(true);
             };
 
-            const handleSaveMenu = async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const data = {
-                    name: formData.get('name'),
-                    category: formData.get('category'),
-                    price: parseInt(formData.get('price')),
-                    stock: parseInt(formData.get('stock')),
-                    image: formData.get('image'),
-                    hasVariants: editingProduct ? editingProduct.hasVariants : false,
-                };
-                if (!data.hasVariants) { data.variants = [{ name: 'Original', price: data.price }]; }
-                try {
-                    const col = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products');
-                    if (editingProduct) await col.doc(editingProduct.id).update(data);
-                    else await col.add(data);
-                    setIsMenuModalOpen(false);
-                    setEditingProduct(null);
-                } catch (err) { showNotify("Gagal simpan!"); }
+            const saveSingleMaterial = async (key, val) => {
+                const updated = {...rawMaterials, [key]: Number(val)};
+                setRawMaterials(updated);
+                showNotify(`Stok diperbarui`);
+                await callGAS({ ...updated, cashier: currentUser?.name || "Admin", action: "updateMaterials" });
+                if(fbUser) await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('materials').doc('daily_stock').set(updated);
             };
-
-            const handleStartCheckout = (type) => {
-                const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                setPaymentModal({ type, total });
-                setCashReceived('');
-            };
-
-            const filteredTransactions = useMemo(() => transactions.filter(t => t.date === filterDate), [transactions, filterDate]);
-            const dailyTotal = useMemo(() => filteredTransactions.reduce((sum, t) => sum + t.total, 0), [filteredTransactions]);
 
             if (view === 'login') {
                 return (
-                    <div className={`min-h-screen w-full flex items-center justify-center p-4 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
-                        <div className={`w-full max-w-md p-8 md:p-10 rounded-[40px] shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5 shadow-black/40' : 'bg-white border-white'} animate-zoom-in`}>
-                            <div className="text-center mb-10 text-orange-500 text-center">
-                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-[30px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white">
-                                    <Icon name="store" size={40} />
-                                </div>
-                                <h1 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Jajanan-Z</h1>
+                    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-950">
+                        <div className="w-full max-w-md p-10 rounded-[50px] shadow-2xl bg-slate-900 border-4 border-white/5 animate-zoom-in text-white text-center">
+                            <div className="mb-10 text-orange-500">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-[30px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white"><Icon name="store" size={40} /></div>
+                                <h1 className="text-3xl font-black uppercase italic tracking-tighter">Jajanan-Z</h1>
                                 <p className="opacity-40 mt-1 font-bold uppercase text-[10px] tracking-[0.3em]">Smart Cloud POS</p>
                             </div>
-                            
-                            {authError && (
-                                <div className="mb-6 p-4 bg-red-500/10 border-2 border-red-500/20 rounded-2xl text-[10px] leading-relaxed font-bold text-red-500 uppercase tracking-wider">
-                                    <p className="flex items-start gap-2"><Icon name="alert" size={14} className="mt-0.5 shrink-0" /> CLOUD ERROR: Aktifkan 'Anonymous' di Firebase Console.</p>
-                                </div>
-                            )}
-
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                if(loginForm.username === 'admin' && loginForm.password === 'admin123') setView('pos');
-                                else if(loginForm.username === 'kasir') setView('pos');
-                                else showNotify("User: admin / admin123 atau kasir");
-                            }} className="space-y-4">
-                                <input type="text" placeholder="User ID" className={`w-full px-6 py-4 rounded-2xl border-2 border-transparent focus:border-orange-500 outline-none font-bold ${isDarkMode ? 'bg-slate-800/50 text-white' : 'bg-gray-100 text-slate-900'}`} value={loginForm.username} onChange={e=>setLoginForm({...loginForm, username: e.target.value})} />
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <input type="text" placeholder="Username" className="w-full px-6 py-4 rounded-2xl bg-slate-800 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-white h-14" value={loginForm.username} onChange={e=>setLoginForm({...loginForm, username: e.target.value})} required />
                                 <div className="relative">
-                                    <input type={showPassword ? "text" : "password"} placeholder="Password" className={`w-full px-6 py-4 rounded-2xl border-2 border-transparent focus:border-orange-500 outline-none font-bold ${isDarkMode ? 'bg-slate-800/50 text-white' : 'bg-gray-100 text-slate-900'}`} value={loginForm.password} onChange={e=>setLoginForm({...loginForm, password: e.target.value})} />
-                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-orange-500 opacity-60">
-                                        <Icon name={showPassword ? "eyeOff" : "eye"} size={20} />
-                                    </button>
+                                    <input type={showPassword ? "text" : "password"} placeholder="Password" className="w-full px-6 py-4 rounded-2xl bg-slate-800 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-white h-14" value={loginForm.password} onChange={e=>setLoginForm({...loginForm, password: e.target.value})} required />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-orange-500 opacity-60"><Icon name={showPassword ? "eyeOff" : "eye"} size={20} /></button>
                                 </div>
-                                <button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all mt-4 uppercase tracking-widest h-14">Mulai Shift</button>
+                                <button disabled={isLoggingIn} className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all mt-4 uppercase h-14 flex items-center justify-center">
+                                    {isLoggingIn ? "Loading..." : "Mulai Shift"}
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -326,218 +311,203 @@
 
             return (
                 <div className={`min-h-screen w-full flex flex-col md:flex-row ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
-                    <aside className={`w-full md:w-72 lg:w-80 p-6 md:p-8 border-r-2 flex flex-col ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-                        <div className="flex items-center space-x-4 mb-10">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
-                                <Icon name="store" size={20} />
-                            </div>
-                            <span className="font-black text-xl text-orange-500 tracking-tighter italic uppercase">JAJAN-Z</span>
+                    <aside className={`w-full md:w-72 lg:w-80 p-8 border-r-2 flex flex-col ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                        <div className="flex items-center space-x-4 mb-12">
+                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg"><Icon name="store" size={20} /></div>
+                            <span className="font-black text-xl text-orange-500 tracking-tighter italic uppercase leading-none">JAJAN-Z</span>
                         </div>
-                        <nav className="flex-1 space-y-2">
-                            <button onClick={()=>setView('pos')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'pos' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-                                <Icon name="cart" size={20}/> <span className="text-sm">TRANSAKSI</span>
-                            </button>
-                            <button onClick={()=>setView('inventory')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'inventory' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-                                <Icon name="package" size={20}/> <span className="text-sm">STOK & MENU</span>
-                            </button>
-                            <button onClick={()=>setView('reports')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'reports' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
-                                <Icon name="dashboard" size={20}/> <span className="text-sm">LAPORAN</span>
-                            </button>
+                        <nav className="flex-1 space-y-2 text-left leading-none">
+                            <button onClick={()=>setView('pos')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'pos' ? 'bg-orange-500 text-white shadow-xl' : 'opacity-40 hover:opacity-100'}`}><Icon name="cart" size={20}/> <span className="text-sm">TRANSAKSI</span></button>
+                            <button onClick={()=>setView('materials')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'materials' ? 'bg-orange-500 text-white shadow-xl' : 'opacity-40 hover:opacity-100'}`}><Icon name="layers" size={20}/> <span className="text-sm">BAHAN BAKU</span></button>
+                            <button onClick={()=>setView('inventory')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'inventory' ? 'bg-orange-500 text-white shadow-xl' : 'opacity-40 hover:opacity-100'}`}><Icon name="package" size={20}/> <span className="text-sm">MENU & STOK</span></button>
+                            <button onClick={()=>setView('reports')} className={`w-full flex items-center space-x-4 p-4 rounded-2xl font-black transition-all ${view === 'reports' ? 'bg-orange-500 text-white shadow-xl' : 'opacity-40 hover:opacity-100'}`}><Icon name="dashboard" size={20}/> <span className="text-sm">LAPORAN</span></button>
                         </nav>
                         <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
-                            <button onClick={()=>setIsDarkMode(!isDarkMode)} className={`w-full flex items-center justify-between p-3 rounded-xl ${isDarkMode ? 'bg-slate-800/30' : 'bg-gray-100'}`}>
-                                <span className="text-[10px] font-black uppercase opacity-40 text-center">Tampilan</span>
-                                {isDarkMode ? <Icon name="moon" size={16} className="text-yellow-400"/> : <Icon name="sun" size={16} className="text-orange-500"/>}
-                            </button>
-                            <button onClick={()=>setView('login')} className="w-full flex items-center space-x-4 p-4 text-red-500 font-black hover:bg-red-500/10 rounded-2xl transition-all">
-                                <Icon name="logout" size={20}/> <span className="text-sm uppercase font-bold">KELUAR</span>
-                            </button>
+                            <button onClick={toggleFullscreen} className={`w-full flex items-center justify-between p-3 rounded-xl ${isDarkMode ? 'bg-slate-800/30' : 'bg-gray-100'}`}><span className="text-[10px] font-black uppercase opacity-40">Full Screen</span><Icon name="maximize" size={16}/></button>
+                            <button onClick={()=>setIsDarkMode(!isDarkMode)} className={`w-full flex items-center justify-between p-3 rounded-xl ${isDarkMode ? 'bg-slate-800/30' : 'bg-gray-100'}`}><span className="text-[10px] font-black uppercase opacity-40">Cahaya</span>{isDarkMode ? <Icon name="sun" size={16} className="text-yellow-400"/> : <Icon name="moon" size={16} className="text-orange-500"/>}</button>
+                            <button onClick={()=>setView('login')} className="w-full flex items-center space-x-4 p-4 text-red-500 font-black hover:bg-red-500/10 rounded-2xl transition-all leading-none"><Icon name="logout" size={20}/> <span className="text-sm uppercase font-bold">KELUAR</span></button>
                         </div>
                     </aside>
 
-                    <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto w-full">
+                    <main className="flex-1 p-8 lg:p-10 overflow-y-auto w-full text-left">
                         {view === 'pos' && (
-                            <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 h-full">
-                                <div className="flex-1 space-y-6 lg:space-y-8 text-left">
-                                    <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
-                                        <h2 className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter uppercase italic leading-tight">Menu Jajan</h2>
-                                    </header>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 pb-20">
+                            <div className="flex flex-col xl:flex-row gap-10 h-full">
+                                <div className="flex-1 space-y-8">
+                                    <header><h2 className="text-4xl lg:text-5xl font-black text-orange-500 tracking-tighter uppercase italic">Menu Jajan</h2></header>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-6 pb-20">
                                         {products.map(p => (
-                                            <div key={p.id} onClick={()=>handleProductClick(p)} className="product-card group rounded-[40px] border-4 transition-all shadow-xl bg-white border-transparent hover:border-orange-500 relative">
-                                                <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden bg-slate-800 rounded-t-[36px]">
+                                            <div key={p.id} onClick={()=>handleProductClick(p)} className="product-card group rounded-[40px] border-4 transition-all shadow-xl bg-white border-transparent hover:border-orange-500 relative overflow-hidden">
+                                                <div className="h-48 relative overflow-hidden bg-slate-800 pointer-events-none rounded-t-[36px]">
                                                     <img src={p.image} className="w-full h-full object-cover product-img" alt={p.name} onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400'; }} />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                                                    <div className="absolute bottom-4 left-4">
-                                                        <span className="text-white text-[8px] lg:text-[10px] font-black bg-orange-500 px-2 py-1 rounded-full uppercase tracking-tighter mb-2 inline-block">{p.category}</span>
-                                                        <h4 className="text-lg lg:text-3xl font-black text-white uppercase tracking-tighter italic leading-none">{p.name}</h4>
-                                                    </div>
-                                                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl text-white font-black text-[10px]">
-                                                        {p.stock} STOK
-                                                    </div>
+                                                    <div className="absolute bottom-4 left-4"><span className="text-white text-[8px] lg:text-[10px] font-black bg-orange-500 px-2 py-1 rounded-full uppercase mb-2 inline-block leading-none">{p.category}</span><h4 className="text-lg lg:text-2xl font-black text-white uppercase italic leading-none">{p.name}</h4></div>
+                                                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl text-white font-black text-[10px]">{p.stock} STOK</div>
                                                 </div>
-                                                <div className="p-4 lg:p-8 flex justify-between items-center text-left">
-                                                    <p className="text-orange-500 font-black text-lg lg:text-2xl italic tracking-tighter leading-none">Rp {p.hasVariants ? `${Math.min(...p.variants.map(v=>v.price)).toLocaleString()}` : (p.variants?.[0]?.price || 0).toLocaleString()}</p>
-                                                    <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg">
-                                                        <Icon name="plus" size={18} strokeWidth={3} className="lg:w-6 lg:h-6" />
-                                                    </div>
+                                                <div className="p-6 lg:p-8 flex justify-between items-center text-left pointer-events-none text-slate-800">
+                                                    <p className="text-orange-500 font-black text-lg lg:text-2xl italic tracking-tighter leading-none">Rp {(p.variants?.[0]?.price || 0).toLocaleString()}</p>
+                                                    <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-lg"><Icon name="plus" size={20} strokeWidth={3} /></div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className={`w-full xl:w-[400px] 2xl:w-[450px] rounded-[45px] lg:rounded-[55px] p-6 lg:p-10 flex flex-col h-auto xl:h-[calc(100vh-120px)] xl:sticky xl:top-6 shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'} mb-10 xl:mb-0 animate-zoom-in text-left`}>
-                                    <h3 className="text-xl lg:text-3xl font-black tracking-tighter uppercase italic leading-none text-orange-500 mb-8">Keranjang <span className="bg-orange-500/10 px-2 lg:px-3 py-1 rounded-xl ml-2">{cart.reduce((s,i)=>s+i.qty,0)}</span></h3>
-                                    <div className="flex-1 overflow-y-auto space-y-4 lg:space-y-5 pr-2 custom-scrollbar min-h-[200px]">
-                                        {cart.length === 0 ? (
-                                            <div className="h-full flex flex-col items-center justify-center opacity-10 text-center font-black py-10 text-orange-500"><Icon name="cart" size={64} className="mb-4" /><p className="uppercase">Kosong</p></div>
-                                        ) : (
-                                            cart.map(i => (
-                                                <div key={i.cartId} className={`flex items-center p-4 lg:p-5 rounded-[25px] lg:rounded-[30px] border-2 ${isDarkMode ? 'bg-white/5 border-transparent' : 'bg-orange-50 border-orange-100'}`}>
-                                                    <div className="flex-1">
-                                                        <p className="font-black text-[10px] lg:text-sm uppercase leading-none mb-1">{i.name}</p>
-                                                        <p className="text-[8px] lg:text-[10px] font-bold text-orange-500 mb-2 uppercase">{i.variant}</p>
-                                                        <div className="flex items-center space-x-3">
-                                                            <button onClick={()=>setCart(prev=>prev.map(c=>c.cartId===i.cartId?{...c,qty:Math.max(0,c.qty-1)}:c).filter(c=>c.qty>0))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg bg-orange-500/20 text-orange-500 flex items-center justify-center font-black text-xs">-</button>
-                                                            <span className="font-black text-xs lg:text-lg">{i.qty}</span>
-                                                            <button onClick={()=>setCart(prev=>prev.map(c=>c.cartId===i.cartId?{...c,qty:c.qty+1}:c))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center font-black text-xs">+</button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right"><p className="font-black text-orange-500 text-sm">{(i.price * i.qty).toLocaleString()}</p></div>
-                                                </div>
-                                            ))
-                                        )}
+                                <div className={`w-full xl:w-[450px] rounded-[55px] p-10 flex flex-col h-auto xl:h-[calc(100vh-120px)] xl:sticky xl:top-6 shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'} mb-10 xl:mb-0 text-left animate-zoom-in`}>
+                                    <h3 className="text-2xl lg:text-3xl font-black tracking-tighter uppercase italic text-orange-500 mb-8 leading-none">Keranjang <span className="bg-orange-500/10 px-3 py-1 rounded-xl ml-2 leading-none">{cart.reduce((s,i)=>s+i.qty,0)}</span></h3>
+                                    <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar min-h-[200px]">
+                                        {cart.length === 0 ? <div className="h-full flex flex-col items-center justify-center opacity-10 text-center font-black py-10 text-orange-500"><Icon name="cart" size={64} className="mb-4" /><p className="uppercase leading-none">Kosong</p></div> : cart.map(i => (
+                                            <div key={i.cartId} className={`flex items-center p-4 rounded-[25px] border-2 ${isDarkMode ? 'bg-white/5 border-transparent text-white' : 'bg-orange-50 border-orange-100 text-slate-800'}`}><div className="flex-1"><p className="font-black text-[10px] lg:text-sm uppercase leading-none mb-1">{i.name}</p><p className="text-[8px] lg:text-[10px] font-bold text-orange-500 mb-2 uppercase italic leading-none">{i.variant}</p><div className="flex items-center space-x-3"><button onClick={()=>setCart(prev=>prev.map(c=>c.cartId===i.cartId?{...c,qty:Math.max(0,c.qty-1)}:c).filter(c=>c.qty>0))} className="w-6 h-6 rounded-lg bg-orange-500/20 text-orange-500 flex items-center justify-center font-black text-xs">-</button><span className="font-black text-xs lg:text-lg leading-none">{i.qty}</span><button onClick={()=>setCart(prev=>prev.map(c=>c.cartId===i.cartId?{...c,qty:c.qty+1}:c))} className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center font-black text-xs">+</button></div></div><div className="text-right leading-none"><p className="font-black text-orange-500 text-sm">{(i.price * i.qty).toLocaleString()}</p></div></div>
+                                        ))}
                                     </div>
-                                    <div className="mt-6 pt-6 border-t-4 border-orange-500/10 space-y-6">
-                                        <div className="flex justify-between items-end"><span className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Total</span><span className="text-3xl lg:text-5xl font-black text-orange-500 tracking-tighter">Rp {cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString()}</span></div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button onClick={()=>handleStartCheckout('CASH')} className="p-4 lg:p-6 rounded-[25px] bg-slate-800 text-white font-black flex flex-col items-center shadow-lg active:scale-95 transition-all"><Icon name="banknote" size={24} className="mb-1 text-orange-500"/> <span className="text-[8px] lg:text-[10px] uppercase">Tunai</span></button>
-                                            <button onClick={()=>handleStartCheckout('QRIS')} className="p-4 lg:p-6 rounded-[25px] bg-orange-500 text-white font-black flex flex-col items-center shadow-xl active:scale-95 transition-all"><Icon name="smartphone" size={24} className="mb-1 text-white"/> <span className="text-[8px] lg:text-[10px] uppercase text-white font-bold">QRIS</span></button>
-                                        </div>
+                                    <div className="mt-8 pt-8 border-t-4 border-orange-500/10 space-y-8 leading-none">
+                                        <div className="flex justify-between items-end text-orange-500 leading-none"><span className="text-[10px] font-black opacity-30 uppercase tracking-widest leading-none">Total</span><span className="text-4xl lg:text-5xl font-black tracking-tighter leading-none italic">Rp {cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString()}</span></div>
+                                        <div className="grid grid-cols-2 gap-4"><button onClick={()=>handleStartCheckout('CASH')} className="p-5 rounded-[30px] bg-slate-800 text-white font-black flex flex-col items-center shadow-lg h-20 leading-none"><Icon name="banknote" size={24} className="mb-2 text-orange-500"/><span className="text-[10px] uppercase tracking-widest">Tunai</span></button><button onClick={()=>handleStartCheckout('QRIS')} className="p-5 rounded-[30px] bg-orange-500 text-white font-black flex flex-col items-center shadow-xl active:scale-95 h-20 leading-none text-white"><Icon name="smartphone" size={24} className="mb-2 text-white"/><span className="text-[10px] uppercase tracking-widest text-white font-bold">QRIS</span></button></div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* View Inventory */}
-                        {view === 'inventory' && (
-                            <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-zoom-in text-left">
-                                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 text-left">
-                                    <div><h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Gudang Menu</h2><p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2 italic leading-none">Sinkronisasi Real-time</p></div>
-                                    <button onClick={()=>{setEditingProduct(null); setIsMenuModalOpen(true)}} className="bg-orange-500 text-white px-6 lg:px-10 py-4 lg:py-5 rounded-2xl lg:rounded-[30px] font-black shadow-xl active:scale-95 transition-all flex items-center uppercase tracking-widest text-[10px] lg:text-sm h-14"><Icon name="plus" size={20} className="mr-3"/> Tambah Menu</button>
-                                </header>
-                                <div className={`rounded-[30px] lg:rounded-[50px] border-4 overflow-x-auto shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
-                                    <table className="w-full text-left min-w-[600px]">
-                                        <thead className="bg-orange-500 text-white font-black text-[10px] lg:text-[11px] uppercase tracking-[0.2em]"><tr><th className="px-6 lg:px-10 py-5 lg:py-7 uppercase">Item</th><th className="px-6 lg:px-10 py-5 lg:py-7 text-center uppercase">Stok</th><th className="px-6 lg:px-10 py-5 lg:py-7 uppercase text-right">Harga</th><th className="px-6 lg:px-10 py-5 lg:py-7 text-center uppercase">Aksi</th></tr></thead>
-                                        <tbody className="divide-y-4 divide-white/5 font-bold">
-                                            {products.map(p => (
-                                                <tr key={p.id} className="hover:bg-white/5 transition-colors group"><td className="px-6 lg:px-10 py-4 lg:py-8 flex items-center space-x-4 lg:space-x-6 text-left"><img src={p.image} className="w-12 h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-[20px] object-cover shadow-xl" alt={p.name} /><div><p className="font-black uppercase tracking-tight leading-none text-sm lg:text-lg">{p.name}</p><p className="text-[8px] lg:text-[10px] opacity-40 uppercase mt-1">{p.category}</p></div></td><td className="px-6 lg:px-10 py-4 lg:py-8 text-center font-mono text-xl">{p.stock}</td><td className="px-6 lg:px-10 py-4 lg:py-8 text-orange-500 font-black tracking-tighter text-right text-xl italic uppercase leading-none">Rp {p.variants?.[0]?.price.toLocaleString() || 0}</td><td className="px-6 lg:px-10 py-4 lg:py-8 text-center"><div className="flex justify-center space-x-2"><button onClick={()=>{setEditingProduct(p); setIsMenuModalOpen(true)}} className="p-2 lg:p-4 bg-slate-800 rounded-xl text-yellow-400 hover:scale-110 transition-all shadow-lg"><Icon name="edit" size={16}/></button><button onClick={()=>setDeleteConfirm(p)} className="p-2 lg:p-4 bg-red-500/10 rounded-xl text-red-500 hover:scale-110 transition-all leading-none"><Icon name="trash" size={16}/></button></div></td></tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                        {view === 'materials' && (
+                            <div className="max-w-4xl mx-auto space-y-12 animate-zoom-in text-slate-800 text-left">
+                                <header><h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic text-left leading-none">Bahan Baku</h2><p className="opacity-40 font-bold uppercase text-[10px] mt-4 italic leading-none text-left">Input stok baru & klik ikon simpan</p></header>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                    {[
+                                        {id: 'sosis_besar', label: 'Sosis Besar'},
+                                        {id: 'sosis_kecil', label: 'Sosis Kecil'},
+                                        {id: 'mika', label: 'Mika'},
+                                        {id: 'keju', label: 'Keju Mozarella'}
+                                    ].map(mat => (
+                                        <div key={mat.id} className={`p-10 rounded-[45px] border-4 ${isDarkMode ? 'bg-slate-900 border-white/5 text-white' : 'bg-white border-orange-100 text-slate-800'} shadow-2xl flex flex-col gap-6`}>
+                                            <div className="flex justify-between items-start text-left">
+                                                <div><p className="text-[10px] font-black uppercase opacity-40 mb-2 leading-none uppercase">{mat.label}</p><h3 className={`text-4xl lg:text-6xl font-black tracking-tighter leading-none italic ${rawMaterials[mat.id] < 10 ? 'text-red-500' : 'text-orange-500'}`}>{rawMaterials[mat.id]}</h3></div>
+                                                <div className="w-16 h-16 rounded-3xl bg-orange-500/10 flex items-center justify-center text-orange-500"><Icon name="layers" size={32} /></div>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <input type="number" id={`input-${mat.id}`} placeholder="Input Stok" className="flex-1 px-6 py-4 rounded-2xl bg-white border-2 border-orange-500 text-slate-900 font-black text-xl outline-none shadow-inner h-14" />
+                                                <button onClick={() => { const el = document.getElementById(`input-${mat.id}`); if(el.value !== "") { saveSingleMaterial(mat.id, el.value); el.value = ""; } }} className="w-14 h-14 rounded-2xl bg-green-500 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"><Icon name="save" size={24} /></button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
-                        
+
                         {view === 'reports' && (
-                            <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 animate-zoom-in text-left">
-                                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
-                                    <div><h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic leading-none">Laporan Cloud</h2><p className="opacity-40 font-bold uppercase text-[10px] tracking-[0.3em] mt-2 italic leading-none">Update Real-time</p></div>
-                                    <div className="flex gap-4"><div className={`flex items-center px-4 lg:px-8 py-3 lg:py-4 rounded-xl lg:rounded-[30px] border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}><Icon name="calendar" size={18} className="text-orange-500 mr-2 lg:mr-4" /><input type="date" className="bg-transparent border-none outline-none font-black text-[10px] lg:text-sm text-inherit h-10 leading-none" value={filterDate} onChange={e=>setFilterDate(e.target.value)} /></div></div>
+                            <div className="max-w-6xl mx-auto space-y-12 animate-zoom-in text-left text-slate-800">
+                                <header className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6 text-left">
+                                    <div><h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic text-left leading-none">Laporan</h2><p className="opacity-40 font-bold uppercase text-[10px] mt-4 italic leading-none uppercase">History Transaksi Cloud</p></div>
+                                    <div className="flex items-center px-6 lg:px-8 py-4 rounded-3xl border-4 bg-white shadow-xl h-16"><Icon name="calendar" size={20} className="text-orange-500 mr-4" /><input type="date" className="bg-transparent border-none outline-none font-black text-sm text-slate-900 h-10" value={filterDate} onChange={e=>setFilterDate(e.target.value)} /></div>
                                 </header>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-10">
-                                    <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl relative overflow-hidden ${isDarkMode ? 'bg-orange-500/10 border-orange-500/20 shadow-orange-500/5' : 'bg-orange-500 border-orange-500 text-white'}`}><p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-2 lg:mb-3 text-orange-400 leading-none uppercase">Omzet Hari Ini</p><h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic leading-none mt-2">Rp {dailyTotal.toLocaleString()}</h3></div>
-                                    <div className={`p-8 lg:p-12 rounded-[40px] lg:rounded-[50px] border-4 shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}><p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mb-2 lg:mb-3 leading-none uppercase">Transaksi</p><h3 className="text-3xl lg:text-6xl font-black tracking-tighter italic leading-none mt-2">{filteredTransactions.length} <span className="text-lg lg:text-2xl opacity-30 font-normal italic">Order</span></h3></div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-white leading-none">
+                                    <div className="p-10 lg:p-12 rounded-[55px] border-4 shadow-2xl bg-orange-500 border-orange-500 text-white relative overflow-hidden leading-none"><p className="text-[10px] font-black uppercase opacity-60 mb-2 leading-none uppercase">Total Omzet</p><h3 className="text-3xl lg:text-7xl font-black tracking-tighter italic leading-none mt-2">Rp {dailyTotal.toLocaleString()}</h3></div>
+                                    <div className={`p-10 lg:p-12 rounded-[55px] border-4 shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5 text-white' : 'bg-white border-orange-100 text-slate-800'} leading-none`}><p className="text-[10px] font-black uppercase opacity-30 mb-2 leading-none uppercase text-center">Jumlah Transaksi</p><h3 className="text-3xl lg:text-7xl font-black tracking-tighter italic leading-none mt-2">{filteredTransactions.length} <span className="text-xl lg:text-3xl opacity-30 font-normal italic uppercase">Order</span></h3></div>
                                 </div>
+                                <div className={`rounded-[45px] border-4 overflow-hidden shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                                    <div className="overflow-x-auto"><table className="w-full text-left min-w-[750px] text-sm"><thead className="bg-orange-500 text-white font-black text-[10px] uppercase tracking-widest h-20 leading-none"><tr><th className="p-8">Waktu</th><th className="p-8">Detail Order</th><th className="p-8">Kasir</th><th className="p-8 text-right">Bayar</th></tr></thead><tbody className="divide-y-2 divide-white/5 font-bold">{filteredTransactions.map(t => (<tr key={t.id} className="hover:bg-white/5 transition-colors h-24 text-slate-600 dark:text-slate-300"><td className="p-8 opacity-40 font-mono italic">{t.time}</td><td className="p-8 leading-relaxed">{t.items}</td><td className="p-8 uppercase italic text-orange-500 font-black tracking-widest leading-none">{t.cashier}</td><td className="p-8 text-right text-orange-500 font-black italic leading-none">Rp {(Number(t.total) || 0).toLocaleString()}</td></tr>))}{filteredTransactions.length === 0 && <tr><td colSpan="4" className="p-32 text-center opacity-10 text-5xl font-black uppercase italic tracking-tighter italic leading-none uppercase text-orange-500">Kosong</td></tr>}</tbody></table></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'inventory' && (
+                            <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-zoom-in text-left text-slate-800">
+                                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 text-left">
+                                    <div><h2 className="text-4xl lg:text-6xl font-black text-orange-500 tracking-tighter uppercase italic text-left">Gudang Menu</h2><p className="opacity-40 font-bold uppercase text-[10px] mt-2 italic leading-none uppercase leading-none">Kelola Menu & Persediaan</p></div>
+                                    <button onClick={()=>{setEditingProduct(null); setIsMenuModalOpen(true)}} className="bg-orange-500 text-white px-8 py-5 rounded-[30px] font-black shadow-xl active:scale-95 transition-all flex items-center uppercase text-[10px] lg:text-sm h-16 tracking-widest uppercase"><Icon name="plus" size={20} className="mr-3"/> Tambah Menu</button>
+                                </header>
+                                <div className={`rounded-[50px] border-4 overflow-x-auto shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5 text-white' : 'bg-white border-orange-100 text-slate-800'}`}><table className="w-full text-left min-w-[650px]"><thead className="bg-orange-500 text-white font-black text-[10px] uppercase tracking-widest h-20 leading-none"><tr><th className="p-8 leading-none">Produk</th><th className="p-8 text-center uppercase leading-none">Stok</th><th className="p-8 text-right uppercase leading-none">Harga</th><th className="p-8 text-center uppercase leading-none">Tindakan</th></tr></thead><tbody className="divide-y-4 divide-white/5 font-bold">{products.map(p => (<tr key={p.id} className="hover:bg-white/5 transition-colors h-24 group"><td className="px-8 py-6 flex items-center space-x-6 text-left"><img src={p.image} className="w-14 h-14 rounded-2xl object-cover shadow-xl" alt={p.name} /><div><p className="font-black uppercase text-base leading-none text-left">{p.name}</p><p className="text-[10px] opacity-40 uppercase mt-1 italic tracking-widest text-left">{p.category}</p></div></td><td className="px-8 py-6 text-center"><span className={`inline-block px-5 py-2 rounded-2xl text-xl lg:text-2xl font-black leading-none ${p.stock < 10 ? 'bg-red-500/10 text-red-500' : 'bg-orange-500/10 text-orange-500 font-black'}`}>{p.stock}</span></td><td className="px-8 py-6 text-orange-500 font-black text-right text-xl italic leading-none uppercase">Rp {(p.variants?.[0]?.price || 0).toLocaleString()}</td><td className="px-8 py-6 text-center leading-none"><div className="flex justify-center space-x-3 text-slate-800 leading-none"><button onClick={()=>{setEditingProduct(p); setIsMenuModalOpen(true)}} className="p-3 bg-slate-800 rounded-2xl text-yellow-400 hover:scale-110 shadow-lg leading-none"><Icon name="edit" size={18}/></button><button onClick={()=>setDeleteConfirm(p)} className="p-3 bg-red-500/10 rounded-2xl text-red-500 hover:scale-110 shadow-lg leading-none text-red-500"><Icon name="trash" size={18}/></button></div></td></tr>))}</tbody></table></div>
                             </div>
                         )}
                     </main>
 
-                    {/* QUANTITY MODAL */}
+                    {/* --- MODALS --- */}
+
+                    {variantModal && (
+                        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-xl p-10 rounded-[50px] border-4 animate-zoom-in max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20 shadow-orange-500/10' : 'bg-white border-orange-200'}`}>
+                                <header className="flex justify-between items-center mb-10 text-left text-orange-500">
+                                    <div><h3 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter italic leading-none">{variantModal.name}</h3><p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mt-3 tracking-widest leading-none">Pilih Rasa / Porsi Pelanggan</p></div>
+                                    <button onClick={()=>setVariantModal(null)} className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all leading-none text-red-500"><Icon name="x" size={24}/></button>
+                                </header>
+                                <div className="space-y-4 lg:space-y-5 text-white">
+                                    {variantModal.variants.map((v, i) => (
+                                        <button key={i} onClick={()=>{ setQtyModal({product: variantModal, variantName: v.name, price: v.price}); setOrderQty(1); setVariantModal(null); }} className={`w-full flex justify-between items-center p-8 lg:p-10 rounded-[30px] lg:rounded-[40px] border-4 transition-all active:scale-[0.97] font-black text-xl lg:text-3xl italic tracking-tighter ${isDarkMode ? 'bg-white/5 border-transparent hover:border-orange-500 text-white shadow-xl' : 'bg-orange-50 border-transparent hover:border-orange-500 text-slate-800 shadow-lg'}`}><span>{v.name}</span><span className="text-orange-500 font-black italic leading-none">Rp {v.price.toLocaleString()}</span></button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {qtyModal && (
-                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[250] flex items-center justify-center p-4 text-center">
-                            <div className={`w-full max-w-md rounded-[50px] p-10 border-4 shadow-2xl animate-zoom-in ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'}`}>
-                                <h3 className="text-2xl font-black text-orange-500 uppercase italic leading-none">{qtyModal.product.name}</h3>
-                                <p className="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] leading-none mt-2">{qtyModal.variantName}</p>
-                                <div className="flex flex-col items-center gap-6 mt-8">
-                                    <div className="flex items-center gap-8">
-                                        <button onClick={()=>setOrderQty(Math.max(1, orderQty - 1))} className="w-16 h-16 rounded-3xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-4xl font-black shadow-lg active:scale-95 transition-all">-</button>
-                                        <span className="text-6xl font-black text-orange-500 leading-none">{orderQty}</span>
-                                        <button onClick={()=>setOrderQty(Math.min(qtyModal.product.stock, orderQty + 1))} className="w-16 h-16 rounded-3xl bg-orange-500 text-white flex items-center justify-center text-4xl font-black shadow-xl active:scale-95 transition-all shadow-orange-500/30">+</button>
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[250] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-md rounded-[55px] p-10 border-4 shadow-2xl animate-zoom-in ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'} text-center text-slate-800`}>
+                                <h3 className={`text-2xl lg:text-3xl font-black uppercase italic leading-none ${isDarkMode ? 'text-orange-500' : 'text-slate-800'}`}>{qtyModal.product.name}</h3>
+                                <p className="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mt-3 leading-none">{qtyModal.variantName}</p>
+                                <div className="flex flex-col items-center gap-8 mt-10">
+                                    <div className="flex items-center gap-10">
+                                        <button onClick={()=>setOrderQty(Math.max(1, orderQty - 1))} className="w-20 h-20 rounded-3xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-5xl font-black shadow-lg">-</button>
+                                        <span className={`text-7xl font-black tracking-tighter leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{orderQty}</span>
+                                        <button onClick={()=>setOrderQty(Math.min(qtyModal.product.stock, orderQty + 1))} className="w-20 h-20 rounded-3xl bg-orange-500 text-white flex items-center justify-center text-5xl font-black shadow-xl">+</button>
                                     </div>
-                                    <p className="font-bold opacity-30 text-sm tracking-widest uppercase italic leading-none">Total: Rp {(qtyModal.price * orderQty).toLocaleString()}</p>
-                                    <div className="grid grid-cols-2 gap-4 w-full mt-4">
-                                        <button onClick={()=>setQtyModal(null)} className="py-5 rounded-3xl bg-slate-800 text-white font-black uppercase text-xs tracking-widest h-14 leading-none">Batal</button>
-                                        <button onClick={confirmAddToCart} className="py-5 rounded-3xl bg-orange-500 text-white font-black uppercase text-xs tracking-widest shadow-xl shadow-orange-500/20 h-14 leading-none uppercase">Tambah</button>
+                                    <div className="grid grid-cols-2 gap-4 w-full mt-6 leading-none">
+                                        <button onClick={()=>setQtyModal(null)} className="py-6 rounded-3xl bg-slate-800 text-white font-black uppercase text-[10px] tracking-widest h-16 leading-none">Batal</button>
+                                        <button onClick={confirmAddToCart} className="py-6 rounded-3xl bg-orange-500 text-white font-black uppercase text-[10px] shadow-xl shadow-orange-500/20 h-16 leading-none uppercase italic tracking-widest">OK</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* PAYMENT MODAL */}
                     {paymentModal && (
-                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4 text-center">
-                            <div className={`w-full max-w-4xl rounded-[40px] lg:rounded-[60px] border-4 p-6 lg:p-12 overflow-hidden relative animate-zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'}`}>
-                                <div className="flex justify-between items-start mb-6 lg:mb-10 text-left">
-                                    <div><h3 className="text-2xl lg:text-4xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">Pembayaran</h3><p className="text-[8px] lg:text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1 uppercase leading-none">Selesaikan Pesanan</p></div>
-                                    <button onClick={()=>setPaymentModal(null)} className="p-2 lg:p-4 bg-red-500/10 text-red-500 rounded-xl lg:rounded-3xl text-red-500"><Icon name="x" size={24}/></button>
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4">
+                            <div className={`w-full max-w-4xl rounded-[60px] border-4 p-8 lg:p-14 overflow-hidden relative animate-zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'} text-center`}>
+                                <div className="flex justify-between items-start mb-10 text-left">
+                                    <div><h3 className="text-3xl lg:text-5xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">Pembayaran</h3><p className="text-[10px] font-bold opacity-40 uppercase mt-2 leading-none italic font-black uppercase">Konfirmasi Tagihan Jajanan</p></div>
+                                    <button onClick={()=>setPaymentModal(null)} className="p-3 lg:p-4 bg-red-500/10 text-red-500 rounded-3xl leading-none text-red-500"><Icon name="x" size={28}/></button>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 text-left">
-                                    <div className="space-y-4 lg:space-y-6 text-left">
-                                        <div className="p-6 lg:p-10 rounded-[35px] lg:rounded-[45px] bg-slate-800/40 border-2 border-white/5 text-center shadow-inner">
-                                            <p className={`text-[10px] font-black uppercase opacity-30 mb-2 lg:mb-4 tracking-widest uppercase italic ${isDarkMode ? 'text-white' : 'text-slate-500'}`}>Tagihan</p>
-                                            <div className="text-4xl lg:text-7xl font-black text-orange-500 tracking-tighter leading-none">Rp {paymentModal.total.toLocaleString()}</div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 text-left text-slate-800">
+                                    <div className="space-y-6">
+                                        <div className="p-10 rounded-[45px] bg-slate-800/40 border-2 border-white/5 text-center shadow-inner text-slate-100 leading-none">
+                                            <p className={`text-[10px] font-black uppercase opacity-30 mb-4 tracking-widest uppercase italic leading-none ${isDarkMode ? 'text-white' : 'text-slate-500'}`}>Total Tagihan</p>
+                                            <div className="text-5xl lg:text-7xl font-black text-orange-500 tracking-tighter leading-none italic">Rp {paymentModal.total.toLocaleString()}</div>
                                         </div>
                                         {paymentModal.type === 'CASH' && (
                                             <div className="space-y-4">
-                                                <label className={`text-[11px] font-black uppercase opacity-40 ml-2 block tracking-widest font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Uang Diterima (Rp)</label>
-                                                <input type="number" autoFocus className="cash-input-field w-full px-6 py-5 rounded-[30px] border-4 outline-none text-3xl lg:text-5xl font-black tracking-tighter h-20 shadow-xl" placeholder="0" value={cashReceived} onChange={e=>setCashReceived(e.target.value)} />
+                                                <label className={`text-[11px] font-black uppercase opacity-40 ml-2 block tracking-widest font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Tunai Diterima (Rp)</label>
+                                                <input type="number" autoFocus className="cash-input-field w-full px-8 py-6 rounded-[35px] border-4 outline-none text-4xl lg:text-6xl font-black tracking-tighter h-24 shadow-2xl text-slate-900 leading-none" placeholder="0" value={cashReceived} onChange={e=>setCashReceived(e.target.value)} />
                                                 {parseInt(cashReceived) >= paymentModal.total && (
-                                                    <div className="p-6 rounded-[35px] bg-green-500/10 border-2 border-green-500/30 text-center animate-zoom-in">
-                                                        <p className="text-[10px] font-black uppercase opacity-60 mb-1 tracking-widest leading-none uppercase text-green-700">Kembalian</p>
-                                                        <p className="text-3xl lg:text-5xl font-black text-green-600 italic tracking-tighter leading-none mt-2 font-mono">Rp {(parseInt(cashReceived) - paymentModal.total).toLocaleString()}</p>
+                                                    <div className="p-10 rounded-[40px] bg-green-500/10 border-2 border-green-500/30 text-center animate-zoom-in text-green-600 font-black">
+                                                        <p className="text-[10px] font-black opacity-60 mb-2 tracking-widest leading-none uppercase">Kembalian</p>
+                                                        <p className="text-4xl lg:text-6xl italic tracking-tighter leading-none font-mono">Rp {(parseInt(cashReceived) - paymentModal.total).toLocaleString()}</p>
                                                     </div>
                                                 )}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[50px] shadow-2xl relative min-h-[350px] text-center text-slate-900">
+                                    <div className="flex flex-col items-center justify-center p-10 bg-white rounded-[55px] shadow-2xl relative min-h-[380px] text-center text-slate-900">
                                         {paymentModal.type === 'QRIS' ? (
-                                            <div className="animate-zoom-in"><img src="https://i.ibb.co.com/jkr5d4Kr/qris-fix.jpg" className="w-full max-w-[320px] object-contain rounded-xl shadow-lg mb-6" alt="QRIS" /><p className="text-slate-900 font-black text-xs lg:text-sm uppercase tracking-[0.2em] italic">Scan QR Pembayaran</p></div>
+                                            <div className="animate-zoom-in"><img src="https://i.ibb.co.com/jkr5d4Kr/qris-fix.jpg" className="w-full max-w-[320px] object-contain rounded-xl shadow-lg mb-8" alt="QRIS" /><p className="text-slate-900 font-black text-xs lg:text-sm uppercase tracking-[0.3em] italic leading-none font-bold">Scan QR Jajanan-Z</p></div>
                                         ) : (
-                                            <div className="opacity-20 flex flex-col items-center justify-center gap-4"><Icon name="banknote" size={100} /><p className="text-slate-900 font-black text-lg lg:text-2xl uppercase italic text-center leading-none">Terima Tunai</p></div>
+                                            <div className="opacity-20 flex flex-col items-center justify-center gap-8"><Icon name="banknote" size={140} /><p className="text-slate-900 font-black text-xl lg:text-3xl uppercase italic text-center leading-none uppercase font-bold">Terima Cash</p></div>
                                         )}
                                     </div>
                                 </div>
-                                <button disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)} onClick={finalizeTransaction} className={`w-full py-5 lg:py-7 rounded-2xl lg:rounded-[35px] font-black text-xl lg:text-3xl mt-12 transition-all uppercase tracking-tighter shadow-2xl h-20 ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed' : 'bg-orange-500 text-white shadow-orange-500/40 active:scale-95'}`}>SIMPAN & SELESAIKAN</button>
+                                <button disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)} onClick={finalizeTransaction} className={`w-full py-6 lg:py-8 rounded-[35px] font-black text-2xl mt-12 transition-all uppercase tracking-tighter shadow-2xl h-24 leading-none uppercase italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed text-slate-400' : 'bg-orange-500 text-white shadow-orange-500/40 hover:scale-[1.01] active:scale-95'}`}>SIMPAN & SELESAIKAN</button>
                             </div>
                         </div>
                     )}
 
-                    {/* SISA MODAL & NOTIFIKASI */}
                     {isSuccessModal && (
                         <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[300] flex items-center justify-center p-4">
-                            <div className={`w-full max-w-sm p-10 lg:p-14 bg-slate-900 rounded-[40px] lg:rounded-[60px] border-4 border-green-500/30 text-center animate-zoom-in shadow-2xl`}>
-                                <div className="w-20 h-20 lg:w-28 lg:h-28 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/30"><Icon name="check" size={40} strokeWidth={3}/></div>
-                                <h3 className="text-2xl lg:text-4xl font-black mb-2 uppercase italic text-white leading-none">Berhasil!</h3>
-                                <p className="opacity-40 text-[10px] font-bold mb-8 uppercase text-white uppercase tracking-widest">Tersinkron ke Database & Sheet</p>
-                                <button onClick={()=>setIsSuccessModal(false)} className="w-full bg-green-500 text-white font-black py-4 lg:py-6 rounded-2xl lg:rounded-[35px] shadow-2xl active:scale-95 h-16 uppercase font-bold">Lanjut</button>
+                            <div className={`w-full max-w-sm p-12 lg:p-16 bg-slate-900 rounded-[55px] border-4 border-green-500/30 text-center animate-zoom-in shadow-2xl text-white`}>
+                                <div className="w-24 h-24 lg:w-32 lg:h-32 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-green-500/30 leading-none"><Icon name="check" size={72} strokeWidth={4}/></div>
+                                <h3 className="text-3xl lg:text-5xl font-black mb-4 uppercase italic tracking-tighter leading-none">BERHASIL!</h3>
+                                <p className="opacity-40 text-[10px] font-bold mb-12 uppercase tracking-widest leading-none uppercase italic text-white">Data Cloud & Sheet Sinkron</p>
+                                <button onClick={()=>setIsSuccessModal(false)} className="w-full bg-green-500 text-white font-black py-6 rounded-[30px] shadow-2xl active:scale-95 h-20 uppercase font-bold leading-none tracking-widest text-xl italic leading-none">Lanjut</button>
                             </div>
                         </div>
-                    )}
-                    {isMenuModalOpen && (
-                        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-4"><div className={`w-full max-w-2xl p-8 lg:p-12 rounded-[40px] lg:rounded-[60px] border-4 shadow-2xl animate-zoom-in max-h-[95vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-200'}`}><div className="flex justify-between items-center mb-8 lg:mb-12"><h3 className="text-2xl lg:text-4xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{editingProduct ? 'Edit Menu' : 'Tambah Menu'}</h3><button onClick={()=>setIsMenuModalOpen(false)} className="p-3 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-lg text-red-500"><Icon name="x" size={28}/></button></div><form onSubmit={handleSaveMenu} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 text-slate-800 text-left"><div className="sm:col-span-2 text-left"><label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>Nama Jajanan</label><input name="name" defaultValue={editingProduct?.name} required className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 outline-none font-bold text-lg h-14 text-slate-900" /></div><div className="sm:col-span-2 text-left"><label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>Kategori</label><select name="category" defaultValue={editingProduct?.category} className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 outline-none font-bold appearance-none text-md h-14 text-slate-900"><option value="SOSTANG">SOSTANG</option><option value="MOZARELLA">MOZARELLA</option><option value="French Fries">French Fries</option></select></div><div className="text-left"><label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>Harga (Rp)</label><input name="price" type="number" defaultValue={editingProduct?.variants?.[0]?.price || 0} required className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 outline-none font-bold text-lg h-14 text-slate-900" /></div><div className="text-left"><label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>Stok</label><input name="stock" type="number" defaultValue={editingProduct?.stock || 0} required className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 outline-none font-bold text-lg h-14 text-slate-900" /></div><div className="sm:col-span-2 text-left"><label className={`text-[10px] font-black uppercase opacity-40 mb-2 block tracking-widest ml-1 ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>URL Foto</label><input name="image" defaultValue={editingProduct?.image} placeholder="https://..." className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-200 focus:border-orange-500 outline-none font-bold text-[10px] h-14 text-slate-900" /></div><button className="sm:col-span-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 lg:py-6 rounded-[25px] lg:rounded-[35px] shadow-2xl active:scale-95 transition-all mt-4 text-xl lg:text-2xl h-16 uppercase italic">SIMPAN</button></form></div></div>
-                    )}
-                    {variantModal && (
-                        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4 text-center"><div className={`w-full max-w-xl p-8 lg:p-14 rounded-[40px] lg:rounded-[65px] border-4 animate-zoom-in max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-slate-900 border-orange-500/20 shadow-orange-500/10' : 'bg-white border-orange-200'}`}><header className="flex justify-between items-center mb-10 text-left"><div><h3 className="text-3xl lg:text-5xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{variantModal.name}</h3><p className="text-[8px] lg:text-[10px] font-black uppercase opacity-30 mt-2 tracking-widest ml-1 leading-none uppercase">Porsi / Rasa</p></div><button onClick={()=>setVariantModal(null)} className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all"><Icon name="x" size={24}/></button></header><div className="space-y-4 lg:space-y-5 text-white">{variantModal.variants.map((v, i) => (<button key={i} onClick={()=>{ setQtyModal({product: variantModal, variantName: v.name, price: v.price}); setOrderQty(1); setVariantModal(null); }} className={`w-full flex justify-between items-center p-6 lg:p-10 rounded-[30px] lg:rounded-[40px] border-4 transition-all active:scale-[0.97] font-black text-xl lg:text-3xl italic tracking-tighter ${isDarkMode ? 'bg-white/5 border-transparent hover:border-orange-500 shadow-xl shadow-black/20 text-white' : 'bg-orange-50 border-transparent hover:border-orange-500 text-slate-800'}`}><span>{v.name}</span><span className="text-orange-500">Rp {v.price.toLocaleString()}</span></button>))}</div></div></div>
-                    )}
-                    {deleteConfirm && (
-                        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center p-4 text-center"><div className={`w-full max-w-md p-8 lg:p-12 bg-slate-900 rounded-[40px] lg:rounded-[55px] border-4 border-red-500/30 shadow-2xl animate-zoom-in text-white`}><div className="w-16 h-16 lg:w-24 lg:h-24 bg-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-8 lg:mb-10 shadow-lg text-red-500"><Icon name="alert" size={40} /></div><h3 className="text-2xl lg:text-3xl font-black mb-2 uppercase italic leading-none">Hapus?</h3><p className="opacity-40 text-[10px] font-bold mb-10 uppercase leading-relaxed">Menu <span className="text-red-500 font-black">{deleteConfirm.name}</span> akan terhapus.</p><div className="grid grid-cols-2 gap-4"><button onClick={()=>setDeleteConfirm(null)} className="py-4 rounded-2xl bg-slate-800 font-black text-[10px] uppercase h-14">Batal</button><button onClick={async ()=>{ try { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').doc(deleteConfirm.id).delete(); setDeleteConfirm(null); showNotify("Dihapus"); } catch (e) { showNotify("Gagal!"); } }} className="py-4 rounded-2xl bg-red-500 text-white font-black text-[10px] h-14 uppercase">Ya, Hapus</button></div></div></div>
                     )}
 
                     {notification && (
-                        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 px-8 lg:px-12 py-4 lg:py-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full shadow-[0_20px_50px_rgba(249,115,22,0.4)] z-[500] flex items-center space-x-4 animate-zoom-in uppercase text-[10px] tracking-widest border-2 border-white/20 leading-none"><Icon name="check" size={24}/> <span>{notification}</span></div>
+                        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 px-10 lg:px-14 py-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full shadow-[0_25px_60px_rgba(249,115,22,0.5)] z-[500] flex items-center space-x-4 animate-zoom-in uppercase text-xs tracking-widest border-2 border-white/20 leading-none"><Icon name="check" size={24}/> <span>{notification}</span></div>
                     )}
                 </div>
             );
