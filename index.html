@@ -1,560 +1,654 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Persuratan BEM Fahutan IPB</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0a1128; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
-        select option { color: black; background: white; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Animasi Shimmer untuk Tombol Login */
-        .shimmer-btn {
-            position: relative;
-            overflow: hidden;
-        }
-        .shimmer-btn::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0) 40%,
-                rgba(255, 255, 255, 0.4) 50%,
-                rgba(255, 255, 255, 0) 60%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(45deg);
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer {
-            0% { transform: translateX(-150%) rotate(45deg); }
-            100% { transform: translateX(150%) rotate(45deg); }
-        }
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  LayoutDashboard, 
+  ShoppingCart, 
+  Package, 
+  LogOut, 
+  Plus, 
+  Trash2, 
+  Edit3,
+  CheckCircle2, 
+  Smartphone, 
+  Banknote,
+  Moon,
+  Sun,
+  FileSpreadsheet,
+  AlertCircle,
+  Search,
+  ArrowUpRight,
+  X,
+  ChevronRight,
+  Filter,
+  Calendar,
+  Wallet,
+  ReceiptText,
+  History,
+  Store
+} from 'lucide-react';
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-    </style>
-</head>
-<body class="overflow-x-hidden text-left">
-    <div id="root"></div>
+// --- CONFIGURATION ---
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1_0ARWmgYs_lyrFMNyPlvosoSPiX9I06WXLGEMiTm_U0nvVlNWSuuaElE7S_O9Y9Orw/exec"; 
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback, useMemo } = React;
-        
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxmMf9yjoNuzbypcGQMp2Q_XSpgzcWfuEG_hHvne_fIWg-Oy9iXEMtcsqqOSq1cmGv/exec"; 
-        const LOGO_URL = "https://i.ibb.co.com/PGDMfSbq/logo.png";
+const INITIAL_PRODUCTS = [
+  { 
+    id: 1, 
+    name: 'SOSTANG (Sosis Kentang)', 
+    category: 'SOSTANG', 
+    // Menggunakan gambar yang lebih spesifik dan stabil
+    image: 'https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=600&q=80', 
+    hasVariants: true,
+    variants: [
+      { name: 'Medium', price: 10000 },
+      { name: 'Large', price: 15000 }
+    ],
+    stock: 50
+  },
+  { 
+    id: 2, 
+    name: 'Mozarella Corndog', 
+    category: 'MOZARELLA', 
+    image: 'https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=600&q=80', 
+    hasVariants: true,
+    variants: [
+      { name: 'Original', price: 13000 },
+      { name: 'Choco', price: 15000 },
+      { name: 'Strawberry', price: 15000 },
+      { name: 'Tiramisu', price: 15000 },
+      { name: 'Kentang', price: 15000 }
+    ],
+    stock: 40
+  },
+  { 
+    id: 3, 
+    name: 'Mozarella Sosis Kentang', 
+    category: 'MOZARELLA', 
+    image: 'https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=600&q=80', 
+    hasVariants: true,
+    variants: [
+      { name: 'Kentang Medium', price: 17000 },
+      { name: 'Kentang Large', price: 22000 }
+    ],
+    stock: 30
+  },
+  { 
+    id: 4, 
+    name: 'French Fries', 
+    category: 'French Fries', 
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80', 
+    hasVariants: true,
+    variants: [
+      { name: 'Medium', price: 10000 },
+      { name: 'Large', price: 15000 }
+    ],
+    stock: 60
+  }
+];
 
-        // --- KOMPONEN UI DI LUAR APP ---
-        const GlassCard = ({ children, className = "" }) => (
-            <div className={`glass rounded-2xl p-6 shadow-2xl relative z-10 ${className}`}>
-                {children}
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState('login');
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [cart, setCart] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [notification, setNotification] = useState(null);
+  
+  // State Pembayaran & Laporan
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [paymentModal, setPaymentModal] = useState(null); 
+  const [cashReceived, setCashReceived] = useState('');
+  const [isSuccessModal, setIsSuccessModal] = useState(false);
+
+  // Modal States
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [variantModal, setVariantModal] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+
+  const showNotify = (msg) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  // --- INTEGRASI GOOGLE SHEETS ---
+  const sendToSpreadsheet = async (data) => {
+    if (!APPS_SCRIPT_URL) return;
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (error) {
+      console.error("Gagal sinkronisasi ke Spreadsheet", error);
+    }
+  };
+
+  // --- LOGIKA TRANSAKSI ---
+  const handleStartCheckout = (type) => {
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    setPaymentModal({ type, total });
+    setCashReceived('');
+  };
+
+  const finalizeTransaction = () => {
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const today = new Date().toISOString().split('T')[0];
+    
+    const newTrx = {
+      id: `TRX-${Date.now()}`,
+      date: today,
+      time: new Date().toLocaleTimeString('id-ID'),
+      items: cart.map(i => `${i.name} ${i.variant} (x${i.qty})`).join(', '),
+      total: total,
+      paymentMethod: paymentModal.type,
+      cashier: user.name,
+      paid: paymentModal.type === 'CASH' ? parseInt(cashReceived) : total,
+      change: paymentModal.type === 'CASH' ? (parseInt(cashReceived) - total) : 0
+    };
+
+    setProducts(prev => prev.map(p => {
+      const itemsInCart = cart.filter(c => c.id === p.id);
+      const soldCount = itemsInCart.reduce((s, i) => s + i.qty, 0);
+      return { ...p, stock: p.stock - soldCount };
+    }));
+
+    setTransactions([newTrx, ...transactions]);
+    sendToSpreadsheet(newTrx); 
+
+    setCart([]);
+    setPaymentModal(null);
+    setIsSuccessModal(true);
+  };
+
+  const addToCart = (product, variantName, price) => {
+    const cartId = `${product.id}-${variantName}`;
+    const existing = cart.find(item => item.cartId === cartId);
+    if (existing) {
+      setCart(cart.map(item => item.cartId === cartId ? { ...item, qty: item.qty + 1 } : item));
+    } else {
+      setCart([...cart, { 
+        cartId, id: product.id, name: product.name, variant: variantName, 
+        price, image: product.image, qty: 1 
+      }]);
+    }
+    setVariantModal(null);
+  };
+
+  const handleSaveMenu = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const price = parseInt(formData.get('price'));
+    const stock = parseInt(formData.get('stock'));
+    const image = formData.get('image');
+    const category = formData.get('category');
+
+    if (editingProduct) {
+      setProducts(products.map(p => p.id === editingProduct.id ? {
+        ...p, name, stock, image, category,
+        variants: p.hasVariants ? p.variants : [{name: 'Original', price}]
+      } : p));
+      showNotify("Menu diperbarui!");
+    } else {
+      setProducts([...products, {
+        id: Date.now(),
+        name, category, image, stock,
+        hasVariants: false,
+        variants: [{name: 'Original', price}]
+      }]);
+      showNotify("Menu ditambahkan!");
+    }
+    setIsMenuModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const filteredTransactions = useMemo(() => transactions.filter(t => t.date === filterDate), [transactions, filterDate]);
+  const dailyTotal = useMemo(() => filteredTransactions.reduce((sum, t) => sum + t.total, 0), [filteredTransactions]);
+
+  if (view === 'login') {
+    return (
+      <div className={`min-h-screen flex items-center justify-center p-6 ${isDarkMode ? 'bg-slate-950' : 'bg-orange-50'}`}>
+        <div className={`w-full max-w-md p-10 rounded-[50px] shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5 shadow-black/40' : 'bg-white border-white'}`}>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-[35px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white">
+              <Store size={48} />
             </div>
-        );
+            <h1 className="text-4xl font-black text-orange-500 uppercase tracking-tighter italic">Jajanan Gen-Z</h1>
+            <p className="opacity-40 mt-2 font-bold uppercase text-[10px] tracking-[0.3em]">Smart Cloud POS</p>
+          </div>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if(loginForm.username === 'admin' && loginForm.password === 'admin123') {
+               setUser({name: 'Owner', role: 'admin'}); setView('pos');
+            } else if(loginForm.username === 'kasir') {
+               setUser({name: 'Staff Kasir', role: 'staff'}); setView('pos');
+            } else { showNotify("Gunakan admin/admin123"); }
+          }} className="space-y-4">
+            <input type="text" placeholder="User ID" className="w-full px-6 py-4 rounded-2xl bg-slate-800/30 border-2 border-transparent focus:border-orange-500 outline-none font-bold" value={loginForm.username} onChange={e=>setLoginForm({...loginForm, username: e.target.value})} />
+            <input type="password" placeholder="Password" className="w-full px-6 py-4 rounded-2xl bg-slate-800/30 border-2 border-transparent focus:border-orange-500 outline-none font-bold" value={loginForm.password} onChange={e=>setLoginForm({...loginForm, password: e.target.value})} />
+            <button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all mt-4 uppercase tracking-widest">Mulai Shift</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
-        const InputField = ({ label, showToggle, toggleAction, isPasswordVisible, ...props }) => (
-            <div className="mb-4 relative group text-left">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2">{label}</label>
-                <div className="relative flex items-center">
-                    <input 
-                        {...props} 
-                        className={`w-full bg-white/5 border rounded-xl px-4 py-3 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-white/10 transition-all ${props.disabled ? 'border-white/5 opacity-40 cursor-not-allowed' : 'border-white/10 group-hover:border-white/30'}`}
-                    />
-                    {showToggle && (
-                        <button 
-                            type="button" 
-                            onClick={toggleAction}
-                            className="absolute right-3 top-0 bottom-0 flex items-center justify-center text-white/40 hover:text-white transition-colors px-2"
-                        >
-                            <i data-lucide={isPasswordVisible ? "eye-off" : "eye"} style={{ width: 18, height: 18 }}></i>
-                        </button>
-                    )}
+  return (
+    <div className={`min-h-screen flex flex-col md:flex-row font-sans ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-orange-50 text-slate-900'}`}>
+      <aside className={`w-full md:w-80 p-8 border-r-2 flex flex-col ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+        <div className="flex items-center space-x-4 mb-12">
+          <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+            <Wallet size={24} />
+          </div>
+          <span className="font-black text-2xl text-orange-500 tracking-tighter italic">JAJAN Gen-Z</span>
+        </div>
+
+        <nav className="flex-1 space-y-2">
+          <button onClick={()=>setView('pos')} className={`w-full flex items-center space-x-4 p-5 rounded-3xl font-black transition-all ${view === 'pos' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+            <ShoppingCart size={22}/> <span className="text-sm">TRANSAKSI</span>
+          </button>
+          {user?.role === 'admin' && (
+            <button onClick={()=>setView('inventory')} className={`w-full flex items-center space-x-4 p-5 rounded-3xl font-black transition-all ${view === 'inventory' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+              <Package size={22}/> <span className="text-sm">STOK & MENU</span>
+            </button>
+          )}
+          <button onClick={()=>setView('reports')} className={`w-full flex items-center space-x-4 p-5 rounded-3xl font-black transition-all ${view === 'reports' ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20' : 'opacity-40 hover:opacity-100'}`}>
+            <History size={22}/> <span className="text-sm">LAPORAN</span>
+          </button>
+        </nav>
+
+        <div className="mt-auto pt-8 border-t border-white/5 space-y-4">
+          <button onClick={()=>setIsDarkMode(!isDarkMode)} className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-800/30">
+             <span className="text-[10px] font-black uppercase opacity-40">Tampilan</span>
+             {isDarkMode ? <Moon size={18} className="text-yellow-400"/> : <Sun size={18} className="text-orange-500"/>}
+          </button>
+          <button onClick={()=>setView('login')} className="w-full flex items-center space-x-4 p-5 text-red-500 font-black hover:bg-red-500/10 rounded-2xl transition-all">
+            <LogOut size={22}/> <span className="text-sm">KELUAR</span>
+          </button>
+        </div>
+      </aside>
+
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+        {view === 'pos' && (
+          <div className="flex flex-col xl:flex-row gap-8 h-full">
+            <div className="flex-1 space-y-8">
+              <header className="flex justify-between items-end">
+                <div>
+                  <h2 className="text-5xl font-black text-orange-500 tracking-tighter uppercase italic">Menu Jajan</h2>
+                  <p className="opacity-40 text-xs font-bold uppercase tracking-widest mt-1">Sapa pelanggan dengan senyum :)</p>
                 </div>
+                <div className="px-5 py-2 bg-orange-500/10 rounded-full text-orange-500 font-black text-xs border border-orange-500/20">
+                  {new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}
+                </div>
+              </header>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-20">
+                {products.map(p => (
+                  <div key={p.id} onClick={()=>p.stock > 0 ? (p.hasVariants ? setVariantModal(p) : addToCart(p, 'Original', p.variants[0].price)) : showNotify("Stok habis!")} 
+                    className={`group cursor-pointer rounded-[45px] border-4 transition-all active:scale-95 overflow-hidden relative shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5 hover:border-orange-500' : 'bg-white border-transparent hover:border-orange-200'} ${p.stock <= 0 ? 'grayscale opacity-60' : ''}`}>
+                    <div className="h-64 relative overflow-hidden">
+                      <img src={p.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={p.name} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                      <div className="absolute bottom-8 left-8">
+                        <span className="text-white text-[10px] font-black bg-orange-500 px-3 py-1 rounded-full uppercase tracking-tighter mb-3 inline-block">{p.category}</span>
+                        <h4 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">{p.name}</h4>
+                      </div>
+                      <div className="absolute top-8 right-8 bg-black/60 backdrop-blur-md px-4 py-2 rounded-2xl text-white font-black text-xs">
+                        {p.stock} TERSEDIA
+                      </div>
+                    </div>
+                    <div className="p-8 flex justify-between items-center">
+                       <p className="text-orange-500 font-black text-2xl italic tracking-tighter">Rp {p.hasVariants ? `${Math.min(...p.variants.map(v=>v.price)).toLocaleString()}` : p.variants[0].price.toLocaleString()}</p>
+                       <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-xl shadow-orange-500/40">
+                          <Plus size={24} strokeWidth={3} />
+                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-        );
 
-        const SelectField = ({ label, options, ...props }) => (
-            <div className="mb-4 group text-left">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2">{label}</label>
-                <div className="relative">
-                    <select 
-                        {...props} 
-                        className={`w-full bg-white/10 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none ${props.disabled ? 'border-white/5 opacity-40 cursor-not-allowed' : 'border-white/10'}`}
-                    >
-                        <option value="">Pilih Opsi</option>
-                        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
-                        <i data-lucide="chevron-down" style={{width: 16}}></i>
+            <div className={`w-full xl:w-[450px] rounded-[55px] p-10 flex flex-col h-[calc(100vh-120px)] sticky top-6 shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+              <div className="flex justify-between items-center mb-10">
+                <h3 className="text-3xl font-black tracking-tighter uppercase italic">Pesanan <span className="text-orange-500 bg-orange-500/10 px-3 py-1 rounded-2xl ml-2">{cart.reduce((s,i)=>s+i.qty,0)}</span></h3>
+                <button onClick={()=>setCart([])} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={24}/></button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-5 pr-2 custom-scrollbar">
+                {cart.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center opacity-10 text-center font-black">
+                    <ReceiptText size={80} className="mb-6" />
+                    <p className="uppercase text-xl tracking-widest">Keranjang Kosong</p>
+                  </div>
+                ) : (
+                  cart.map(i => (
+                    <div key={i.cartId} className={`flex items-center p-5 rounded-[30px] border-2 ${isDarkMode ? 'bg-white/5 border-transparent' : 'bg-orange-50 border-orange-100'}`}>
+                      <div className="flex-1">
+                        <p className="font-black text-sm uppercase leading-none mb-1">{i.name}</p>
+                        <p className="text-[10px] font-bold text-orange-500 mb-3 tracking-widest">{i.variant}</p>
+                        <div className="flex items-center space-x-4">
+                          <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:Math.max(0,c.qty-1)}:c).filter(c=>c.qty>0))} className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-500 flex items-center justify-center font-black">-</button>
+                          <span className="font-black text-lg">{i.qty}</span>
+                          <button onClick={()=>setCart(cart.map(c=>c.cartId===i.cartId?{...c,qty:c.qty+1}:c))} className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center font-black shadow-lg shadow-orange-500/30">+</button>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-black text-orange-500 text-lg">{(i.price * i.qty).toLocaleString()}</p>
+                      </div>
                     </div>
+                  ))
+                )}
+              </div>
+
+              <div className="mt-8 pt-8 border-t-4 border-orange-500/10 space-y-8">
+                <div className="flex justify-between items-end">
+                  <span className="text-xs font-black opacity-30 uppercase tracking-[0.2em]">Tagihan</span>
+                  <span className="text-5xl font-black text-orange-500 tracking-tighter">Rp {cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString()}</span>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <button onClick={()=>handleStartCheckout('CASH')} className="p-6 rounded-[30px] bg-slate-800 text-white font-black flex flex-col items-center shadow-lg active:scale-95 transition-all">
+                    <Banknote size={28} className="mb-2 text-orange-500"/> <span className="text-[10px] uppercase tracking-widest">Tunai</span>
+                  </button>
+                  <button onClick={()=>handleStartCheckout('QRIS')} className="p-6 rounded-[30px] bg-orange-500 text-white font-black flex flex-col items-center shadow-xl shadow-orange-500/30 active:scale-95 transition-all">
+                    <Smartphone size={28} className="mb-2"/> <span className="text-[10px] uppercase tracking-widest">QRIS / E-Wallet</span>
+                  </button>
+                </div>
+              </div>
             </div>
-        );
+          </div>
+        )}
 
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [view, setView] = useState('dashboard');
-            const [loading, setLoading] = useState(false);
-            const [dataArsip, setDataArsip] = useState([]);
-            const [dataCOPM, setDataCOPM] = useState([]);
-            const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-            const [showPassword, setShowPassword] = useState(false);
-            const [error, setError] = useState('');
-            const [submitting, setSubmitting] = useState(false);
-            const [searchQueryArsip, setSearchQueryArsip] = useState('');
-            const [searchQueryCOPM, setSearchQueryCOPM] = useState('');
-            const [showDeleteModal, setShowDeleteModal] = useState(null);
-            const [sortBy, setSortBy] = useState('terbaru');
+        {view === 'inventory' && (
+          <div className="max-w-6xl mx-auto space-y-12 pb-20">
+            <header className="flex justify-between items-end">
+              <div>
+                <h2 className="text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Gudang Menu</h2>
+                <p className="opacity-40 font-bold uppercase text-xs tracking-[0.3em] mt-2">Update stok dan jajanan baru</p>
+              </div>
+              <button onClick={()=>{setEditingProduct(null); setIsMenuModalOpen(true)}} className="bg-orange-500 text-white px-10 py-5 rounded-[30px] font-black shadow-xl shadow-orange-500/20 active:scale-95 transition-all flex items-center uppercase tracking-widest text-sm">
+                <Plus size={24} className="mr-3"/> Tambah Menu
+              </button>
+            </header>
 
-            const [formArsip, setFormArsip] = useState({
-                tglTerima: '', noSurat: '', tglSurat: '', asal: '', perihal: '', diteruskan: '', kode: '', file: null
-            });
-
-            const [formCOPM, setFormCOPM] = useState({
-                noSurat: '', judul: '', linkDocs: '', owner: '', tglIsi: '', deadline: '', status: 'Draft', notes: '', linkPdf: ''
-            });
-
-            const DEPARTEMEN_LIST = ["BEM Fahutan", "Ketua BEM", "Sekretaris", "Bendahara", "Koordinator Bidang", "Badan Manajemen Internal", "Biro Research and Development", "Biro Media and Digital Information", "Departemen Advokasi dan Kesejahteraan Mahasiswa", "Departemen Konektivitas Eksternal", "Departemen Ekonomi Kreatif", "Departemen Human Resource and Development", "Departemen Akademik dan Prestasi", "Departemen Seni dan Budaya", "Departemen Olahraga", "Departemen Sosial Lingkungan dan Kehutanan", "Departemen Kajian dan Aksi Strategis"];
-            const KODE_ARSIP = ["INT", "ORM", "UKM", "BEM", "DTM", "FAK", "IPB", "EKS", "MIT", "MED"];
-            const OWNER_LIST = ["BPH", "MI", "RND", "MENDIGI", "KESTARI", "FINANCE", "KORBID", "KONEK", "ADKESMAH", "EKRAF", "AKPRES", "SENBUD", "HRD", "DEPOR", "SLH", "KASTRAT", "[MP] FORCUP", "[MP] BCR", "[MP] SEMARAK", "[MP] FACT", "[MP] RIMBADES", "Faculty Day"];
-            const STATUS_LIST = ["Draft", "Final", "Revisi"];
-
-            useEffect(() => { lucide.createIcons(); });
-
-            const handleLogin = async (e) => {
-                e.preventDefault();
-                setLoading(true);
-                setError('');
-                
-                // Tambahkan jeda minimal 1.5 detik agar animasi shimmer terlihat
-                const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1500));
-                
-                try {
-                    const fetchLogin = fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'login', payload: loginForm })
-                    });
-                    
-                    const [response] = await Promise.all([fetchLogin, minLoadingTime]);
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        setUser(result.user);
-                    } else {
-                        setError(result.message || 'Username atau password salah.');
-                    }
-                } catch (err) { 
-                    setError('Gagal menyambung ke server.'); 
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const fetchData = useCallback(async () => {
-                if (!user) return;
-                setLoading(true);
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=readAll`);
-                    const result = await response.json();
-                    setDataArsip(result.arsip || []);
-                    setDataCOPM(result.copm || []);
-                } catch (err) { console.error(err); }
-                setLoading(false);
-            }, [user]);
-
-            useEffect(() => { if (user) fetchData(); }, [user, fetchData]);
-
-            const handleSubmitArsip = async (e) => {
-                e.preventDefault();
-                setSubmitting(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'submitArsip', payload: formArsip })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') {
-                        alert("Arsip disimpan.");
-                        setFormArsip({ tglTerima: '', noSurat: '', tglSurat: '', asal: '', perihal: '', diteruskan: '', kode: '', file: null });
-                        fetchData();
-                        setView('data-arsip');
-                    }
-                } catch (err) { alert("Error sistem."); }
-                setSubmitting(false);
-            };
-
-            const handleSubmitCOPM = async (e) => {
-                e.preventDefault();
-                setSubmitting(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'submitCOPM', payload: { ...formCOPM, notes: formCOPM.notes || "" } })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') {
-                        alert("Data COPM diperbarui.");
-                        setFormCOPM({ noSurat: '', judul: '', linkDocs: '', owner: '', tglIsi: '', deadline: '', status: 'Draft', notes: '', linkPdf: '' });
-                        fetchData();
-                        setView('cek-status');
-                    }
-                } catch (err) { alert("Gagal memperbarui data."); }
-                setSubmitting(false);
-            };
-
-            const handleDeleteArsip = async (noSurat) => {
-                setLoading(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'deleteArsip', payload: { noSurat } })
-                    });
-                    const res = await response.json();
-                    if(res.status === 'success') fetchData();
-                } catch (err) { console.error(err); }
-                setShowDeleteModal(null);
-                setLoading(false);
-            };
-
-            const handleEditCOPM = (item) => {
-                setFormCOPM(item);
-                setView('ajukan');
-            };
-
-            // LOGIKA FILTER & SORTIR
-            const filteredArsip = dataArsip.filter(it => 
-                Object.values(it).some(val => String(val).toLowerCase().includes(searchQueryArsip.toLowerCase()))
-            );
-
-            const finalCOPM = useMemo(() => {
-                let list = dataCOPM.map((it, idx) => ({ ...it, dbIndex: idx }));
-
-                if (user && user.role === 'kestari' && user.owner_unit) {
-                    list = list.filter(it => it.owner === user.owner_unit);
-                }
-                
-                if (searchQueryCOPM) {
-                    const q = searchQueryCOPM.toLowerCase();
-                    list = list.filter(it => 
-                        it.judul.toLowerCase().includes(q) || 
-                        it.owner.toLowerCase().includes(q)
-                    );
-                }
-
-                if (sortBy === 'terbaru') {
-                    list.sort((a, b) => b.dbIndex - a.dbIndex);
-                } else if (sortBy === 'judul') {
-                    list.sort((a, b) => a.judul.localeCompare(b.judul));
-                } else if (sortBy === 'owner') {
-                    list.sort((a, b) => a.owner.localeCompare(b.owner));
-                } else if (sortBy === 'status') {
-                    list.sort((a, b) => a.status.localeCompare(b.status));
-                }
-                
-                return list;
-            }, [dataCOPM, user, sortBy, searchQueryCOPM]);
-
-            if (!user) {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative bg-[#060b1d]">
-                        <div className="absolute w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
-                        <GlassCard className="w-full max-w-md border-t-4 border-t-[#193DEB] fade-in">
-                            <div className="text-center mb-10">
-                                <img src={LOGO_URL} alt="Logo" className="h-28 mx-auto mb-6" />
-                                <h1 className="text-2xl font-black uppercase tracking-widest text-white">Sistem Persuratan</h1>
-                                <p className="text-blue-300 text-[10px] mt-2 font-black uppercase tracking-[0.2em]">BEM Fahutan Kabinet Elaborasi Mimpi</p>
-                            </div>
-                            <form onSubmit={handleLogin}>
-                                <InputField label="Username Pengguna" type="text" value={loginForm.username} onChange={e => setLoginForm(p => ({...p, username: e.target.value}))} required placeholder="Username" />
-                                <InputField 
-                                    label="Kata Sandi" 
-                                    type={showPassword ? "text" : "password"} 
-                                    value={loginForm.password} 
-                                    onChange={e => setLoginForm(p => ({...p, password: e.target.value}))} 
-                                    required 
-                                    placeholder="Password"
-                                    showToggle={true}
-                                    isPasswordVisible={showPassword}
-                                    toggleAction={() => setShowPassword(!showPassword)}
-                                />
-                                {error && <div className="text-red-400 text-[10px] mb-6 flex items-center gap-2 font-bold"><i data-lucide="alert-circle" style={{width: 14}}></i> {error}</div>}
-                                <button 
-                                    disabled={loading} 
-                                    className={`w-full py-4 bg-[#193DEB] hover:bg-blue-600 text-white font-black rounded-2xl transition-all shadow-lg flex justify-center items-center gap-3 ${loading ? 'shimmer-btn opacity-80 cursor-wait' : 'active:scale-95'}`}
-                                >
-                                    {loading ? <i data-lucide="loader" className="animate-spin"></i> : <i data-lucide="log-in"></i>}
-                                    {loading ? "MEMPROSES AKSES..." : "MASUK KE SISTEM"}
-                                </button>
-                            </form>
-                        </GlassCard>
-                        <div className="mt-10 text-white/20 text-[9px] font-black uppercase tracking-[0.4em]">&copy; Sekretaris Eksekutif</div>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="min-h-screen flex flex-col md:flex-row bg-[#0a1128]">
-                    {/* Sidebar */}
-                    <div className="w-full md:w-72 bg-black/50 backdrop-blur-3xl border-r border-white/10 p-6 flex flex-col shrink-0 h-screen overflow-y-auto text-left">
-                        
-                        <div className="mb-8 p-5 rounded-3xl bg-white/5 border border-white/10 shadow-xl">
-                            <div className="flex items-center gap-4 mb-5 text-left">
-                                <div className="bg-[#193DEB] w-12 h-12 rounded-2xl font-black flex items-center justify-center text-white text-xl">U</div>
-                                <div className="truncate flex-1 text-left">
-                                    <b className="text-white text-xs uppercase tracking-tighter block truncate">{user.nama_lengkap}</b>
-                                    <span className="opacity-40 font-bold uppercase text-[9px] block truncate text-left">{user.biro_departemen}</span>
-                                </div>
-                            </div>
-                            <button onClick={() => setUser(null)} className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-black rounded-xl transition-all text-[10px] border border-red-500/20 tracking-widest uppercase">
-                                <i data-lucide="log-out" style={{width: 12}}></i> Logout Sistem
-                            </button>
+            <div className={`rounded-[50px] border-4 overflow-hidden shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-orange-500 text-white font-black text-[11px] uppercase tracking-[0.2em]">
+                  <tr>
+                    <th className="px-10 py-7">Item Menu</th>
+                    <th className="px-10 py-7 text-center">Stok Harian</th>
+                    <th className="px-10 py-7">Harga Awal</th>
+                    <th className="px-10 py-7 text-center">Tindakan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y-4 divide-white/5 font-bold">
+                  {products.map(p => (
+                    <tr key={p.id} className="hover:bg-white/5 transition-colors group">
+                      <td className="px-10 py-8 flex items-center space-x-6">
+                        <img src={p.image} className="w-16 h-16 rounded-[20px] object-cover shadow-xl group-hover:scale-110 transition-transform" />
+                        <div>
+                           <p className="text-xl font-black uppercase tracking-tight">{p.name}</p>
+                           <p className="text-[10px] opacity-40 uppercase">{p.category}</p>
                         </div>
-
-                        <div className="mb-10 flex items-center gap-3 px-3">
-                            <img src={LOGO_URL} className="h-9" alt="Logo" />
-                            <div className="text-xs font-black leading-tight uppercase tracking-tighter italic text-white">ELABORASI<br/><span className="text-blue-500 not-italic">MIMPI</span></div>
+                      </td>
+                      <td className="px-10 py-8 text-center">
+                        <div className={`inline-block px-5 py-2 rounded-2xl text-2xl ${p.stock < 10 ? 'bg-red-500/10 text-red-500 font-black' : 'bg-orange-500/10 text-orange-500'}`}>
+                           {p.stock}
                         </div>
-
-                        <nav className="flex-1 space-y-2 font-bold text-sm">
-                            <button onClick={() => setView('dashboard')} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all ${view === 'dashboard' ? 'bg-[#193DEB] text-white shadow-lg shadow-blue-900/40' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="layout-dashboard" style={{width: 18}}></i> Dashboard
-                            </button>
-                            {user.role === 'admin' && (
-                                <>
-                                    <div className="pt-6 pb-2 px-5 text-[10px] font-black text-gray-500 uppercase tracking-widest opacity-40">Pengarsipan</div>
-                                    <button onClick={() => setView('arsipkan')} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all ${view === 'arsipkan' ? 'bg-[#193DEB] text-white' : 'hover:bg-white/5 text-gray-400'}`}>
-                                        <i data-lucide="archive" style={{width: 18}}></i> Arsipkan Surat
-                                    </button>
-                                    <button onClick={() => setView('data-arsip')} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all ${view === 'data-arsip' ? 'bg-[#193DEB] text-white' : 'hover:bg-white/5 text-gray-400'}`}>
-                                        <i data-lucide="list" style={{width: 18}}></i> Data Surat
-                                    </button>
-                                </>
-                            )}
-                            <div className="pt-6 pb-2 px-5 text-[10px] font-black text-gray-500 uppercase tracking-widest opacity-40">COPM Surat</div>
-                            <button onClick={() => setView('ajukan')} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all ${view === 'ajukan' ? 'bg-[#193DEB] text-white' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="plus-circle" style={{width: 18}}></i> Ajukan Surat
-                            </button>
-                            <button onClick={() => setView('cek-status')} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all ${view === 'cek-status' ? 'bg-[#193DEB] text-white' : 'hover:bg-white/5 text-gray-400'}`}>
-                                <i data-lucide="shield-check" style={{width: 18}}></i> Cek Status
-                            </button>
-                        </nav>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 p-6 md:p-12 overflow-y-auto h-screen bg-[#080d21]">
-                        {view === 'dashboard' && (
-                            <div className="fade-in text-left">
-                                <h2 className="text-4xl font-black mb-10 italic uppercase tracking-tighter text-left">Dashboard Utama</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <GlassCard className="border-l-8 border-l-blue-600 py-12 flex justify-between items-center text-left">
-                                        <div>
-                                            <p className="text-[11px] font-black uppercase text-blue-400 mb-2">Arsip Surat Masuk</p>
-                                            <h3 className="text-7xl font-black tracking-tighter">{dataArsip.length}</h3>
-                                        </div>
-                                        <i data-lucide="archive" className="opacity-10 scale-150 mr-4" style={{width: 80, height: 80}}></i>
-                                    </GlassCard>
-                                    <GlassCard className="border-l-8 border-l-indigo-600 py-12 flex justify-between items-center text-left">
-                                        <div>
-                                            <p className="text-[11px] font-black uppercase text-indigo-400 mb-2">Surat Keluar (COPM)</p>
-                                            <h3 className="text-7xl font-black tracking-tighter">{dataCOPM.length}</h3>
-                                        </div>
-                                        <i data-lucide="file-text" className="opacity-10 scale-150 mr-4" style={{width: 80, height: 80}}></i>
-                                    </GlassCard>
-                                </div>
-                            </div>
-                        )}
-
-                        {view === 'arsipkan' && (
-                            <div className="max-w-4xl mx-auto fade-in">
-                                <h2 className="text-2xl font-black mb-8 uppercase flex items-center gap-4 italic text-left"><i data-lucide="archive" className="text-blue-400"></i> Arsipkan Surat</h2>
-                                <GlassCard>
-                                    <form onSubmit={handleSubmitArsip} className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                                        <InputField label="Tgl Terima" type="date" value={formArsip.tglTerima} onChange={e => setFormArsip(p => ({...p, tglTerima: e.target.value}))} required />
-                                        <InputField label="Nomor Surat" type="text" value={formArsip.noSurat} onChange={e => setFormArsip(p => ({...p, noSurat: e.target.value}))} required placeholder="Nomor Surat" />
-                                        <InputField label="Tgl Surat" type="date" value={formArsip.tglSurat} onChange={e => setFormArsip(p => ({...p, tglSurat: e.target.value}))} required />
-                                        <InputField label="Asal Pengirim" type="text" value={formArsip.asal} onChange={e => setFormArsip(p => ({...p, asal: e.target.value}))} required placeholder="Asal Instansi" />
-                                        <div className="md:col-span-2"><InputField label="Perihal" type="text" value={formArsip.perihal} onChange={e => setFormArsip(p => ({...p, perihal: e.target.value}))} required placeholder="Perihal" /></div>
-                                        <SelectField label="Diteruskan Ke" options={DEPARTEMEN_LIST} value={formArsip.diteruskan} onChange={e => setFormArsip(p => ({...p, diteruskan: e.target.value}))} required />
-                                        <SelectField label="Kode" options={KODE_ARSIP} value={formArsip.kode} onChange={e => setFormArsip(p => ({...p, kode: e.target.value}))} required />
-                                        <div className="md:col-span-2 mb-8">
-                                            <div className="border-2 border-dashed border-white/10 p-12 rounded-3xl text-center relative group bg-white/5">
-                                                <input type="file" accept=".pdf" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={e => {
-                                                    const f = e.target.files[0];
-                                                    const r = new FileReader();
-                                                    r.onload = () => setFormArsip(p => ({...p, file: { base64: r.result.split(',')[1], name: f.name, type: f.type }}));
-                                                    r.readAsDataURL(f);
-                                                }} />
-                                                {formArsip.file ? <span className="text-green-400 font-black">{formArsip.file.name}</span> : <span className="opacity-30 font-black">UNGGAH BERKAS PDF</span>}
-                                            </div>
-                                        </div>
-                                        <button disabled={submitting} className="bg-[#193DEB] hover:bg-blue-600 px-10 py-4 rounded-2xl font-black uppercase shadow-2xl transition-all">SIMPAN ARSIP</button>
-                                    </form>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'data-arsip' && (
-                            <div className="fade-in">
-                                <div className="flex justify-between items-center mb-10 gap-6 text-left">
-                                    <h2 className="text-2xl font-black uppercase italic text-left">Database Arsip</h2>
-                                    <input className="bg-white/5 border border-white/10 rounded-2xl px-6 py-3 text-sm w-full md:w-96 outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="Cari data..." value={searchQueryArsip} onChange={e => setSearchQueryArsip(e.target.value)} />
-                                </div>
-                                <GlassCard className="p-0 overflow-hidden">
-                                    <div className="overflow-x-auto text-left">
-                                        <table className="w-full text-left text-[11px] whitespace-nowrap">
-                                            <thead className="bg-white/5 font-black uppercase tracking-widest text-blue-200">
-                                                <tr>
-                                                    <th className="px-8 py-6 border-r border-white/5">No. Surat</th>
-                                                    <th className="px-8 py-4 border-r border-white/5 text-left">Asal</th>
-                                                    <th className="px-8 py-4 border-r border-white/5 text-left">Perihal</th>
-                                                    <th className="px-8 py-4 text-center">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {filteredArsip.map((it, i) => (
-                                                    <tr key={i} className="hover:bg-white/[0.04] transition-colors">
-                                                        <td className="px-8 py-6 font-mono font-black text-blue-400">{it.noSurat}</td>
-                                                        <td className="px-8 py-6 font-bold">{it.asal}</td>
-                                                        <td className="px-8 py-6 truncate max-w-xs">{it.perihal}</td>
-                                                        <td className="px-8 py-6 flex justify-center gap-4">
-                                                            {it.fileUrl && <a href={it.fileUrl} target="_blank" className="bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-lg font-black"><i data-lucide="file-text" style={{width: 14}}></i></a>}
-                                                            <button onClick={() => setShowDeleteModal(it.noSurat)} className="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg font-black"><i data-lucide="trash-2" style={{width: 14}}></i></button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'ajukan' && (
-                            <div className="max-w-4xl mx-auto fade-in">
-                                <h2 className="text-2xl font-black mb-8 uppercase flex items-center gap-4 italic text-left"><i data-lucide="file-plus" className="text-indigo-400"></i> Form COPM</h2>
-                                <GlassCard>
-                                    <form onSubmit={handleSubmitCOPM} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 text-left">
-                                        <InputField label="Nomor Surat" type="text" value={formCOPM.noSurat} onChange={e => setFormCOPM(p => ({...p, noSurat: e.target.value}))} disabled={user.role !== 'admin'} placeholder="Input Admin" />
-                                        <InputField label="Judul Surat" type="text" value={formCOPM.judul} onChange={e => setFormCOPM(p => ({...p, judul: e.target.value}))} required placeholder="Nama Surat" />
-                                        <InputField label="Link Docs" type="url" value={formCOPM.linkDocs} onChange={e => setFormCOPM(p => ({...p, linkDocs: e.target.value}))} required placeholder="https://..." />
-                                        <SelectField label="Owner" options={OWNER_LIST} value={formCOPM.owner} onChange={e => setFormCOPM(p => ({...p, owner: e.target.value}))} required />
-                                        <InputField label="Tgl Isi" type="date" value={formCOPM.tglIsi} onChange={e => setFormCOPM(p => ({...p, tglIsi: e.target.value}))} required />
-                                        <InputField label="Deadline" type="date" value={formCOPM.deadline} onChange={e => setFormCOPM(p => ({...p, deadline: e.target.value}))} required />
-                                        {user.role === 'admin' ? (
-                                            <>
-                                                <SelectField label="Status" options={STATUS_LIST} value={formCOPM.status} onChange={e => setFormCOPM(p => ({...p, status: e.target.value}))} />
-                                                <InputField label="Link PDF Final" type="url" value={formCOPM.linkPdf} onChange={e => setFormCOPM(p => ({...p, linkPdf: e.target.value}))} placeholder="Link Berkas" />
-                                            </>
-                                        ) : (
-                                            <div className="mb-4 bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 text-left">
-                                                <p className="text-[10px] font-black uppercase text-blue-300 text-left">Status Saat Ini</p>
-                                                <span className="font-black uppercase text-lg tracking-tighter text-left">{formCOPM.status || 'Draft'}</span>
-                                            </div>
-                                        )}
-                                        <div className="md:col-span-2"><InputField label="Notes" type="text" value={formCOPM.notes} onChange={e => setFormCOPM(p => ({...p, notes: e.target.value}))} placeholder="Info tambahan" /></div>
-                                        <button disabled={submitting} className="bg-[#193DEB] hover:bg-blue-600 px-12 py-4 rounded-2xl font-black uppercase shadow-lg w-full md:w-auto text-xs tracking-widest text-left">KONFIRMASI PENGAJUAN</button>
-                                    </form>
-                                </GlassCard>
-                            </div>
-                        )}
-
-                        {view === 'cek-status' && (
-                            <div className="fade-in">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 text-left">
-                                    <h2 className="text-2xl font-black uppercase italic flex items-center gap-4 text-left"><i data-lucide="shield-check" className="text-blue-400"></i> Status COPM</h2>
-                                    <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto text-left">
-                                        <div className="relative text-left">
-                                            <i data-lucide="search" className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" style={{width:16}}></i>
-                                            <input className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-2.5 text-[11px] w-full md:w-64 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold" placeholder={user.role === 'admin' ? "Cari Biro/Judul..." : "Cari Judul..."} value={searchQueryCOPM} onChange={e => setSearchQueryCOPM(e.target.value)} />
-                                        </div>
-                                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-2 text-left">
-                                            <span className="text-[10px] font-black uppercase opacity-40">Sortir:</span>
-                                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent text-[11px] font-black uppercase outline-none cursor-pointer text-blue-400">
-                                                <option value="terbaru">Terbaru</option>
-                                                <option value="judul">Judul (A-Z)</option>
-                                                <option value="owner">Owner (A-Z)</option>
-                                                <option value="status">Status (A-Z)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <GlassCard className="p-0 overflow-hidden">
-                                    <div className="overflow-x-auto text-left">
-                                        <table className="w-full text-left text-[11px] whitespace-nowrap">
-                                            <thead className="bg-white/5 font-black uppercase tracking-widest text-indigo-200">
-                                                <tr>
-                                                    <th className="px-8 py-6 border-r border-white/5 text-left">Pengajuan</th>
-                                                    <th className="px-8 py-6 border-r border-white/5 text-left">Owner</th>
-                                                    <th className="px-8 py-6 border-r border-white/5 text-center">Status</th>
-                                                    <th className="px-8 py-6 text-center text-left text-xs">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5 text-left">
-                                                {finalCOPM.map((it, i) => (
-                                                    <tr key={i} className="hover:bg-white/[0.04] transition-colors text-left">
-                                                        <td className="px-8 py-6 text-left">
-                                                            <div className="font-black text-white uppercase text-xs tracking-tighter text-left">{it.judul}</div>
-                                                            <div className="text-[9px] opacity-40 font-mono italic mt-1 text-left">
-                                                                {it.tglIsi || '-'} | {it.noSurat ? it.noSurat : "menunggu admin"}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-8 py-6 font-bold text-gray-400 text-left uppercase">{it.owner}</td>
-                                                        <td className="px-8 py-6 text-center">
-                                                            <span className={`px-4 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest border ${it.status === 'Final' ? 'bg-green-500/10 text-green-400 border-green-500/20' : it.status === 'Revisi' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>{it.status || 'Draft'}</span>
-                                                        </td>
-                                                        <td className="px-8 py-6 flex justify-center gap-4 text-left">
-                                                            <a href={it.linkDocs} target="_blank" className="p-2.5 bg-white/5 hover:bg-white/15 rounded-xl text-blue-400 transition-all border border-white/10" title="DOCS"><i data-lucide="file-text" style={{width: 16}}></i></a>
-                                                            <button onClick={() => handleEditCOPM(it)} className="p-2.5 bg-white/5 hover:bg-white/15 rounded-xl text-indigo-400 transition-all border border-white/10" title="EDIT"><i data-lucide="edit-3" style={{width: 16}}></i></button>
-                                                            {it.linkPdf && <a href={it.linkPdf} target="_blank" className="p-2.5 bg-green-500/10 hover:bg-green-500/20 rounded-xl text-green-400 transition-all border border-green-500/20" title="PDF"><i data-lucide="file-check" style={{width: 16}}></i></a>}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </GlassCard>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Modal Hapus */}
-                    {showDeleteModal && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 fade-in">
-                            <GlassCard className="max-w-md w-full text-center border-t-8 border-t-red-600 shadow-2xl text-left">
-                                <i data-lucide="alert-triangle" className="mx-auto text-red-500 mb-6" style={{width: 60, height: 60}}></i>
-                                <h3 className="text-xl font-black mb-3 text-white uppercase tracking-tighter text-left">Konfirmasi Hapus</h3>
-                                <p className="text-[11px] text-gray-400 mb-10 font-bold px-8 leading-relaxed uppercase text-left">Hapus arsip nomor: <span className="text-red-400 font-black">{showDeleteModal}</span>?</p>
-                                <div className="flex gap-4 px-4 text-left">
-                                    <button onClick={() => setShowDeleteModal(null)} className="flex-1 py-4 rounded-2xl bg-white/5 font-black uppercase text-[10px] border border-white/10 text-left">BATAL</button>
-                                    <button onClick={() => handleDeleteArsip(showDeleteModal)} className="flex-1 py-4 rounded-2xl bg-red-600 font-black uppercase text-[10px] text-white text-left">HAPUS DATA</button>
-                                </div>
-                            </GlassCard>
+                      </td>
+                      <td className="px-10 py-8 text-xl text-orange-500 font-black tracking-tighter italic">Rp {p.variants[0].price.toLocaleString()}</td>
+                      <td className="px-10 py-8">
+                        <div className="flex justify-center space-x-3">
+                          <button onClick={()=>{setEditingProduct(p); setIsMenuModalOpen(true)}} className="p-4 bg-slate-800 rounded-3xl text-yellow-400 hover:scale-110 transition-all shadow-lg"><Edit3 size={20}/></button>
+                          <button onClick={()=>setDeleteConfirm(p)} className="p-4 bg-red-500/10 rounded-3xl text-red-500 hover:scale-110 transition-all shadow-lg"><Trash2 size={20}/></button>
                         </div>
-                    )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {view === 'reports' && (
+          <div className="max-w-6xl mx-auto space-y-12">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+              <div>
+                <h2 className="text-6xl font-black text-orange-500 tracking-tighter uppercase italic">Laporan</h2>
+                <p className="opacity-40 font-bold uppercase text-xs tracking-[0.3em] mt-2">Cek hasil cuan jualanmu</p>
+              </div>
+              <div className="flex gap-4">
+                <div className={`flex items-center px-8 py-4 rounded-[30px] border-4 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                  <Calendar size={22} className="text-orange-500 mr-4" />
+                  <input type="date" className="bg-transparent outline-none font-black text-sm" value={filterDate} onChange={e=>setFilterDate(e.target.value)} />
                 </div>
-            );
-        };
+                <button className="bg-green-600 text-white px-8 py-4 rounded-[30px] font-black shadow-xl hover:bg-green-700 active:scale-95 transition-all text-sm uppercase tracking-widest">Download Data</button>
+              </div>
+            </header>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+               <div className={`p-12 rounded-[50px] border-4 shadow-2xl relative overflow-hidden ${isDarkMode ? 'bg-orange-500/10 border-orange-500/20' : 'bg-orange-500 border-orange-500 text-white'}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.3em] opacity-60 mb-3">Total Omzet Harian</p>
+                  <h3 className="text-6xl font-black tracking-tighter italic">Rp {dailyTotal.toLocaleString()}</h3>
+                  <ArrowUpRight className="absolute top-10 right-10 opacity-20" size={64}/>
+               </div>
+               <div className={`p-12 rounded-[50px] border-4 shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30 mb-3">Pesanan Sukses</p>
+                  <h3 className="text-6xl font-black tracking-tighter italic">{filteredTransactions.length} <span className="text-2xl opacity-30 font-normal">Selesai</span></h3>
+               </div>
+            </div>
+
+            <div className={`rounded-[50px] border-4 overflow-hidden shadow-2xl ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-100'}`}>
+               <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
+                  {filteredTransactions.length === 0 ? (
+                    <div className="py-40 text-center opacity-10 font-black italic text-4xl uppercase tracking-tighter">Belum Ada Transaksi</div>
+                  ) : (
+                    <table className="w-full text-left">
+                      <thead className={`sticky top-0 font-black text-[11px] uppercase tracking-widest ${isDarkMode ? 'bg-slate-800' : 'bg-orange-50 text-orange-500'}`}>
+                        <tr>
+                          <th className="px-10 py-6 border-b-2 border-white/5">Waktu</th>
+                          <th className="px-10 py-6 border-b-2 border-white/5">Item Pesanan</th>
+                          <th className="px-10 py-6 border-b-2 border-white/5">Metode</th>
+                          <th className="px-10 py-6 text-right border-b-2 border-white/5">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y-2 divide-white/5 font-bold text-sm">
+                        {filteredTransactions.map(t => (
+                          <tr key={t.id} className="hover:bg-white/5 transition-colors">
+                            <td className="px-10 py-8 opacity-40 font-mono">{t.time}</td>
+                            <td className="px-10 py-8 leading-relaxed">{t.items}</td>
+                            <td className="px-10 py-8"><span className="px-4 py-2 bg-slate-800 text-orange-400 rounded-xl text-[10px] font-black uppercase tracking-widest">{t.paymentMethod}</span></td>
+                            <td className="px-10 py-8 text-right text-orange-500 font-black text-lg italic">Rp {t.total.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+               </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {paymentModal && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-6">
+          <div className={`w-full max-w-3xl rounded-[60px] border-4 p-12 overflow-hidden relative animate-in zoom-in ${isDarkMode ? 'bg-slate-900 border-orange-500/20' : 'bg-white border-orange-100'}`}>
+            <div className="flex justify-between items-start mb-10">
+              <div>
+                <h3 className="text-4xl font-black text-orange-500 uppercase tracking-tighter italic">Pembayaran</h3>
+                <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Selesaikan pesanan pelanggan</p>
+              </div>
+              <button onClick={()=>setPaymentModal(null)} className="p-4 bg-red-500/10 text-red-500 rounded-3xl"><X size={28}/></button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-6">
+                 <div className="p-8 rounded-[40px] bg-slate-800/40 border-2 border-white/5 shadow-inner">
+                    <p className="text-[10px] font-black uppercase opacity-30 mb-3 tracking-widest">Cara Bayar</p>
+                    <div className="flex items-center text-2xl font-black text-orange-500 uppercase italic tracking-tighter">
+                       {paymentModal.type === 'CASH' ? <Banknote className="mr-4" size={32}/> : <Smartphone className="mr-4" size={32}/>}
+                       {paymentModal.type === 'CASH' ? 'Tunai / Cash' : 'QRIS / E-Wallet'}
+                    </div>
+                 </div>
+                 <div className="p-8 rounded-[40px] bg-orange-500/10 border-2 border-orange-500/30">
+                    <p className="text-[10px] font-black uppercase opacity-30 mb-3 tracking-widest">Total Tagihan</p>
+                    <div className="text-5xl font-black text-orange-500 tracking-tighter italic">Rp {paymentModal.total.toLocaleString()}</div>
+                 </div>
+                 
+                 {paymentModal.type === 'CASH' && (
+                   <div className="space-y-6">
+                      <div>
+                        <label className="text-[11px] font-black uppercase opacity-40 ml-2 mb-3 block tracking-widest">Uang Diterima (Rp)</label>
+                        <input type="number" autoFocus className="w-full px-8 py-5 rounded-[30px] bg-slate-800 border-4 border-orange-500 outline-none text-4xl font-black tracking-tighter" placeholder="0" value={cashReceived} onChange={e=>setCashReceived(e.target.value)} />
+                      </div>
+                      {parseInt(cashReceived) >= paymentModal.total && (
+                        <div className="p-7 rounded-[35px] bg-green-500/10 border-2 border-green-500/30 animate-in slide-in-from-bottom-10">
+                           <p className="text-[10px] font-black uppercase opacity-40 mb-1 tracking-widest">Kembalian</p>
+                           <p className="text-3xl font-black text-green-500 italic tracking-tighter">Rp {(parseInt(cashReceived) - paymentModal.total).toLocaleString()}</p>
+                        </div>
+                      )}
+                   </div>
+                 )}
+              </div>
+
+              <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[50px] shadow-2xl relative">
+                 {paymentModal.type === 'QRIS' ? (
+                   <div className="text-center">
+                    <img src="https://i.ibb.co.com/rfH4wLBj/qris.jpg" className="w-full max-w-[280px] object-contain rounded-xl shadow-lg mb-6" alt="QRIS" />
+                    <p className="text-slate-900 font-black text-sm uppercase tracking-widest">Scan QR Untuk Bayar</p>
+                    <p className="text-slate-400 text-[10px] mt-1 font-bold">Pastikan Nominal Sesuai Tagihan</p>
+                   </div>
+                 ) : (
+                   <div className="text-center p-10 opacity-20">
+                      <Banknote size={100} className="text-slate-900 mb-6 mx-auto" />
+                      <p className="text-slate-900 font-black text-lg leading-tight uppercase italic">Terima Tunai Dari<br/>Pelanggan</p>
+                   </div>
+                 )}
+              </div>
+            </div>
+
+            <button 
+              disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)}
+              onClick={finalizeTransaction}
+              className={`w-full py-6 rounded-[35px] font-black text-2xl mt-12 transition-all uppercase tracking-tighter shadow-2xl italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed' : 'bg-orange-500 text-white shadow-orange-500/40 hover:scale-[1.02] active:scale-95'}`}
+            >
+              SIMPAN & SELESAIKAN
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isSuccessModal && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[300] flex items-center justify-center p-6">
+           <div className="w-full max-w-sm p-14 bg-slate-900 rounded-[60px] border-4 border-green-500/30 text-center animate-in zoom-in">
+              <div className="w-28 h-28 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-green-500/30"><CheckCircle2 size={56} strokeWidth={3}/></div>
+              <h3 className="text-4xl font-black mb-2 uppercase italic tracking-tighter text-white">Sukses!</h3>
+              <p className="opacity-40 text-xs font-bold mb-12 uppercase tracking-[0.2em]">Data Sinkron ke Cloud</p>
+              <button onClick={()=>setIsSuccessModal(false)} className="w-full bg-green-500 text-white font-black py-6 rounded-[35px] shadow-2xl shadow-green-500/30 uppercase tracking-widest active:scale-95 transition-all">Lanjut Jualan</button>
+           </div>
+        </div>
+      )}
+
+      {isMenuModalOpen && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[200] flex items-center justify-center p-6">
+          <div className={`w-full max-w-2xl p-12 rounded-[60px] border-4 shadow-2xl animate-in zoom-in ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-orange-200'}`}>
+            <div className="flex justify-between items-center mb-12">
+              <h3 className="text-4xl font-black text-orange-500 tracking-tighter uppercase italic leading-none">{editingProduct ? 'Edit Menu' : 'Tambah Menu'}</h3>
+              <button onClick={()=>setIsMenuModalOpen(false)} className="p-4 hover:bg-red-500 hover:text-white rounded-3xl transition-all shadow-lg"><X size={32}/></button>
+            </div>
+            <form onSubmit={handleSaveMenu} className="grid grid-cols-2 gap-8">
+              <div className="col-span-2">
+                <label className="text-[11px] font-black uppercase opacity-40 mb-3 block tracking-widest ml-1">Nama Jajanan</label>
+                <input name="name" defaultValue={editingProduct?.name} required className="w-full px-8 py-5 rounded-[30px] bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-xl tracking-tight" />
+              </div>
+              <div className="col-span-2">
+                <label className="text-[11px] font-black uppercase opacity-40 mb-3 block tracking-widest ml-1">Kategori Menu</label>
+                <select name="category" defaultValue={editingProduct?.category} className="w-full px-8 py-5 rounded-[30px] bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold appearance-none text-lg">
+                   <option value="SOSTANG">SOSTANG</option>
+                   <option value="MOZARELLA">MOZARELLA</option>
+                   <option value="French Fries">French Fries</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] font-black uppercase opacity-40 mb-3 block tracking-widest ml-1">Harga Dasar (Rp)</label>
+                <input name="price" type="number" defaultValue={editingProduct?.variants[0].price} required className="w-full px-8 py-5 rounded-[30px] bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-xl" />
+              </div>
+              <div>
+                <label className="text-[11px] font-black uppercase opacity-40 mb-3 block tracking-widest ml-1">Stok Awal</label>
+                <input name="stock" type="number" defaultValue={editingProduct?.stock} required className="w-full px-8 py-5 rounded-[30px] bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-xl" />
+              </div>
+              <div className="col-span-2">
+                 <label className="text-[11px] font-black uppercase opacity-40 mb-3 block tracking-widest ml-1">Link URL Foto</label>
+                 <input name="image" defaultValue={editingProduct?.image} placeholder="Masukkan URL Foto (https://...)" className="w-full px-8 py-5 rounded-[30px] bg-slate-800/50 border-2 border-transparent focus:border-orange-500 outline-none font-bold text-xs" />
+              </div>
+              <button className="col-span-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-6 rounded-[35px] shadow-2xl active:scale-95 transition-all mt-6 text-2xl uppercase tracking-tighter italic">Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {variantModal && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-6">
+          <div className={`w-full max-w-xl p-14 rounded-[65px] border-4 animate-in zoom-in ${isDarkMode ? 'bg-slate-900 border-orange-500/20 shadow-orange-500/10' : 'bg-white border-orange-200'}`}>
+             <header className="flex justify-between items-center mb-12">
+               <div>
+                <h3 className="text-5xl font-black text-orange-500 uppercase tracking-tighter italic leading-none">{variantModal.name}</h3>
+                <p className="text-[10px] font-black uppercase opacity-30 mt-3 tracking-widest ml-1">Tentukan Porsi Pelanggan</p>
+               </div>
+               <button onClick={()=>setVariantModal(null)} className="p-4 bg-red-500/10 text-red-500 rounded-3xl"><X size={32}/></button>
+             </header>
+             <div className="space-y-5">
+               {variantModal.variants.map((v, i) => (
+                 <button key={i} onClick={()=>addToCart(variantModal, v.name, v.price)} className={`w-full flex justify-between items-center p-10 rounded-[40px] border-4 transition-all active:scale-[0.97] font-black text-3xl italic tracking-tighter ${isDarkMode ? 'bg-white/5 border-transparent hover:border-orange-500 shadow-xl shadow-black/20' : 'bg-orange-50 border-transparent hover:border-orange-500'}`}>
+                   <span>{v.name}</span>
+                   <span className="text-orange-500">Rp {v.price.toLocaleString()}</span>
+                 </button>
+               ))}
+             </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center p-6">
+           <div className="w-full max-w-md p-12 bg-slate-900 rounded-[55px] border-4 border-red-500/30 text-center animate-in zoom-in shadow-red-500/10 shadow-2xl">
+              <div className="w-24 h-24 bg-red-500/20 text-red-500 rounded-[30px] flex items-center justify-center mx-auto mb-10 shadow-lg"><AlertCircle size={48}/></div>
+              <h3 className="text-3xl font-black mb-3 uppercase tracking-tighter italic text-white">Hapus Menu?</h3>
+              <p className="opacity-40 text-xs font-bold mb-12 uppercase leading-relaxed">Menu <span className="text-red-500 font-black">{deleteConfirm.name}</span> akan hilang dari sistem selamanya.</p>
+              <div className="grid grid-cols-2 gap-5">
+                 <button onClick={()=>setDeleteConfirm(null)} className="py-5 rounded-3xl bg-slate-800 font-black text-[11px] uppercase opacity-40 active:scale-95 transition-all">Batal</button>
+                 <button onClick={()=>{setProducts(products.filter(p=>p.id!==deleteConfirm.id)); setDeleteConfirm(null); showNotify("Dihapus!");}} className="py-5 rounded-3xl bg-red-500 text-white font-black text-[11px] uppercase shadow-xl shadow-red-500/20 active:scale-95 transition-all">Hapus Menu</button>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {notification && (
+        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 px-12 py-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full shadow-[0_20px_50px_rgba(249,115,22,0.4)] z-[500] flex items-center space-x-5 animate-in slide-in-from-bottom-10 uppercase text-xs tracking-widest border-2 border-white/20">
+           <CheckCircle2 size={28}/> <span>{notification}</span>
+        </div>
+      )}
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.2); border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.5); }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoom-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slide-in-from-bottom { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-in { animation-duration: 0.4s; animation-fill-mode: both; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+        .fade-in { animation-name: fade-in; }
+        .zoom-in { animation-name: zoom-in; }
+        .slide-in-from-bottom-10 { animation-name: slide-in-from-bottom; }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
