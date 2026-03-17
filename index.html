@@ -285,7 +285,7 @@
                     <div className="w-full max-w-md p-10 rounded-[55px] bg-slate-900 border-4 border-white/5 shadow-2xl animate-zoom-in text-white text-center">
                         <div className="mb-10 text-orange-500">
                             <div className="inline-flex items-center justify-center w-20 h-20 rounded-[30px] bg-gradient-to-tr from-orange-500 to-yellow-400 mb-6 shadow-2xl text-white"><Icon name="dashboard" size={40} /></div>
-                            <h1 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Jajanan-Z</h1>
+                            <h1 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Jajanan Gen-Z</h1>
                             <p className="opacity-40 mt-1 font-bold uppercase text-[10px] tracking-[0.3em]">Smart Cloud POS</p>
                         </div>
                         <form onSubmit={handleLogin} className="space-y-4 text-left">
@@ -508,7 +508,7 @@
                                         )}
                                     </div>
                                 </div>
-                                <button disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)} onClick={finalizeTransaction} className={`w-full py-8 lg:py-10 rounded-[45px] font-black text-3xl mt-16 transition-all uppercase tracking-tighter shadow-2xl h-28 leading-none uppercase italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed text-slate-400' : 'bg-orange-50 text-white shadow-orange-500/40 hover:scale-[1.01] active:scale-95'}`}>SIMPAN & SELESAIKAN</button>
+                                <button disabled={paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived)} onClick={finalizeTransaction} className={`w-full py-8 lg:py-10 rounded-[45px] font-black text-3xl mt-16 transition-all uppercase tracking-tighter shadow-2xl h-28 leading-none uppercase italic ${paymentModal.type === 'CASH' && (parseInt(cashReceived) < paymentModal.total || !cashReceived) ? 'bg-slate-800 opacity-20 cursor-not-allowed text-slate-400' : 'bg-orange-50 font-black shadow-orange-500/40 hover:scale-[1.01] active:scale-95'}`}>SIMPAN & SELESAIKAN</button>
                             </div>
                         </div>
                     )}
